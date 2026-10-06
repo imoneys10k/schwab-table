@@ -114,6 +114,9 @@ def reexec_in_venv():
     if py.exists() and Path(sys.prefix).resolve() != venv.resolve() and not os.environ.get("SCHWAB_TABLE_REEXEC"):
         os.environ["SCHWAB_TABLE_REEXEC"] = "1"
         sys.stdout.flush()
+        if os.name == "nt":  # os.execv on Windows detaches from the console; wait for the child instead
+            import subprocess
+            sys.exit(subprocess.call([str(py), *sys.argv]))
         os.execv(str(py), [str(py), *sys.argv])
 
 

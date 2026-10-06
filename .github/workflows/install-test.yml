@@ -20,7 +20,7 @@ jobs:
       - name: Install (tarball path, no git)
         run: |
           mkdir -p "$RUNNER_TEMP/nogit"
-          for t in curl tar sh mktemp dirname mkdir ls sed uname rm cat python3; do ln -sf "$(command -v $t)" "$RUNNER_TEMP/nogit/$t"; done
+          for t in curl tar gzip sh mktemp dirname mkdir ls sed uname rm cat python3; do ln -sf "$(command -v $t)" "$RUNNER_TEMP/nogit/$t"; done
           PATH="$RUNNER_TEMP/nogit" /bin/sh ./install.sh --dir "$RUNNER_TEMP/skill-tar/schwab-performance-table"
 
   windows:

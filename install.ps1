@@ -24,8 +24,12 @@ $Target = if ($Dir) { $Dir } else { Join-Path $SkillsRoot $SkillName }
 function Say($m) { Write-Host "==> $m" }
 function Test-Cmd($n) { [bool](Get-Command $n -ErrorAction SilentlyContinue) }
 function Invoke-Checked($exe, [string[]]$arguments) {
-  & $exe @arguments
-  if ($LASTEXITCODE -ne 0) { throw "$exe $($arguments -join ' ') failed (exit code $LASTEXITCODE)" }
+  # Windows PowerShell 5.1 turns native stderr output into terminating errors under
+  # $ErrorActionPreference = "Stop", so relax it just for the native call.
+  $saved = $ErrorActionPreference
+  $ErrorActionPreference = "Continue"
+  try { & $exe @arguments; $code = $LASTEXITCODE } finally { $ErrorActionPreference = $saved }
+  if ($code -ne 0) { throw "$exe $($arguments -join ' ') failed (exit code $code)" }
 }
 
 # 1. Fetch the files -----------------------------------------------------------
@@ -54,20 +58,26 @@ if (Test-Path (Join-Path $Target ".git")) {
 if ($SkipDeps) {
   Say "Skipping Python dependencies (-SkipDeps)"
 } else {
-  $py = $null
-  foreach ($cand in @(@("py", "-3"), @("python"), @("python3"))) {
-    if (Test-Cmd $cand[0]) {
-      $extra = if ($cand.Count -gt 1) { $cand[1..($cand.Count - 1)] } else { @() }
-      & $cand[0] @extra -c "import sys; sys.exit(0 if sys.version_info >= (3, 9) else 1)" 2>$null
-      if ($LASTEXITCODE -eq 0) { $py = $cand; break }
-    }
+  $candidates = @(
+    @{ Exe = "py";      Args = @("-3") },
+    @{ Exe = "python";  Args = @() },
+    @{ Exe = "python3"; Args = @() }
+  )
+  $pyExe = $null
+  $pyArgs = @()
+  foreach ($c in $candidates) {
+    if (-not (Test-Cmd $c.Exe)) { continue }
+    try {
+      Invoke-Checked $c.Exe (@($c.Args) + @("-c", "import sys; sys.exit(0 if sys.version_info >= (3, 9) else 1)")) | Out-Null
+      $pyExe = $c.Exe
+      $pyArgs = @($c.Args)
+      break
+    } catch { }
   }
-  if (-not $py) { throw "Python 3.9+ not found. Install it from https://www.python.org/downloads/ (tick 'Add python.exe to PATH'), or re-run with -SkipDeps." }
-  $pyExe = $py[0]
-  $pyExtra = if ($py.Count -gt 1) { $py[1..($py.Count - 1)] } else { @() }
+  if (-not $pyExe) { throw "Python 3.9+ not found. Install it from https://www.python.org/downloads/ (tick 'Add python.exe to PATH'), or re-run with -SkipDeps." }
 
   Say "Creating virtual environment ($Target\.venv)"
-  Invoke-Checked $pyExe ($pyExtra + @("-m", "venv", (Join-Path $Target ".venv")))
+  Invoke-Checked $pyExe (@($pyArgs) + @("-m", "venv", (Join-Path $Target ".venv")))
   $vpy = Join-Path $Target ".venv\Scripts\python.exe"
   if (-not (Test-Path $vpy)) { $vpy = Join-Path $Target ".venv/bin/python" }  # PowerShell on Linux/macOS
   Say "Installing Playwright"
@@ -79,8 +89,8 @@ if ($SkipDeps) {
   Say "Smoke test: rendering the example table"
   $smoke = Join-Path ([IO.Path]::GetTempPath()) ("schwab-smoke-" + [Guid]::NewGuid())
   New-Item -ItemType Directory -Force -Path $smoke | Out-Null
-  & $vpy (Join-Path $Target "render_table.py") (Join-Path $Target "examples\neural9_spec.json") (Join-Path $smoke "smoke") | Out-Null
-  $ok = ($LASTEXITCODE -eq 0)
+  $ok = $true
+  try { Invoke-Checked $vpy @((Join-Path $Target "render_table.py"), (Join-Path $Target "examples\neural9_spec.json"), (Join-Path $smoke "smoke")) | Out-Null } catch { $ok = $false; Write-Host $_.Exception.Message }
   Remove-Item -Recurse -Force $smoke -ErrorAction SilentlyContinue
   if (-not $ok) { throw "smoke test failed" }
   Say "Render OK"
