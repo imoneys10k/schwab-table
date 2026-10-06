@@ -2,7 +2,7 @@
 
 All notable changes. Versions follow the [releases](https://github.com/imoneys10k/schwab-table/releases) page.
 
-## Unreleased (0.4.0)
+## 0.4.0 (2026-10-07)
 
 ### Added
 - `csv_to_prices.py`: turn your own CSV files (broker exports, Hong Kong / A-share prices, adjusted closes) into chart data; `--adj-close` makes a total-return chart.
@@ -11,10 +11,13 @@ All notable changes. Versions follow the [releases](https://github.com/imoneys10
 - Installers: `--ref` / `-Ref` to pin a version, `--uninstall` / `-Uninstall`.
 - Unit tests (`tests/`), a `tests` workflow (3 operating systems, Python 3.9 and 3.13, example regeneration check, a live Nasdaq smoke test), issue and pull request templates, Dependabot for Actions.
 
+- `evals/`: six realistic test requests with assertions, a 20-query trigger set, and the results of the first eval run (see `evals/RESULTS.md`).
+
 ### Fixed
 - `COMP` (and `NDX`, ...) was looked up as a stock ticker (COMP is also Compass Inc), giving wrong numbers for the Nasdaq Composite. Known index codes now go straight to the index.
 
 ### Changed
+- `SKILL.md` after the first eval run: mode C prefers `fetch_prices.py`; screenshots with an intraday timestamp are not called a closing date; totals that do not add up are shown as the broker shows them and reported; no benchmark row unless asked. The `description` is more explicit about when to trigger (not yet validated, see `evals/README.md`).
 - Footnotes list only the sources of the symbols actually drawn.
 - Shared rendering code moved to `render_common.py`.
 

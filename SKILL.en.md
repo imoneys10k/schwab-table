@@ -31,10 +31,12 @@ If the mode is unclear, ask one question. If the user gives only tickers and no 
 - Read from the screenshot: ticker, open P/L %, day P/L, cost, quantity; the total row's P/L % and day P/L; account value and open P/L amount (these go in the footnote)
 - The "trade price" in a screenshot is usually the cost basis, not the current price; do not treat it as the current price
 - The "portfolio total" row plays the benchmark role: bold, inserted at its sorted position by P/L %, with cost and shares set to `NA`
-- `as_of` is the **most recent US market close** matching the screenshot (a Taipei/Beijing morning screenshot = the previous US Eastern trading day)
+- `as_of`: use the screenshot's own timestamp when it has one. If the numbers are intraday (a US-Eastern midday screenshot), say "as of {time}, prices delayed" and **do not call it a closing date**; with no timestamp, use the **most recent US market close** matching the screenshot (a Taipei/Beijing morning screenshot = the previous US Eastern trading day)
+- When the total row does not match the rows (it may include holdings or cash not shown), **show the broker's figures as they are and do not correct them**; say so in the footnote or reply and tell the user the difference you computed
 
 ### Mode C (tickers only)
-- Claude fetches official closing prices per the "Data-source rules" below and computes YTD, 1-month and 1-year returns itself
+- Prefer `fetch_prices.py` for the official closes (faster than a browser and reproducible); `--start` must be more than a year back to get the 1-year return, e.g. `python3 fetch_prices.py NVDA AMD MU --start 2025-09-01 -o data/x.json`; then compute YTD, 1-month and 1-year returns yourself per the "Data-source rules" below. Fall back to Claude in Chrome only if that fails
+- No benchmark row unless the user mentions a comparison; if they do, fetch benchmarks with `--benchmark SPY,COMP` and say that SPY is only a proxy for the S&P 500
 - With more than 15 stocks, confirm with the user first whether to include them all; a table that long loses the research-note look
 
 ## Data-source rules: authoritative data only

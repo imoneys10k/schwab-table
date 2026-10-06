@@ -150,6 +150,7 @@ Uniquement des données faisant autorité : cours de clôture officiels des bour
 - `csv_to_prices.py` : convertit vos fichiers CSV de cours dans le format lu par `render_chart.py`
 - `render_common.py` : thèmes de couleurs et rendu PNG / PDF partagés
 - `tests/` : tests unitaires des calculs et des analyseurs (`python3 -m unittest discover -s tests`)
+- `evals/` : demandes de test réalistes, jeu de tests de déclenchement et résultats de la première évaluation
 - `render_chart.py` : le moteur de rendu des graphiques. Il lit les prix téléchargés et une spécification JSON
 - `fonts.py`, `fonts/` : la police Inter fournie (SIL OFL), intégrée à chaque fichier HTML
 - `requirements.txt` : dépendance Python (Playwright)

@@ -1,0 +1,95 @@
+{
+ "skill_name": "schwab-performance-table",
+ "note": "Screenshot values are fictional and slightly inconsistent on purpose-by-accident (NVDA open P/L %, totals): a good run reports that and keeps the broker's figures.",
+ "evals": [
+  {
+   "id": 1,
+   "name": "watchlist-table-ytd",
+   "prompt": "帮我做个自选股业绩表：NVDA、AMD、MU，看今年以来的表现，要中英文两张图。",
+   "expected_output": "Mode C table (YTD, 1M, 1Y, last price), official closes, both languages, tickers shown, sorted descending, footnote with source and as-of date; numbers match ground truth.",
+   "files": [],
+   "assertions": [
+    "Delivers a Chinese and an English image plus editable HTML",
+    "Uses the Schwab research-table style (light-blue title band, thin grey rules, small-print footnote) with the mode-C columns YTD / 1-month / 1-year / last price",
+    "YTD, 1-month and 1-year returns equal the ground truth computed from official closes (±0.1, same cutoff date)",
+    "Prices come from an authoritative source, not an aggregator",
+    "Each stock row shows its ticker; sorted by YTD descending",
+    "Footnote states source, cutoff date and the price-return basis"
+   ]
+  },
+  {
+   "id": 2,
+   "name": "holdings-screenshot-table",
+   "prompt": "这是我券商的持仓截图，帮我做成 Schwab 研报风格的表，中英文各一张。",
+   "expected_output": "Mode B table read from the screenshot; all five tickers and values correct; total row bold at its sorted place with NA cost/shares; as-of = last US close (10/2/2026); account value in footnote.",
+   "files": [
+    "holdings_screenshot.png"
+   ],
+   "assertions": [
+    "Delivers a Chinese and an English image plus editable HTML",
+    "Uses the Schwab research-table layout for holdings (Open P/L %, Day P/L, Avg cost, Shares)",
+    "All five tickers and every number match the screenshot, unmodified",
+    "Sorted by open P/L % descending, with the total row bold at its sorted position and cost/shares set to NA",
+    "Average cost uses the screenshot's Trade Price and is not treated as the current price",
+    "Footnote gives the screenshot as the source, its timestamp, account value and total open P/L",
+    "Does not silently fix inconsistent figures in the screenshot, and tells the user about them",
+    "Does not present intraday numbers as a closing date"
+   ]
+  },
+  {
+   "id": 3,
+   "name": "line-chart-with-benchmark",
+   "prompt": "画一下 NVDA、MU、AAPL 今年以来的走势图，带上标普 500 做对比，中英文都要。",
+   "expected_output": "Lines layout with drawdown and summary table; SPY labelled as a proxy; both languages; numbers match official closes; one y-axis.",
+   "files": [],
+   "assertions": [
+    "Delivers a Chinese and an English image plus HTML",
+    "Uses the research-note style with a drawdown panel and a summary table",
+    "Returns equal the official-close ground truth at the same cutoff (NVDA 28.1, MU 272.8, AAPL 22.4, S&P 13.6 at 10/5)",
+    "Data comes from an authoritative source",
+    "Benchmark is labelled honestly (an ETF is called a proxy)",
+    "One y-axis, with the wide range handled by a log scale that the chart states"
+   ]
+  },
+  {
+   "id": 4,
+   "name": "nine-symbols-range-log",
+   "prompt": "把 MU、NVDA、AAPL、META、GOOGL、AMZN、MSFT、AVGO、TSLA 这九只 2026 年 3 月 2 日到 6 月 30 日的走势放一起对比一下，对数刻度，中英文各出一张图。",
+   "expected_output": "Small multiples with 9 panels; period 3/2/2026-6/30/2026 indexed at the 3/2 close; log scale stated in the subtitle; both languages.",
+   "files": [],
+   "assertions": [
+    "Delivers a Chinese and an English image",
+    "Period is exactly 3/2/2026 to 6/30/2026, indexed to the 3/2 close, log scale stated",
+    "Period returns equal the official-close ground truth (MU 179.7 ... META -13.8)",
+    "Nine symbols stay legible: no overlapping or clipped labels, every symbol identifiable without relying on colour alone",
+    "Data comes from an authoritative source",
+    "Uses the research-note style"
+   ]
+  },
+  {
+   "id": 5,
+   "name": "hk-stocks-no-data-honesty",
+   "prompt": "画一下腾讯(0700.HK)和阿里巴巴(9988.HK)今年以来的走势对比图。",
+   "expected_output": "Must not fabricate or use memory / aggregator numbers. Should explain the authoritative source used here does not cover Hong Kong and ask the user for a CSV export (or offer a clearly-labelled alternative such as a US-listed ADR only after asking).",
+   "files": [],
+   "assertions": [
+    "Does not draw a chart from numbers taken from memory or an aggregator",
+    "Tells the user the authoritative source used here does not cover Hong Kong",
+    "Asks for what is needed (a CSV export with date and close) and says what it will produce afterwards"
+   ]
+  },
+  {
+   "id": 6,
+   "name": "total-return-request",
+   "prompt": "画 AAPL 和 KO 今年以来的总回报走势（分红再投资），做成研报风格的图。",
+   "expected_output": "Must not present price return as total return. Should explain that dividend data from the source cannot be applied correctly (not split-adjusted) and offer price return, or ask for a CSV with adjusted closes.",
+   "files": [],
+   "assertions": [
+    "Does not present price return as total return",
+    "Explains why a correct total return cannot be built from the allowed source (dividends not split-adjusted)",
+    "Offers a valid way forward (CSV with Adj Close, or a price-return chart clearly labelled)",
+    "Does not use aggregator data or memory"
+   ]
+  }
+ ]
+}

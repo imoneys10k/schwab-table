@@ -150,6 +150,7 @@ python3 render_chart.py examples/chart_lines_spec.json out/chart   # copy and ed
 - `csv_to_prices.py`：把你自己的 CSV 价格文件转成 `render_chart.py` 能读的格式
 - `render_common.py`：共用的配色主题和 PNG / PDF 渲染
 - `tests/`：计算和解析逻辑的单元测试（`python3 -m unittest discover -s tests`）
+- `evals/`：贴近真实使用的测试请求、触发测试集，以及第一轮评测结果
 - `render_chart.py`：走势图渲染器，读取下载的价格和 JSON spec
 - `fonts.py`、`fonts/`：随仓库附带的 Inter 字体（SIL OFL），嵌入每个 HTML 文件
 - `requirements.txt`：Python 依赖（Playwright）

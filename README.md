@@ -150,6 +150,7 @@ Authoritative data only: official exchange closing prices, index providers (S&P 
 - `csv_to_prices.py`: converts your own CSV price files into the format `render_chart.py` reads
 - `render_common.py`: shared colour themes and PNG / PDF rendering
 - `tests/`: unit tests for the calculations and parsers (`python3 -m unittest discover -s tests`)
+- `evals/`: realistic test requests, a trigger-test set and the results of the first eval run
 - `render_chart.py`: the chart renderer. Reads the fetched prices plus a JSON spec
 - `fonts.py`, `fonts/`: the bundled Inter font (SIL OFL), embedded into every HTML file
 - `requirements.txt`: Python dependency (Playwright)

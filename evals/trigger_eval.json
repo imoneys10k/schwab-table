@@ -1,0 +1,82 @@
+[
+ {
+  "query": "帮我把这几只票做个 Schwab 那种风格的业绩表：NVDA AMD MU AVGO，今年以来的，中英文各一张",
+  "should_trigger": true
+ },
+ {
+  "query": "我券商持仓的截图发你了，做成研报里那种浅蓝表头的持仓表，中英文都要",
+  "should_trigger": true
+ },
+ {
+  "query": "画一下 TSLA 和 NVDA 从 3 月到现在的走势对比，要带回撤",
+  "should_trigger": true
+ },
+ {
+  "query": "make me a YTD price chart for MU, NVDA and AAPL vs the S&P 500, bilingual, research-note style",
+  "should_trigger": true
+ },
+ {
+  "query": "把这九只股票做成小图矩阵，每个都带最大回撤，用对数刻度，中英文各出一张",
+  "should_trigger": true
+ },
+ {
+  "query": "公众号要配图：2026 年 Neural9 的涨幅排名表，还要标普 500 排名和贡献排名那几列，照 Schwab 研报那种样式",
+  "should_trigger": true
+ },
+ {
+  "query": "出一张深色主题的走势图，GOOGL META AMZN 近一年，我要放进 PPT 里",
+  "should_trigger": true
+ },
+ {
+  "query": "我有腾讯和恒生指数的 CSV，帮我画个年初至今的走势对比图",
+  "should_trigger": true
+ },
+ {
+  "query": "给我做个自选股表：年初至今、近一个月、近一年、最新价，代码是 SMCI PLTR ARM",
+  "should_trigger": true
+ },
+ {
+  "query": "把我这周的持仓盈亏做成表，发小红书用，要好看的研报风格，中英文双版",
+  "should_trigger": true
+ },
+ {
+  "query": "帮我分析一下 NVDA 的估值，做一个 DCF",
+  "should_trigger": false
+ },
+ {
+  "query": "把这个 Excel 里的销售数据做成柱状图",
+  "should_trigger": false
+ },
+ {
+  "query": "写一段 Python 用 pandas 算一下 AAPL 的夏普比率",
+  "should_trigger": false
+ },
+ {
+  "query": "解释一下什么是最大回撤和夏普比率",
+  "should_trigger": false
+ },
+ {
+  "query": "NVDA 今天为什么涨？",
+  "should_trigger": false
+ },
+ {
+  "query": "帮我做一份 PPT，介绍我们公司的季度业绩",
+  "should_trigger": false
+ },
+ {
+  "query": "用 matplotlib 画一个正弦曲线，加上网格",
+  "should_trigger": false
+ },
+ {
+  "query": "把这份 Schwab PDF 研报第 3 页的表格提取成 Excel",
+  "should_trigger": false
+ },
+ {
+  "query": "给我推荐几只适合长期持有的科技股",
+  "should_trigger": false
+ },
+ {
+  "query": "帮我把这份财报里的现金流数据整理成一个汇总表，导出 Excel",
+  "should_trigger": false
+ }
+]
