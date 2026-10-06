@@ -71,9 +71,10 @@ else
   "$VPY" -m playwright install chromium
 
   # 3. Smoke test ----------------------------------------------------------------
-  say "Smoke test: rendering the example table"
+  say "Smoke test: rendering an example table and an example chart"
   SMOKE="$(mktemp -d)"
-  if "$VPY" "$TARGET/render_table.py" "$TARGET/examples/neural9_spec.json" "$SMOKE/smoke" >/dev/null 2>"$SMOKE/err"; then
+  if "$VPY" "$TARGET/render_table.py" "$TARGET/examples/neural9_spec.json" "$SMOKE/table" >/dev/null 2>"$SMOKE/err" \
+     && "$VPY" "$TARGET/render_chart.py" "$TARGET/examples/chart_lines_spec.json" "$SMOKE/chart" >/dev/null 2>>"$SMOKE/err"; then
     say "Render OK"
   else
     cat "$SMOKE/err" >&2
@@ -84,6 +85,10 @@ else
     die "smoke test failed"
   fi
   rm -rf "$SMOKE"
+fi
+
+if [ "$SKIP_DEPS" -eq 0 ] && [ "$(uname -s)" = "Linux" ] && command -v fc-list >/dev/null 2>&1 && [ -z "$(fc-list :lang=zh 2>/dev/null)" ]; then
+  echo "hint: no Chinese font found, so the Chinese version would render as boxes. Install one, e.g. on Debian/Ubuntu: sudo apt install fonts-noto-cjk" >&2
 fi
 
 say "Installed to $TARGET"

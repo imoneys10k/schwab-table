@@ -5,6 +5,8 @@
 ## When to use
 The user wants to turn a set of stocks into the kind of table found in Schwab research: a light-blue title/header band, thin grey row dividers, and a small-print disclaimer footnote. By default, output **both a Chinese and an English version**, one HTML file each, then render each to PNG with Playwright at 2x.
 
+For a **price chart** (several symbols over a period), jump to "Chart mode" at the end.
+
 ## Step 1: Identify the mode
 
 | Mode | What the user provides | Title | Columns 2–5 |
@@ -167,7 +169,7 @@ Spec format:
 ```
 `formats`: `pct` = 1 decimal, `money` = 2 decimals with thousands separator, `raw` = output as given (use it for ranks and share counts). `null` renders as `NA`.
 
-Optional flags: `--langs en` renders only the listed languages; `--no-png` writes HTML only and does not need Playwright.
+Optional flags: `--langs en` renders only the listed languages; `--no-png` writes HTML only and does not need Playwright; `--scale 3` raises the PNG resolution (default 2).
 
 Without `render_table.py`, hand-write a single-file HTML following the structure and visual parameters above, and screenshot the `#wrap` container with Playwright at `device_scale_factor=2`.
 
@@ -182,3 +184,68 @@ Without `render_table.py`, hand-write a single-file HTML following the structure
 - [ ] Title and header form one continuous light-blue band
 - [ ] The footnote's last sentence is bold
 - [ ] Do not draw the "Legend" badge from the top-left of the original screenshot (a screenshot artifact)
+
+---
+
+# Chart mode: price history for several symbols over a period
+
+## When to use
+The user wants to see how one or more symbols moved over a period, their cumulative return or drawdown (e.g. "chart NVDA and MU this year", "compare these names from March to June"). The look matches the performance tables: light-blue title band, thin grey rules, small-print footnote. Output **both a Chinese and an English version** (PNG + HTML). Up to **9 symbols**, plus an optional benchmark.
+
+## Workflow
+1. **Fix the symbols and the period.** Use the dates the user gives exactly; with none, use **year to date**. The start is indexed to 100 at the close on or before the start date (YTD = the last close of the previous year)
+2. **Fetch the data** (the only source is Nasdaq's official historical-quote API):
+   ```bash
+   python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 --end 2026-10-02 -o data/watch.json
+   ```
+   - Official exchange daily closes, split-adjusted and excluding dividends, i.e. **price returns**; about 10 years of daily history. Stocks, ETFs and Nasdaq indexes (`COMP`, `NDX`) work
+   - The default benchmark is **SPY** (an S&P 500 ETF, same source; the chart and footnote say it is only a proxy for the index). `--benchmark COMP` uses the Nasdaq Composite; `--benchmark SP500` uses the S&P 500 index republished by FRED (FRED sometimes times out); `--benchmark none` draws no benchmark
+   - Never use aggregator sites or numbers from the model's memory. If the script exits with code 2, or `errors` in the JSON is non-empty, some symbol was not fetched: **stop and tell the user which one**; do not fill the gap
+   - Claude supplies the company names (English full name + common Chinese name) in the spec's `names`
+3. **Write the spec** (format below) and run:
+   ```bash
+   python3 render_chart.py spec.json out/watch
+   ```
+   This produces `out/watch_en.html/.png` and `out/watch_zh.html/.png`
+4. Open both PNGs and check them against the checklist; fix the spec and re-render if needed. Deliver both PNGs (and the HTML)
+
+## Layouts
+| `layout` | Content | Use for |
+|---|---|---|
+| `auto` (default) | `lines` for up to 5 symbols, `multiples` for 6–9 | the usual case |
+| `lines` | line chart + drawdown panel + summary table | 2–5 symbols |
+| `multiples` | one small chart per symbol, **the same y-scale in every panel**, a drawdown strip under each, grey dashed benchmark | 6–9 symbols |
+
+- `y_scale`: `auto` (default), `linear`, `log`. `auto` switches to a **log scale** when the highest and lowest index levels differ by more than 3x, and the subtitle says "Log scale"
+- `drawdown`: draw drawdowns (default on); `table`: summary table in the `lines` layout (default on)
+
+## Specification
+- The y-axis is always an index with the start = 100, and **a chart has one y-axis, never two**
+- **Colours are fixed per symbol, in a fixed order, and never follow the ranking**: blue `#2a78d6`, orange `#eb6834`, green `#1baf7a`, yellow `#eda100`, pink `#e87ba4` (checked for colour-blind separability). The benchmark is always a dark-grey dashed line `#595959`. In the small multiples every stock is navy `#1B2A4A` and the benchmark a light-grey dashed line
+- Line width 2px (benchmark 1.6px dashed); a dot with a 2px white ring at each line end, **with the symbol and return labelled directly at the line end**, nudged apart with small leader lines when they collide. Green and yellow have low contrast on white, so the direct labels and the summary table are not optional
+- Summary table columns: period return, annualized volatility, max drawdown, last price; sorted by return descending, benchmark row bold, benchmark last price `NA`
+- Annualized volatility = standard deviation of daily price returns × √252; drawdown = the close's decline from the highest close up to that day within the period; max drawdown = the lowest drawdown in the period
+- Footnote, in order: source and cutoff date, retrieval date, start, metric definitions, the proxy note (when an ETF is the benchmark), disclaimer, bold last sentence
+- The span of the period sets the x-axis ticks: weekly within 45 days, monthly up to about a year, quarterly or yearly beyond
+
+## Spec format
+```json
+{
+  "data": "data/watch.json",
+  "symbols": ["NVDA", "MU"],
+  "names": {"NVDA": {"en": "NVIDIA Corp", "zh": "英伟达"}, "MU": {"en": "Micron Technology Inc", "zh": "美光科技"}},
+  "benchmark_name": {"en": "S&P 500 (SPY)", "zh": "标普 500 (SPY)"},
+  "layout": "auto", "y_scale": "auto", "drawdown": true, "table": true,
+  "start": "2026-01-01", "end": "2026-10-02",
+  "title": {"en": "...", "zh": "..."}, "note": {"en": "...", "zh": "..."}
+}
+```
+Everything except `data` is optional. Without `start` / `end` the data file's range is used; `note` is put at the start of the footnote (the examples use it to say "Hypothetical example"). Command-line options: `--langs en` renders one language, `--no-png` writes HTML only, `--scale 3` raises the PNG resolution (default 2).
+
+## Checklist (charts)
+- [ ] At most 9 symbols; the period matches the request (year to date if none was given)
+- [ ] Data comes from `fetch_prices.py` (Nasdaq official closes), with no aggregator or memory numbers; symbols that could not be fetched were reported to the user
+- [ ] Both language versions produced; source, cutoff date and start in the footnote are correct
+- [ ] One y-axis only; colours fixed per symbol; line-end labels present, not overlapping, not clipped
+- [ ] When an ETF is the benchmark the footnote says it is a proxy; when a log scale is used the subtitle says so
+- [ ] Summary table sorted by return descending, benchmark row bold, numbers consistent with the line-end labels

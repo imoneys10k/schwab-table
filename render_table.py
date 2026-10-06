@@ -1,9 +1,9 @@
 """Render a Schwab-style performance table (EN + ZH) from a JSON spec.
 
-Usage: python3 render_table.py spec.json OUT_PREFIX [--langs en,zh] [--no-png]
+Usage: python3 render_table.py spec.json OUT_PREFIX [--langs en,zh] [--no-png] [--scale 2]
 Writes OUT_PREFIX_en.html/.png and OUT_PREFIX_zh.html/.png (2x).
 Missing output directories are created. --langs limits the languages rendered,
---no-png writes HTML only (no Playwright needed).
+--no-png writes HTML only (no Playwright needed). --scale sets PNG pixel density (default 2).
 
 Spec:
 {
@@ -26,6 +26,8 @@ import json
 import os
 import sys
 from pathlib import Path
+
+from fonts import font_face_css
 
 FONT_STACK = ('"Inter", "Helvetica Neue", Helvetica, Arial, '
               '"Noto Sans CJK SC", "Source Han Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif')
@@ -54,6 +56,7 @@ def build_html(spec, lang):
     h2 = "".join(f"<th>{t}</th>" for t in L["h2"])
     return f"""<!doctype html><html lang="{'zh-CN' if lang == 'zh' else 'en'}"><head><meta charset="utf-8">
 <title>{L['title']}</title><style>
+{font_face_css()}
 body {{ margin:0; background:#fff; font-family:{FONT_STACK}; -webkit-font-smoothing:antialiased; }}
 tbody td:not(.name) {{ font-feature-settings:"tnum" 1, "lnum" 1; }}
 .sgn {{ font-feature-settings:"tnum" 0; }}
@@ -120,7 +123,7 @@ def reexec_in_venv():
         os.execv(str(py), [str(py), *sys.argv])
 
 
-async def render_png(htmls, prefix):
+async def render_png(htmls, prefix, scale=2):
     try:
         from playwright.async_api import async_playwright
     except ImportError:
@@ -135,7 +138,7 @@ async def render_png(htmls, prefix):
                 sys.exit("error: Chromium is not installed. Run: playwright install chromium")
             raise
         for lang, html in htmls.items():
-            pg = await b.new_page(device_scale_factor=2, viewport={"width": 800, "height": 600})
+            pg = await b.new_page(device_scale_factor=scale, viewport={"width": 800, "height": 600})
             await pg.set_content(html)
             await pg.evaluate("document.fonts.ready")
             await pg.locator("#wrap").screenshot(path=f"{prefix}_{lang}.png")
@@ -149,6 +152,7 @@ def main():
     ap.add_argument("prefix", help="output prefix, e.g. out/neural9 -> out/neural9_en.html / .png")
     ap.add_argument("--langs", help="comma-separated languages to render (default: all in the spec)")
     ap.add_argument("--no-png", action="store_true", help="write HTML only")
+    ap.add_argument("--scale", type=float, default=2, help="PNG pixel density (default 2; use 3 for print)")
     args = ap.parse_args()
 
     spec = load_spec(args.spec)
@@ -160,7 +164,7 @@ def main():
         Path(f"{args.prefix}_{lang}.html").write_text(html, encoding="utf-8")
         print(f"wrote {args.prefix}_{lang}.html")
     if not args.no_png:
-        asyncio.run(render_png(htmls, args.prefix))
+        asyncio.run(render_png(htmls, args.prefix, args.scale))
         for lang in htmls:
             print(f"wrote {args.prefix}_{lang}.png")
 

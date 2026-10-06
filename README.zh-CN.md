@@ -4,7 +4,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![install-test](https://github.com/imoneys10k/schwab-table/actions/workflows/install-test.yml/badge.svg)](https://github.com/imoneys10k/schwab-table/actions/workflows/install-test.yml)
 
-一个 Claude Skill：把股票清单、券商持仓截图或现成的涨跌幅/排名数据，做成 Charles Schwab 研报风格的业绩表，同时输出中文版和英文版（PNG + HTML）。
+一个 Claude Skill：把股票清单、券商持仓截图或现成的涨跌幅/排名数据，做成 Charles Schwab 研报风格的业绩表；还能用同样的风格画出若干标的在任意时间段内的走势图。全部同时输出中文版和英文版（PNG + HTML）。
 
 ![英文版](examples/neural9_en.png)
 
@@ -20,6 +20,29 @@
 
 模式 A 的数据来自 Charles Schwab 公开图表；模式 B、C 的示例使用虚构公司和编造数字，仅作演示。
 
+## 走势图
+
+最多 9 只标的、任意时间段（默认年初至今），同样的研报风格，带回撤面板和汇总表，中英双版（PNG + HTML）。示例使用虚构公司和合成数据。
+
+![线图](examples/chart_lines_zh.png)
+
+![小图矩阵](examples/chart_multiples_zh.png)
+
+| 版式 | 内容 | 适用 |
+|---|---|---|
+| `lines` | 折线图、回撤面板、汇总表 | 2–5 只 |
+| `multiples` | 每只一个小图，同一纵轴，下方带回撤条 | 6–9 只 |
+
+`layout: auto` 会按标的数量自动选择。
+
+- **数据：** Nasdaq 官方历史行情接口：交易所官方日收盘价，已按拆股复权，价格回报，约 10 年。基准默认用 SPY，图上标注为标普 500 的替代。不使用其他来源。
+- **纵轴：** 只有一个纵轴，起点为 100。涨幅差距很大时自动改用对数刻度（也可用 `y_scale` 手动指定）。
+
+```bash
+python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 -o data/watch.json
+python3 render_chart.py examples/chart_lines_spec.json out/chart   # copy and edit the spec for your own data
+```
+
 ## 在 Claude 里使用
 
 安装后直接用自然语言说就行，例如：
@@ -27,6 +50,8 @@
 - 帮我给 NVDA、AMD、MU 做个业绩表。
 - 把这张持仓截图做成 Schwab 风格的表。（附上截图）
 - 用这份数据做一张 2026 年 Neural9 排名表。
+- 帮我画 NVDA、MU、AAPL 今年的走势图。
+- 把这六只股票 3 月到 6 月的走势用对数刻度对比一下。
 
 ## 数据源
 
@@ -37,9 +62,12 @@
 - `SKILL.md`：Claude 实际加载的 Skill 说明（结构、视觉参数、数据源规定、自查清单）
 - `SKILL.en.md`：`SKILL.md` 的英文译本，供人阅读
 - `install.sh` / `install.ps1`：一键安装脚本（macOS / Linux 与 Windows）
-- `render_table.py`：渲染器，读 JSON spec，输出中英文 HTML 和 2x PNG
+- `render_table.py`：表格渲染器，读 JSON spec，输出中英文 HTML 和 2x PNG
+- `fetch_prices.py`：从 Nasdaq 官方接口下载日收盘价（仅用标准库）
+- `render_chart.py`：走势图渲染器，读取下载的价格和 JSON spec
+- `fonts.py`、`fonts/`：随仓库附带的 Inter 字体（SIL OFL），嵌入每个 HTML 文件
 - `requirements.txt`：Python 依赖（Playwright）
-- `examples/`：三种模式各一份 spec 和渲染结果
+- `examples/`：三种表格模式和两种图表版式各一份 spec 和渲染结果（`sample_prices.json` 为合成数据）
 - `assets/`：社交预览图
 
 ## 安装
@@ -97,9 +125,16 @@ pip install -r requirements.txt && playwright install chromium
 python3 render_table.py examples/neural9_spec.json out/neural9
 ```
 
-可选参数：`--langs en` 只渲染指定语言（逗号分隔）；`--no-png` 只写 HTML，不需要 Playwright。输出目录不存在时会自动创建。
+可选参数（两个渲染器通用）：`--langs en` 只渲染指定语言（逗号分隔）；`--no-png` 只写 HTML，不需要 Playwright；`--scale 3` 提高 PNG 清晰度（默认 2，即 1520 px 宽）。输出目录不存在时会自动创建。
 
-字体：英文和数字用 Inter，中文用思源黑体（Noto Sans CJK SC / Source Han Sans SC），没有安装时回退到 Helvetica Neue / PingFang。
+走势图分两步：先下载价格，再渲染。用 `--start` / `--end` 指定时间段，默认年初至今；`--benchmark COMP` 可把基准从 SPY 换成纳斯达克综合指数。
+
+```bash
+python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 -o data/watch.json
+python3 render_chart.py examples/chart_lines_spec.json out/chart   # copy and edit the spec for your own data
+```
+
+字体：Inter（随仓库放在 `fonts/`，SIL 开源字体许可）会嵌入每个 HTML 文件，用于英文和数字，所以在任何机器上效果一致。中文使用系统自带的中文字体（macOS 为苹方，Windows 为微软雅黑）。精简的 Linux 服务器上请先装一个，例如 `sudo apt install fonts-noto-cjk`，否则中文版会显示成方块。
 
 ## 免责声明
 

@@ -4,7 +4,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![install-test](https://github.com/imoneys10k/schwab-table/actions/workflows/install-test.yml/badge.svg)](https://github.com/imoneys10k/schwab-table/actions/workflows/install-test.yml)
 
-Un Claude Skill qui transforme une liste d'actions, une capture d'écran de positions chez un courtier ou des données de performance/classement déjà prêtes en un tableau de performance dans le style des études de Charles Schwab, produit en chinois et en anglais (PNG + HTML).
+Un Claude Skill qui transforme une liste d'actions, une capture d'écran de positions chez un courtier ou des données de performance/classement déjà prêtes en un tableau de performance dans le style des études de Charles Schwab, et qui trace dans le même style l'évolution de plusieurs valeurs sur une période au choix. Tout est produit en chinois et en anglais (PNG + HTML).
 
 ![Version anglaise](examples/neural9_en.png)
 
@@ -20,6 +20,29 @@ Un Claude Skill qui transforme une liste d'actions, une capture d'écran de posi
 
 Le mode A utilise les données d'un graphique public de Charles Schwab. Les exemples des modes B et C reposent sur des sociétés fictives et des chiffres inventés, à titre d'illustration uniquement.
 
+## Graphiques de cours
+
+Jusqu'à 9 valeurs sur une période au choix (par défaut : depuis le début de l'année), dans le même style d'étude, avec un panneau de drawdown et un tableau de synthèse. Versions chinoise et anglaise, PNG + HTML. Les exemples utilisent des sociétés fictives et des données synthétiques.
+
+![Graphique en courbes](examples/chart_lines_en.png)
+
+![Petits multiples](examples/chart_multiples_en.png)
+
+| Disposition | Contenu | Pour |
+|---|---|---|
+| `lines` | Courbes, panneau de drawdown, tableau de synthèse | 2 à 5 valeurs |
+| `multiples` | Un petit graphique par valeur à échelle commune, avec une bande de drawdown dessous | 6 à 9 valeurs |
+
+`layout: auto` choisit selon le nombre de valeurs.
+
+- **Données :** l'API officielle d'historique de cours de Nasdaq : cours de clôture quotidiens officiels, ajustés des divisions de titres, rendements de prix, environ 10 ans. La référence par défaut est SPY, indiquée comme substitut du S&P 500. Aucune autre source n'est utilisée.
+- **Axe :** un seul axe vertical, indexé à 100 au départ. Il passe automatiquement en échelle logarithmique quand l'écart est grand (ou fixez `y_scale` vous-même).
+
+```bash
+python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 -o data/watch.json
+python3 render_chart.py examples/chart_lines_spec.json out/chart   # copy and edit the spec for your own data
+```
+
 ## Utilisation avec Claude
 
 Une fois installé, il suffit de demander en langage naturel, par exemple :
@@ -27,6 +50,8 @@ Une fois installé, il suffit de demander en langage naturel, par exemple :
 - Fais-moi un tableau de performance pour NVDA, AMD et MU.
 - Transforme cette capture d'écran de positions en tableau de style Schwab. (joindre la capture)
 - Fais un tableau de classement Neural9 2026 à partir de ces données.
+- Trace le cours de NVDA, MU et AAPL depuis le début de l'année.
+- Compare ces six actions de mars à juin en échelle logarithmique.
 
 ## Sources de données
 
@@ -37,9 +62,12 @@ Uniquement des données faisant autorité : cours de clôture officiels des bour
 - `SKILL.md` : la définition du skill chargée par Claude (structure, paramètres visuels, règles sur les sources de données, liste de contrôle), en chinois
 - `SKILL.en.md` : traduction anglaise de `SKILL.md`, pour les lecteurs humains
 - `install.sh` / `install.ps1` : installateurs en une commande (macOS / Linux et Windows)
-- `render_table.py` : le moteur de rendu. Il lit une spécification JSON et produit des fichiers HTML en chinois et en anglais ainsi que des PNG en 2x
+- `render_table.py` : le moteur de rendu des tableaux. Il lit une spécification JSON et produit des fichiers HTML en chinois et en anglais ainsi que des PNG en 2x
+- `fetch_prices.py` : télécharge les cours de clôture quotidiens depuis l'API officielle de Nasdaq (bibliothèque standard uniquement)
+- `render_chart.py` : le moteur de rendu des graphiques. Il lit les prix téléchargés et une spécification JSON
+- `fonts.py`, `fonts/` : la police Inter fournie (SIL OFL), intégrée à chaque fichier HTML
 - `requirements.txt` : dépendance Python (Playwright)
-- `examples/` : une spécification et son rendu pour chacun des trois modes
+- `examples/` : une spécification et son rendu pour chacun des trois modes de tableau et les deux dispositions de graphique (`sample_prices.json` est synthétique)
 - `assets/` : image d'aperçu social
 
 ## Installation
@@ -97,9 +125,16 @@ pip install -r requirements.txt && playwright install chromium
 python3 render_table.py examples/neural9_spec.json out/neural9
 ```
 
-Options : `--langs en` ne rend que les langues indiquées (séparées par des virgules) ; `--no-png` n'écrit que le HTML et ne nécessite pas Playwright. Les dossiers de sortie manquants sont créés automatiquement.
+Options (les deux moteurs) : `--langs en` ne rend que les langues indiquées (séparées par des virgules) ; `--no-png` n'écrit que le HTML et ne nécessite pas Playwright ; `--scale 3` augmente la résolution des PNG (2 par défaut, soit 1520 px de large). Les dossiers de sortie manquants sont créés automatiquement.
 
-Polices : Inter pour les caractères latins et les chiffres, Noto Sans CJK SC / Source Han Sans SC pour le chinois. À défaut, repli sur Helvetica Neue / PingFang.
+Les graphiques se font en deux étapes : télécharger les prix, puis les rendre. Indiquez la période avec `--start` / `--end` ; par défaut, c'est le début de l'année. `--benchmark COMP` remplace SPY par le Nasdaq Composite.
+
+```bash
+python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 -o data/watch.json
+python3 render_chart.py examples/chart_lines_spec.json out/chart   # copy and edit the spec for your own data
+```
+
+Polices : Inter (fournie dans `fonts/`, licence SIL Open Font) est intégrée à chaque fichier HTML pour les caractères latins et les chiffres, donc le rendu est identique sur toutes les machines. Le chinois utilise la police CJK du système (PingFang SC sous macOS, Microsoft YaHei sous Windows). Sur un serveur Linux minimal, installez-en une, par exemple `sudo apt install fonts-noto-cjk` ; sinon la version chinoise s'affiche en carrés.
 
 ## Avertissement
 

@@ -4,7 +4,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![install-test](https://github.com/imoneys10k/schwab-table/actions/workflows/install-test.yml/badge.svg)](https://github.com/imoneys10k/schwab-table/actions/workflows/install-test.yml)
 
-銘柄リスト、証券口座の保有銘柄スクリーンショット、または既存の騰落率・順位データを、Charles Schwab のリサーチレポート風のパフォーマンス表に変換する Claude Skill です。中国語版と英語版の両方を出力します（PNG + HTML）。
+銘柄リスト、証券口座の保有銘柄スクリーンショット、または既存の騰落率・順位データを、Charles Schwab のリサーチレポート風のパフォーマンス表に変換する Claude Skill です。同じスタイルで、複数銘柄の任意期間の推移チャートも作れます。すべて中国語版と英語版の両方を出力します（PNG + HTML）。
 
 ![英語版](examples/neural9_en.png)
 
@@ -20,6 +20,29 @@
 
 モード A は Charles Schwab が公開しているチャートのデータを使用しています。モード B・C のサンプルは架空の企業と作り物の数字で、例示のみを目的としています。
 
+## 推移チャート
+
+最大 9 銘柄を任意の期間（既定は年初来）でチャート化します。スタイルは同じリサーチレポート風で、ドローダウンのパネルとサマリー表付き。中国語版と英語版（PNG + HTML）を出力します。サンプルは架空の企業と合成データです。
+
+![折れ線チャート](examples/chart_lines_en.png)
+
+![スモールマルチプル](examples/chart_multiples_en.png)
+
+| レイアウト | 内容 | 向いているケース |
+|---|---|---|
+| `lines` | 折れ線チャート、ドローダウンパネル、サマリー表 | 2〜5 銘柄 |
+| `multiples` | 銘柄ごとの小さなチャート（共通スケール）と、その下のドローダウン帯 | 6〜9 銘柄 |
+
+`layout: auto` は銘柄数に応じて自動で選びます。
+
+- **データ：** Nasdaq の公式ヒストリカル API。取引所の公式日次終値で、株式分割調整済み、価格リターン、約 10 年分。ベンチマークは既定で SPY で、S&P 500 の代用であることを明記します。他のデータソースは使いません。
+- **軸：** Y 軸は 1 本だけで、開始時点を 100 に指数化します。値幅が大きいときは自動で対数目盛に切り替わります（`y_scale` で手動指定も可能）。
+
+```bash
+python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 -o data/watch.json
+python3 render_chart.py examples/chart_lines_spec.json out/chart   # copy and edit the spec for your own data
+```
+
 ## Claude での使い方
 
 インストール後は、普通の言葉で頼むだけです。例：
@@ -27,6 +50,8 @@
 - NVDA、AMD、MU のパフォーマンス表を作って。
 - この保有銘柄のスクリーンショットを Schwab 風の表にして。（スクリーンショットを添付）
 - このデータで 2026 年 Neural9 のランキング表を作って。
+- NVDA、MU、AAPL の今年の推移チャートを作って。
+- この 6 銘柄の 3 月から 6 月の推移を対数目盛で比較して。
 
 ## データソース
 
@@ -37,9 +62,12 @@
 - `SKILL.md`：Claude が実際に読み込む Skill の説明（構成、ビジュアル仕様、データソース規定、チェックリスト）。中国語
 - `SKILL.en.md`：`SKILL.md` の英語訳（人が読む用）
 - `install.sh` / `install.ps1`：ワンクリックインストーラー（macOS / Linux と Windows）
-- `render_table.py`：レンダラー。JSON spec を読み込み、中国語・英語の HTML と 2x PNG を出力します
+- `render_table.py`：表のレンダラー。JSON spec を読み込み、中国語・英語の HTML と 2x PNG を出力します
+- `fetch_prices.py`：Nasdaq の公式 API から日次終値をダウンロードします（標準ライブラリのみ）
+- `render_chart.py`：チャートのレンダラー。取得した価格と JSON spec を読み込みます
+- `fonts.py`、`fonts/`：同梱の Inter フォント（SIL OFL）。すべての HTML に埋め込まれます
 - `requirements.txt`：Python の依存パッケージ（Playwright）
-- `examples/`：3 つのモードそれぞれの spec と出力結果
+- `examples/`：3 つの表モードと 2 つのチャートレイアウトそれぞれの spec と出力結果（`sample_prices.json` は合成データ）
 - `assets/`：ソーシャルプレビュー画像
 
 ## インストール
@@ -97,9 +125,16 @@ pip install -r requirements.txt && playwright install chromium
 python3 render_table.py examples/neural9_spec.json out/neural9
 ```
 
-オプション：`--langs en` は指定した言語のみレンダリングします（カンマ区切り）。`--no-png` は HTML のみを書き出し、Playwright は不要です。出力先フォルダがなければ自動で作成されます。
+オプション（両方のレンダラー共通）：`--langs en` は指定した言語のみレンダリングします（カンマ区切り）。`--no-png` は HTML のみを書き出し、Playwright は不要です。`--scale 3` で PNG の解像度を上げます（既定は 2、幅 1520 px）。出力先フォルダがなければ自動で作成されます。
 
-フォント：英数字は Inter、中国語は Noto Sans CJK SC / Source Han Sans SC を使用します。未インストールの場合は Helvetica Neue / PingFang にフォールバックします。
+チャートは 2 ステップです。価格を取得してから描画します。期間は `--start` / `--end` で指定し、既定は年初来です。`--benchmark COMP` でベンチマークを SPY から Nasdaq 総合指数に変えられます。
+
+```bash
+python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 -o data/watch.json
+python3 render_chart.py examples/chart_lines_spec.json out/chart   # copy and edit the spec for your own data
+```
+
+フォント：Inter（リポジトリの `fonts/` に同梱、SIL Open Font License）が英数字用にすべての HTML に埋め込まれるため、どのマシンでも同じ見た目になります。中国語はシステムの中国語フォント（macOS は PingFang SC、Windows は Microsoft YaHei）を使います。最小構成の Linux サーバーでは、例えば `sudo apt install fonts-noto-cjk` で入れてください。ないと中国語版が四角で表示されます。
 
 ## 免責事項
 

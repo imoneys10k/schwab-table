@@ -1,0 +1,55 @@
+{
+  "data": "sample_prices.json",
+  "symbols": [
+    "ACRB",
+    "STRK",
+    "HOOL",
+    "GLBX"
+  ],
+  "names": {
+    "ACRB": {
+      "en": "Acme Robotics Inc",
+      "zh": "极客机器人"
+    },
+    "STRK": {
+      "en": "Stark Aerospace Corp",
+      "zh": "星锐航天"
+    },
+    "HOOL": {
+      "en": "Hooli Cloud Inc",
+      "zh": "呼哩云"
+    },
+    "GLBX": {
+      "en": "Globex Energy Corp",
+      "zh": "环球能源"
+    },
+    "INSY": {
+      "en": "Initech Systems Inc",
+      "zh": "因尼科技"
+    },
+    "UMBB": {
+      "en": "Umbrella Biotech Inc",
+      "zh": "伞形生物"
+    },
+    "WAYN": {
+      "en": "Wayne Industries Inc",
+      "zh": "韦恩工业"
+    },
+    "CYDN": {
+      "en": "Cyberdyne Labs Inc",
+      "zh": "赛博动力"
+    },
+    "SOYL": {
+      "en": "Soylent Foods Corp",
+      "zh": "绿叶食品"
+    }
+  },
+  "benchmark_name": {
+    "en": "Benchmark index",
+    "zh": "基准指数"
+  },
+  "note": {
+    "en": "Hypothetical example: fictional companies and synthetic data. ",
+    "zh": "虚构示例：公司为虚构，数据为合成数据。"
+  }
+}

@@ -33,3 +33,14 @@ jobs:
       - name: Install (Windows PowerShell 5.1)
         shell: powershell
         run: .\install.ps1 -Dir "$env:RUNNER_TEMP\skill-ps51\schwab-performance-table"
+
+  examples:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Regenerate HTML examples and check they match the repo
+        run: |
+          python3 examples/make_sample_prices.py
+          for m in neural9 holdings watchlist; do python3 render_table.py examples/${m}_spec.json examples/$m --no-png >/dev/null; done
+          for m in chart_lines chart_multiples; do python3 render_chart.py examples/${m}_spec.json examples/$m --no-png >/dev/null; done
+          git diff --exit-code -- 'examples/*.html' examples/sample_prices.json

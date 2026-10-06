@@ -86,11 +86,14 @@ if ($SkipDeps) {
   Invoke-Checked $vpy @("-m", "playwright", "install", "chromium")
 
   # 3. Smoke test ----------------------------------------------------------------
-  Say "Smoke test: rendering the example table"
+  Say "Smoke test: rendering an example table and an example chart"
   $smoke = Join-Path ([IO.Path]::GetTempPath()) ("schwab-smoke-" + [Guid]::NewGuid())
   New-Item -ItemType Directory -Force -Path $smoke | Out-Null
   $ok = $true
-  try { Invoke-Checked $vpy @((Join-Path $Target "render_table.py"), (Join-Path $Target "examples\neural9_spec.json"), (Join-Path $smoke "smoke")) | Out-Null } catch { $ok = $false; Write-Host $_.Exception.Message }
+  try {
+    Invoke-Checked $vpy @((Join-Path $Target "render_table.py"), (Join-Path $Target "examples\neural9_spec.json"), (Join-Path $smoke "table")) | Out-Null
+    Invoke-Checked $vpy @((Join-Path $Target "render_chart.py"), (Join-Path $Target "examples\chart_lines_spec.json"), (Join-Path $smoke "chart")) | Out-Null
+  } catch { $ok = $false; Write-Host $_.Exception.Message }
   Remove-Item -Recurse -Force $smoke -ErrorAction SilentlyContinue
   if (-not $ok) { throw "smoke test failed" }
   Say "Render OK"
