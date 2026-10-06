@@ -78,9 +78,9 @@ Ready-made "YTD %" figures on web pages mostly come from aggregators and are not
 ### Columns
 | # | Alignment | Width | Content |
 |---|---|---|---|
-| 1 | Left | 37% | `{name} ({TICKER})`; header left blank |
-| 2 | Right | 15% | Primary metric (the sort key) |
-| 3–5 | Right | 16% each | Remaining metrics |
+| 1 | Left | 30% | `{name} ({TICKER})`; header left blank |
+| 2 | Right | 13% | Primary metric (the sort key) |
+| 3–5 | Right | 19% each | Remaining metrics |
 
 - **Column 1 must include the ticker**, in both language versions: `Micron Technology Inc (MU)`, `美光科技 (MU)`
 - Benchmark and total rows carry no ticker
@@ -128,7 +128,7 @@ Ready-made "YTD %" figures on web pages mostly come from aggregators and are not
 - For modes B and C, replace the metric definitions in the middle with this table's metrics; if there is no index row, drop the "Indexes are unmanaged…" sentence
 - The Chinese version is a full translation, ending in the bold sentence 「过往业绩不代表未来表现。」
 
-## Visual parameters (table width 720px; colours are estimates)
+## Visual parameters (table width 760px; colours are estimates)
 | Element | Value |
 |---|---|
 | Latin/number font | `Inter`, falling back to `Helvetica Neue`, Helvetica, Arial |
