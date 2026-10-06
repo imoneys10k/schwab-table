@@ -1,7 +1,9 @@
 """Render a Schwab-style performance table (EN + ZH) from a JSON spec.
 
-Usage: python3 render_table.py spec.json OUT_PREFIX
+Usage: python3 render_table.py spec.json OUT_PREFIX [--langs en,zh] [--no-png]
 Writes OUT_PREFIX_en.html/.png and OUT_PREFIX_zh.html/.png (2x).
+Missing output directories are created. --langs limits the languages rendered,
+--no-png writes HTML only (no Playwright needed).
 
 Spec:
 {
@@ -18,10 +20,11 @@ Spec:
 Rows are sorted by cells[0] descending; bench rows are bold, have no ticker, and null renders as NA.
 Formats: pct = 1 decimal, money = 2 decimals with thousands separator, raw = string as given.
 """
+import argparse
 import asyncio
 import json
 import sys
-from playwright.async_api import async_playwright
+from pathlib import Path
 
 FONT_STACK = ('"Inter", "Helvetica Neue", Helvetica, Arial, '
               '"Noto Sans CJK SC", "Source Han Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif')
@@ -82,14 +85,40 @@ tbody tr.bench td {{ color:#2B2B2B; font-weight:600; }}
 </div></body></html>"""
 
 
-async def main(spec_path, prefix):
-    spec = json.load(open(spec_path, encoding="utf-8"))
+def load_spec(spec_path):
+    try:
+        with open(spec_path, encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        sys.exit(f"error: spec file not found: {spec_path}")
+    except json.JSONDecodeError as e:
+        sys.exit(f"error: {spec_path} is not valid JSON: {e}")
+
+
+def pick_langs(spec, wanted):
+    available = list(spec["langs"])
+    if not wanted:
+        return available
+    missing = [l for l in wanted if l not in available]
+    if missing:
+        sys.exit(f"error: language(s) {', '.join(missing)} not in spec (available: {', '.join(available)})")
+    return wanted
+
+
+async def render_png(htmls, prefix):
+    try:
+        from playwright.async_api import async_playwright
+    except ImportError:
+        sys.exit("error: playwright is not installed. Run: pip install playwright && playwright install chromium\n"
+                 "(or pass --no-png to write HTML only)")
     async with async_playwright() as p:
-        b = await p.chromium.launch()
-        for lang in spec["langs"]:
-            html = build_html(spec, lang)
-            with open(f"{prefix}_{lang}.html", "w", encoding="utf-8") as f:
-                f.write(html)
+        try:
+            b = await p.chromium.launch()
+        except Exception as e:
+            if "Executable doesn't exist" in str(e):
+                sys.exit("error: Chromium is not installed. Run: playwright install chromium")
+            raise
+        for lang, html in htmls.items():
             pg = await b.new_page(device_scale_factor=2, viewport={"width": 800, "height": 600})
             await pg.set_content(html)
             await pg.evaluate("document.fonts.ready")
@@ -98,5 +127,27 @@ async def main(spec_path, prefix):
         await b.close()
 
 
+def main():
+    ap = argparse.ArgumentParser(description="Render a Schwab-style performance table from a JSON spec.")
+    ap.add_argument("spec", help="path to the spec JSON")
+    ap.add_argument("prefix", help="output prefix, e.g. out/neural9 -> out/neural9_en.html / .png")
+    ap.add_argument("--langs", help="comma-separated languages to render (default: all in the spec)")
+    ap.add_argument("--no-png", action="store_true", help="write HTML only")
+    args = ap.parse_args()
+
+    spec = load_spec(args.spec)
+    langs = pick_langs(spec, [l.strip() for l in args.langs.split(",")] if args.langs else None)
+    Path(args.prefix).parent.mkdir(parents=True, exist_ok=True)
+
+    htmls = {lang: build_html(spec, lang) for lang in langs}
+    for lang, html in htmls.items():
+        Path(f"{args.prefix}_{lang}.html").write_text(html, encoding="utf-8")
+        print(f"wrote {args.prefix}_{lang}.html")
+    if not args.no_png:
+        asyncio.run(render_png(htmls, args.prefix))
+        for lang in htmls:
+            print(f"wrote {args.prefix}_{lang}.png")
+
+
 if __name__ == "__main__":
-    asyncio.run(main(sys.argv[1], sys.argv[2]))
+    main()

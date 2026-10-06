@@ -1,0 +1,128 @@
+{
+  "langs": {
+    "en": {
+      "title": "2026 Watchlist Performance",
+      "h1": [
+        "",
+        "",
+        "1-month",
+        "1-year",
+        "Last"
+      ],
+      "h2": [
+        "",
+        "YTD (%)",
+        "return (%)",
+        "return (%)",
+        "price ($)"
+      ],
+      "foot": "Hypothetical example for illustration only. Source: sample data, as of 10/2/2026. Returns are price returns (excluding dividends). Company names are fictional and the figures are not real market data or a recommendation, offer to sell, or a solicitation of an offer to buy any security. <b>Past performance is no guarantee of future results.</b>",
+      "foot_size": "10px"
+    },
+    "zh": {
+      "title": "2026 年自选股表现",
+      "h1": [
+        "",
+        "年初",
+        "近 1 月",
+        "近 1 年",
+        "最新"
+      ],
+      "h2": [
+        "",
+        "至今 (%)",
+        "涨跌幅 (%)",
+        "涨跌幅 (%)",
+        "收盘价 ($)"
+      ],
+      "foot": "虚构示例，仅作说明用途。资料来源：示例数据，截至 10/2/2026。回报为价格回报（不含股息）。公司名称均为虚构，数字不是真实市场数据，也不构成任何证券的推荐、出售要约或购买要约邀请。<b>过往业绩不代表未来表现。</b>",
+      "foot_size": "10.5px"
+    }
+  },
+  "formats": [
+    "pct",
+    "pct",
+    "pct",
+    "money"
+  ],
+  "rows": [
+    {
+      "ticker": "ACRB",
+      "name": {
+        "en": "Acme Robotics Inc",
+        "zh": "极客机器人"
+      },
+      "cells": [
+        88.4,
+        12.6,
+        143.2,
+        194.35
+      ]
+    },
+    {
+      "ticker": "STRK",
+      "name": {
+        "en": "Stark Aerospace Corp",
+        "zh": "星锐航天"
+      },
+      "cells": [
+        41.7,
+        5.1,
+        62.9,
+        312.8
+      ]
+    },
+    {
+      "ticker": "HOOL",
+      "name": {
+        "en": "Hooli Cloud Inc",
+        "zh": "呼哩云"
+      },
+      "cells": [
+        22.3,
+        -2.4,
+        35.0,
+        127.55
+      ]
+    },
+    {
+      "ticker": "GLBX",
+      "name": {
+        "en": "Globex Energy Corp",
+        "zh": "环球能源"
+      },
+      "cells": [
+        6.8,
+        1.9,
+        9.4,
+        60.95
+      ]
+    },
+    {
+      "ticker": "INSY",
+      "name": {
+        "en": "Initech Systems Inc",
+        "zh": "因尼科技"
+      },
+      "cells": [
+        -5.2,
+        -7.8,
+        -11.6,
+        39.9
+      ]
+    },
+    {
+      "ticker": "UMBB",
+      "name": {
+        "en": "Umbrella Biotech Inc",
+        "zh": "伞形生物"
+      },
+      "cells": [
+        -18.6,
+        -3.3,
+        -24.1,
+        1234.5
+      ]
+    }
+  ]
+}

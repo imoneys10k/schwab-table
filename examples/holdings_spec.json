@@ -1,0 +1,128 @@
+{
+  "langs": {
+    "en": {
+      "title": "2026 Portfolio Performance",
+      "h1": [
+        "",
+        "Open",
+        "Day",
+        "Avg",
+        ""
+      ],
+      "h2": [
+        "",
+        "P/L (%)",
+        "P/L ($)",
+        "cost ($)",
+        "Shares"
+      ],
+      "foot": "Hypothetical example for illustration only. Source: sample brokerage holdings, as of 10/2/2026. Open P/L is the unrealized gain or loss versus average cost; Day P/L is the change in position value since the prior close. Company names are fictional and the figures are not real market data or a recommendation, offer to sell, or a solicitation of an offer to buy any security. <b>Past performance is no guarantee of future results.</b>",
+      "foot_size": "10px"
+    },
+    "zh": {
+      "title": "2026 年持仓表现",
+      "h1": [
+        "",
+        "开仓",
+        "当日",
+        "平均",
+        ""
+      ],
+      "h2": [
+        "",
+        "盈亏 (%)",
+        "盈亏 ($)",
+        "成本 ($)",
+        "持股数"
+      ],
+      "foot": "虚构示例，仅作说明用途。资料来源：示例券商持仓，截至 10/2/2026。开仓盈亏为相对平均成本的未实现盈亏；当日盈亏为持仓市值相对前一收盘价的变动。公司名称均为虚构，数字不是真实市场数据，也不构成任何证券的推荐、出售要约或购买要约邀请。<b>过往业绩不代表未来表现。</b>",
+      "foot_size": "10.5px"
+    }
+  },
+  "formats": [
+    "pct",
+    "money",
+    "money",
+    "raw"
+  ],
+  "rows": [
+    {
+      "ticker": "ACRB",
+      "name": {
+        "en": "Acme Robotics Inc",
+        "zh": "极客机器人"
+      },
+      "cells": [
+        64.2,
+        1284.5,
+        118.4,
+        "250"
+      ]
+    },
+    {
+      "ticker": "HOOL",
+      "name": {
+        "en": "Hooli Cloud Inc",
+        "zh": "呼哩云"
+      },
+      "cells": [
+        31.8,
+        -412.1,
+        96.75,
+        "400"
+      ]
+    },
+    {
+      "ticker": "GLBX",
+      "name": {
+        "en": "Globex Energy Corp",
+        "zh": "环球能源"
+      },
+      "cells": [
+        12.5,
+        215.0,
+        54.2,
+        "1,000"
+      ]
+    },
+    {
+      "name": {
+        "en": "Total",
+        "zh": "组合合计"
+      },
+      "cells": [
+        9.7,
+        1087.4,
+        null,
+        null
+      ],
+      "bench": true
+    },
+    {
+      "ticker": "INSY",
+      "name": {
+        "en": "Initech Systems Inc",
+        "zh": "因尼科技"
+      },
+      "cells": [
+        -3.4,
+        -98.3,
+        42.1,
+        "600"
+      ]
+    },
+    {
+      "ticker": "UMBB",
+      "name": {
+        "en": "Umbrella Biotech Inc",
+        "zh": "伞形生物"
+      },
+      "cells": [
+        -21.9,
+        -1120.25,
+        73.6,
+        "350"
+      ]
+    }
+  ]
+}

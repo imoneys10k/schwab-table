@@ -170,6 +170,8 @@ spec 格式：
 ```
 `formats`：`pct` 一位小数，`money` 两位小数加千分位，`raw` 原样输出（排名、持股数用它）。`null` 显示为 `NA`。
 
+可选参数：`--langs en` 只渲染指定语言；`--no-png` 只写 HTML，不需要 Playwright。
+
 没有 `render_table.py` 时，按上面的结构和视觉参数手写单文件 HTML，用 Playwright `device_scale_factor=2` 截 `#wrap` 容器。
 
 ## 自查清单
