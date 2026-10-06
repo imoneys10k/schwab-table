@@ -40,3 +40,7 @@ Polices : Inter pour les caractères latins et les chiffres, Noto Sans CJK SC / 
 ## Avertissement
 
 Ce projet ne produit que la mise en forme de tableaux et ne fournit aucun conseil en investissement. Les données des exemples sont données à titre d'illustration uniquement.
+
+## Licence
+
+[MIT](LICENSE)

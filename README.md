@@ -40,3 +40,7 @@ Fonts: Inter for Latin text and numbers, Noto Sans CJK SC / Source Han Sans SC f
 ## Disclaimer
 
 This project only generates table styling and does not provide investment advice. The data in the examples is for illustration only.
+
+## License
+
+[MIT](LICENSE)

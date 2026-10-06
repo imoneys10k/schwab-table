@@ -40,3 +40,7 @@ python3 render_table.py examples/neural9_spec.json out/neural9
 ## 免責事項
 
 このプロジェクトは表のスタイルを生成するだけで、投資助言は行いません。表中のデータは例示のみを目的としています。
+
+## ライセンス
+
+[MIT](LICENSE)
