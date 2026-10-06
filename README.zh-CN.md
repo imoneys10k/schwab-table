@@ -6,7 +6,7 @@
 
 [English](README.md) · **简体中文** · [日本語](README.ja.md) · [Français](README.fr.md)
 
-<p><a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/License-MIT-2a78d6?style=flat-square"></a> <a href="https://github.com/imoneys10k/schwab-table/actions/workflows/install-test.yml"><img alt="install test" src="https://img.shields.io/github/actions/workflow/status/imoneys10k/schwab-table/install-test.yml?branch=main&style=flat-square&label=install%20test"></a> <a href="https://github.com/imoneys10k/schwab-table/releases"><img alt="release" src="https://img.shields.io/github/v/release/imoneys10k/schwab-table?style=flat-square&color=1B2A4A"></a> <a href="https://github.com/imoneys10k/schwab-table/stargazers"><img alt="stars" src="https://img.shields.io/github/stars/imoneys10k/schwab-table?style=flat-square&color=eda100"></a> <img alt="Python 3.9+" src="https://img.shields.io/badge/Python-3.9%2B-1baf7a?style=flat-square"> <img alt="macOS, Linux, Windows" src="https://img.shields.io/badge/macOS%20%C2%B7%20Linux%20%C2%B7%20Windows-supported-ACDCEC?style=flat-square&labelColor=1B2A4A"> <img alt="Claude Skill" src="https://img.shields.io/badge/Claude-Skill-eb6834?style=flat-square"></p>
+<p><a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/License-MIT-2a78d6?style=flat-square"></a> <a href="https://github.com/imoneys10k/schwab-table/actions/workflows/install-test.yml"><img alt="install test" src="https://img.shields.io/github/actions/workflow/status/imoneys10k/schwab-table/install-test.yml?branch=main&style=flat-square&label=install%20test"></a> <a href="https://github.com/imoneys10k/schwab-table/releases"><img alt="release" src="https://img.shields.io/github/v/release/imoneys10k/schwab-table?style=flat-square&color=1B2A4A"></a> <a href="https://github.com/imoneys10k/schwab-table/stargazers"><img alt="stars" src="https://img.shields.io/github/stars/imoneys10k/schwab-table?style=flat-square&color=eda100"></a> <a href="https://github.com/imoneys10k/schwab-table/actions/workflows/tests.yml"><img alt="tests" src="https://img.shields.io/github/actions/workflow/status/imoneys10k/schwab-table/tests.yml?branch=main&style=flat-square&label=tests"></a> <img alt="Python 3.9+" src="https://img.shields.io/badge/Python-3.9%2B-1baf7a?style=flat-square"> <img alt="macOS, Linux, Windows" src="https://img.shields.io/badge/macOS%20%C2%B7%20Linux%20%C2%B7%20Windows-supported-ACDCEC?style=flat-square&labelColor=1B2A4A"> <img alt="Claude Skill" src="https://img.shields.io/badge/Claude-Skill-eb6834?style=flat-square"></p>
 
 <p><a href="#-安装"><b>🚀 安装</b></a> · <a href="#-效果图"><b>🎨 效果图</b></a> · <a href="https://imoneys10k.github.io/schwab-table/"><b>🌐 项目主页</b></a> · <a href="SKILL.en.md"><b>📘 Skill 文档</b></a></p>
 
@@ -84,11 +84,13 @@ irm https://raw.githubusercontent.com/imoneys10k/schwab-table/main/install.ps1 |
 | 选项（macOS / Linux） | 选项（Windows） | 作用 |
 |---|---|---|
 | `--dir PATH` | `-Dir PATH` | 装到别处（比如其他 Agent 的 skills 目录）。环境变量 `CLAUDE_SKILLS_DIR` 可修改默认根目录 |
+| `--ref TAG` | `-Ref TAG` | 安装指定的标签或分支而不是 `main`，例如 `v0.4.0`，用来固定版本 |
 | `--skip-deps` | `-SkipDeps` | 跳过 Python / Playwright / Chromium，只下载文件 |
+| `--uninstall` | `-Uninstall` | 删除已安装的 skill 文件夹 |
 
 用管道运行时，选项要放在 `sh -s --` 后面，例如 `curl -fsSL .../install.sh | sh -s -- --dir ~/my-skills/schwab`。Windows 请先保存 `install.ps1`，再运行 `.\install.ps1 -Dir C:\path`。
 
-**更新：** 再运行一遍同样的命令。**卸载：** 删除安装目录。
+**更新：** 再运行一遍同样的命令。**卸载：** 加上 `--uninstall` 运行（Windows 用 `-Uninstall`）。
 
 **常见问题：** Debian/Ubuntu 需要先装 `python3-venv`；Linux 上 Chromium 启动失败时，运行 `sudo <安装目录>/.venv/bin/python -m playwright install-deps chromium`。
 
@@ -125,6 +127,8 @@ irm https://raw.githubusercontent.com/imoneys10k/schwab-table/main/install.ps1 |
 
 - **数据：** Nasdaq 官方历史行情接口：交易所官方日收盘价，已按拆股复权，价格回报，约 10 年。基准默认用 SPY，图上标注为标普 500 的替代。不使用其他来源。
 - **纵轴：** 只有一个纵轴，起点为 100。涨幅差距很大时自动改用对数刻度（也可用 `y_scale` 手动指定）。
+- **自己的数据：** `csv_to_prices.py` 可以把 CSV 文件（券商导出、港股或 A 股价格、用于总回报的复权价）转成同样的格式。
+- **选项：** `--theme dark` 深色主题、`--pdf` 矢量 PDF、多个基准（`--benchmark SPY,COMP`）、自定义线条颜色，HTML 文件里还有鼠标悬停提示。
 
 ```bash
 python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 -o data/watch.json
@@ -143,6 +147,9 @@ python3 render_chart.py examples/chart_lines_spec.json out/chart   # copy and ed
 - `install.sh` / `install.ps1`：一键安装脚本（macOS / Linux 与 Windows）
 - `render_table.py`：表格渲染器，读 JSON spec，输出中英文 HTML 和 2x PNG
 - `fetch_prices.py`：从 Nasdaq 官方接口下载日收盘价（仅用标准库）
+- `csv_to_prices.py`：把你自己的 CSV 价格文件转成 `render_chart.py` 能读的格式
+- `render_common.py`：共用的配色主题和 PNG / PDF 渲染
+- `tests/`：计算和解析逻辑的单元测试（`python3 -m unittest discover -s tests`）
 - `render_chart.py`：走势图渲染器，读取下载的价格和 JSON spec
 - `fonts.py`、`fonts/`：随仓库附带的 Inter 字体（SIL OFL），嵌入每个 HTML 文件
 - `requirements.txt`：Python 依赖（Playwright）
@@ -167,8 +174,12 @@ python3 render_table.py examples/neural9_spec.json out/neural9
 
 ```bash
 python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 -o data/watch.json
-python3 render_chart.py examples/chart_lines_spec.json out/chart   # copy and edit the spec for your own data
+python3 render_chart.py examples/chart_lines_spec.json out/chart   # 复制并修改 spec 用于你自己的数据
+python3 render_chart.py examples/chart_lines_spec.json out/chart --theme dark --pdf   # 深色主题和矢量 PDF
+python3 csv_to_prices.py 0700.HK=tencent.csv --benchmark HSI=hsi.csv -o data/hk.json   # 你自己的 CSV 文件
 ```
+
+`fetch_prices.py` 会把响应缓存 12 小时（`--refresh` 可绕过缓存），网络失败时会带警告地使用上一次的缓存。代码有歧义时，可用 `index:COMP`、`etf:SPY` 指定资产类别。两个渲染器都支持 `--theme dark` 和 `--pdf`。
 
 字体：Inter（随仓库放在 `fonts/`，SIL 开源字体许可）会嵌入每个 HTML 文件，用于英文和数字，所以在任何机器上效果一致。中文使用系统自带的中文字体（macOS 为苹方，Windows 为微软雅黑）。精简的 Linux 服务器上请先装一个，例如 `sudo apt install fonts-noto-cjk`，否则中文版会显示成方块。
 

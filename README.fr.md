@@ -6,7 +6,7 @@
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · **Français**
 
-<p><a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/License-MIT-2a78d6?style=flat-square"></a> <a href="https://github.com/imoneys10k/schwab-table/actions/workflows/install-test.yml"><img alt="install test" src="https://img.shields.io/github/actions/workflow/status/imoneys10k/schwab-table/install-test.yml?branch=main&style=flat-square&label=install%20test"></a> <a href="https://github.com/imoneys10k/schwab-table/releases"><img alt="release" src="https://img.shields.io/github/v/release/imoneys10k/schwab-table?style=flat-square&color=1B2A4A"></a> <a href="https://github.com/imoneys10k/schwab-table/stargazers"><img alt="stars" src="https://img.shields.io/github/stars/imoneys10k/schwab-table?style=flat-square&color=eda100"></a> <img alt="Python 3.9+" src="https://img.shields.io/badge/Python-3.9%2B-1baf7a?style=flat-square"> <img alt="macOS, Linux, Windows" src="https://img.shields.io/badge/macOS%20%C2%B7%20Linux%20%C2%B7%20Windows-supported-ACDCEC?style=flat-square&labelColor=1B2A4A"> <img alt="Claude Skill" src="https://img.shields.io/badge/Claude-Skill-eb6834?style=flat-square"></p>
+<p><a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/License-MIT-2a78d6?style=flat-square"></a> <a href="https://github.com/imoneys10k/schwab-table/actions/workflows/install-test.yml"><img alt="install test" src="https://img.shields.io/github/actions/workflow/status/imoneys10k/schwab-table/install-test.yml?branch=main&style=flat-square&label=install%20test"></a> <a href="https://github.com/imoneys10k/schwab-table/releases"><img alt="release" src="https://img.shields.io/github/v/release/imoneys10k/schwab-table?style=flat-square&color=1B2A4A"></a> <a href="https://github.com/imoneys10k/schwab-table/stargazers"><img alt="stars" src="https://img.shields.io/github/stars/imoneys10k/schwab-table?style=flat-square&color=eda100"></a> <a href="https://github.com/imoneys10k/schwab-table/actions/workflows/tests.yml"><img alt="tests" src="https://img.shields.io/github/actions/workflow/status/imoneys10k/schwab-table/tests.yml?branch=main&style=flat-square&label=tests"></a> <img alt="Python 3.9+" src="https://img.shields.io/badge/Python-3.9%2B-1baf7a?style=flat-square"> <img alt="macOS, Linux, Windows" src="https://img.shields.io/badge/macOS%20%C2%B7%20Linux%20%C2%B7%20Windows-supported-ACDCEC?style=flat-square&labelColor=1B2A4A"> <img alt="Claude Skill" src="https://img.shields.io/badge/Claude-Skill-eb6834?style=flat-square"></p>
 
 <p><a href="#-installation"><b>🚀 Installation</b></a> · <a href="#-galerie"><b>🎨 Galerie</b></a> · <a href="https://imoneys10k.github.io/schwab-table/"><b>🌐 Site du projet</b></a> · <a href="SKILL.en.md"><b>📘 Doc du skill</b></a></p>
 
@@ -84,11 +84,13 @@ L'installateur place le skill dans `~/.claude/skills/schwab-performance-table` (
 | Option (macOS / Linux) | Option (Windows) | Effet |
 |---|---|---|
 | `--dir PATH` | `-Dir PATH` | Installer ailleurs (par exemple dans le dossier skills d'un autre agent). La variable `CLAUDE_SKILLS_DIR` change la racine par défaut |
+| `--ref TAG` | `-Ref TAG` | Installer un tag ou une branche au lieu de `main`, par exemple `v0.4.0`, pour figer une version |
 | `--skip-deps` | `-SkipDeps` | Ignorer Python / Playwright / Chromium (récupérer seulement les fichiers) |
+| `--uninstall` | `-Uninstall` | Supprimer le dossier du skill installé |
 
 Avec un tube (pipe), passez les options après `sh -s --`, par exemple `curl -fsSL .../install.sh | sh -s -- --dir ~/my-skills/schwab`. Sous Windows, enregistrez `install.ps1` puis lancez `.\install.ps1 -Dir C:\path`.
 
-**Mise à jour :** relancez la même commande. **Désinstallation :** supprimez le dossier d'installation.
+**Mise à jour :** relancez la même commande. **Désinstallation :** lancez-le avec `--uninstall` (`-Uninstall` sous Windows).
 
 **Dépannage :** sous Debian/Ubuntu, installez d'abord `python3-venv` ; sous Linux, si Chromium ne démarre pas, exécutez `sudo <dossier d'installation>/.venv/bin/python -m playwright install-deps chromium`.
 
@@ -125,6 +127,8 @@ Jusqu'à 9 valeurs sur une période au choix (par défaut : depuis le début de 
 
 - **Données :** l'API officielle d'historique de cours de Nasdaq : cours de clôture quotidiens officiels, ajustés des divisions de titres, rendements de prix, environ 10 ans. La référence par défaut est SPY, indiquée comme substitut du S&P 500. Aucune autre source n'est utilisée.
 - **Axe :** un seul axe vertical, indexé à 100 au départ. Il passe automatiquement en échelle logarithmique quand l'écart est grand (ou fixez `y_scale` vous-même).
+- **Vos propres données :** `csv_to_prices.py` convertit des fichiers CSV (exports de courtier, cours de Hong Kong ou des actions A, cours ajustés pour le rendement total) dans le même format.
+- **Options :** `--theme dark` (thème sombre), `--pdf` (PDF vectoriel), plusieurs références (`--benchmark SPY,COMP`), couleurs de courbes personnalisées et infobulles au survol dans les fichiers HTML.
 
 ```bash
 python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 -o data/watch.json
@@ -143,6 +147,9 @@ Uniquement des données faisant autorité : cours de clôture officiels des bour
 - `install.sh` / `install.ps1` : installateurs en une commande (macOS / Linux et Windows)
 - `render_table.py` : le moteur de rendu des tableaux. Il lit une spécification JSON et produit des fichiers HTML en chinois et en anglais ainsi que des PNG en 2x
 - `fetch_prices.py` : télécharge les cours de clôture quotidiens depuis l'API officielle de Nasdaq (bibliothèque standard uniquement)
+- `csv_to_prices.py` : convertit vos fichiers CSV de cours dans le format lu par `render_chart.py`
+- `render_common.py` : thèmes de couleurs et rendu PNG / PDF partagés
+- `tests/` : tests unitaires des calculs et des analyseurs (`python3 -m unittest discover -s tests`)
 - `render_chart.py` : le moteur de rendu des graphiques. Il lit les prix téléchargés et une spécification JSON
 - `fonts.py`, `fonts/` : la police Inter fournie (SIL OFL), intégrée à chaque fichier HTML
 - `requirements.txt` : dépendance Python (Playwright)
@@ -167,8 +174,12 @@ Les graphiques se font en deux étapes : télécharger les prix, puis les rendre
 
 ```bash
 python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 -o data/watch.json
-python3 render_chart.py examples/chart_lines_spec.json out/chart   # copy and edit the spec for your own data
+python3 render_chart.py examples/chart_lines_spec.json out/chart   # copiez et modifiez la spécification pour vos données
+python3 render_chart.py examples/chart_lines_spec.json out/chart --theme dark --pdf   # thème sombre et PDF vectoriel
+python3 csv_to_prices.py 0700.HK=tencent.csv --benchmark HSI=hsi.csv -o data/hk.json   # vos propres fichiers CSV
 ```
+
+`fetch_prices.py` met les réponses en cache 12 heures (`--refresh` l'ignore) et, en cas d'échec réseau, reprend le dernier cache avec un avertissement. `index:COMP` / `etf:SPY` forcent la classe d'actif quand un code est ambigu. Les deux moteurs acceptent aussi `--theme dark` et `--pdf`.
 
 Polices : Inter (fournie dans `fonts/`, licence SIL Open Font) est intégrée à chaque fichier HTML pour les caractères latins et les chiffres, donc le rendu est identique sur toutes les machines. Le chinois utilise la police CJK du système (PingFang SC sous macOS, Microsoft YaHei sous Windows). Sur un serveur Linux minimal, installez-en une, par exemple `sudo apt install fonts-noto-cjk` ; sinon la version chinoise s'affiche en carrés.
 

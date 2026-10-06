@@ -5,7 +5,9 @@
 #
 # Options (when piping, pass them with `sh -s --`):
 #   --dir PATH     install into PATH (default: $CLAUDE_SKILLS_DIR or ~/.claude/skills, + /schwab-performance-table)
+#   --ref REF      install a tag or branch instead of main, e.g. --ref v0.4.0 (pin a version)
 #   --skip-deps    do not create the Python venv / install Playwright + Chromium
+#   --uninstall    delete the installed skill folder (only if it contains SKILL.md)
 # Re-running updates an existing install.
 set -eu
 
@@ -14,12 +16,16 @@ SKILL_NAME="schwab-performance-table"
 SKILLS_ROOT="${CLAUDE_SKILLS_DIR:-$HOME/.claude/skills}"
 TARGET=""
 SKIP_DEPS=0
+REF=""
+UNINSTALL=0
 
 while [ $# -gt 0 ]; do
   case "$1" in
     --dir) [ $# -ge 2 ] || { echo "error: --dir needs a path" >&2; exit 2; }; TARGET="$2"; shift 2 ;;
+    --ref) [ $# -ge 2 ] || { echo "error: --ref needs a tag or branch" >&2; exit 2; }; REF="$2"; shift 2 ;;
     --skip-deps) SKIP_DEPS=1; shift ;;
-    -h|--help) sed -n '2,10p' "$0" 2>/dev/null | sed 's/^# \{0,1\}//'; exit 0 ;;
+    --uninstall) UNINSTALL=1; shift ;;
+    -h|--help) sed -n '2,13p' "$0" 2>/dev/null | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "error: unknown option: $1" >&2; exit 2 ;;
   esac
 done
@@ -28,19 +34,34 @@ done
 say() { printf '==> %s\n' "$*"; }
 die() { printf 'error: %s\n' "$*" >&2; exit 1; }
 
+# 0. Uninstall ----------------------------------------------------------------
+if [ "$UNINSTALL" -eq 1 ]; then
+  if [ -f "$TARGET/SKILL.md" ]; then
+    rm -rf "$TARGET"
+    say "Removed $TARGET"
+  else
+    die "$TARGET does not look like an installed skill (no SKILL.md); nothing removed"
+  fi
+  exit 0
+fi
+
 # 1. Fetch the files -----------------------------------------------------------
 mkdir -p "$(dirname "$TARGET")"
 if [ -d "$TARGET/.git" ]; then
   command -v git >/dev/null 2>&1 || die "git is required to update $TARGET"
   say "Updating existing install in $TARGET"
-  git -C "$TARGET" pull --ff-only
+  if [ -n "$REF" ]; then
+    git -C "$TARGET" fetch --depth 1 origin "$REF" && git -C "$TARGET" checkout -q FETCH_HEAD
+  else
+    git -C "$TARGET" pull --ff-only
+  fi
 elif command -v git >/dev/null 2>&1 && { [ ! -e "$TARGET" ] || [ -z "$(ls -A "$TARGET" 2>/dev/null)" ]; }; then
-  say "Cloning into $TARGET"
-  git clone --depth 1 "$REPO_URL.git" "$TARGET"
+  say "Cloning into $TARGET${REF:+ ($REF)}"
+  git clone --depth 1 ${REF:+--branch "$REF"} "$REPO_URL.git" "$TARGET"
 else
-  say "Downloading into $TARGET"
+  say "Downloading into $TARGET${REF:+ ($REF)}"
   mkdir -p "$TARGET"
-  TARBALL="$REPO_URL/archive/refs/heads/main.tar.gz"
+  TARBALL="$REPO_URL/archive/${REF:-main}.tar.gz"
   if command -v curl >/dev/null 2>&1; then
     curl -fsSL "$TARBALL" | tar -xz -C "$TARGET" --strip-components=1
   elif command -v wget >/dev/null 2>&1; then

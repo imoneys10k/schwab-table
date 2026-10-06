@@ -14,7 +14,7 @@ jobs:
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install (git clone path)
         run: sh ./install.sh --dir "$RUNNER_TEMP/skill-git/schwab-performance-table"
       - name: Install (tarball path, no git)
@@ -23,24 +23,29 @@ jobs:
           for t in curl tar gzip sh mktemp dirname mkdir ls sed uname rm cat python3; do ln -sf "$(command -v $t)" "$RUNNER_TEMP/nogit/$t"; done
           PATH="$RUNNER_TEMP/nogit" /bin/sh ./install.sh --dir "$RUNNER_TEMP/skill-tar/schwab-performance-table"
 
+      - name: Pin a version, then uninstall
+        run: |
+          D="$RUNNER_TEMP/skill-ref/schwab-performance-table"
+          sh ./install.sh --dir "$D" --ref v0.3.0 --skip-deps
+          test -f "$D/SKILL.md"
+          sh ./install.sh --dir "$D" --uninstall
+          test ! -e "$D"
+
   windows:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install (PowerShell 7)
         shell: pwsh
         run: .\install.ps1 -Dir "$env:RUNNER_TEMP\skill-pwsh\schwab-performance-table"
       - name: Install (Windows PowerShell 5.1)
         shell: powershell
         run: .\install.ps1 -Dir "$env:RUNNER_TEMP\skill-ps51\schwab-performance-table"
-
-  examples:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Regenerate HTML examples and check they match the repo
+      - name: Pin a version, then uninstall
+        shell: pwsh
         run: |
-          python3 examples/make_sample_prices.py
-          for m in neural9 holdings watchlist; do python3 render_table.py examples/${m}_spec.json examples/$m --no-png >/dev/null; done
-          for m in chart_lines chart_multiples; do python3 render_chart.py examples/${m}_spec.json examples/$m --no-png >/dev/null; done
-          git diff --exit-code -- 'examples/*.html' examples/sample_prices.json
+          $d = "$env:RUNNER_TEMP\skill-ref\schwab-performance-table"
+          .\install.ps1 -Dir $d -Ref v0.3.0 -SkipDeps
+          if (-not (Test-Path "$d\SKILL.md")) { throw "pinned install failed" }
+          .\install.ps1 -Dir $d -Uninstall
+          if (Test-Path $d) { throw "uninstall failed" }

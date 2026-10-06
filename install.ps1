@@ -4,14 +4,18 @@ One-click installer for the schwab-table Claude Skill (Windows PowerShell 5.1+ /
   irm https://raw.githubusercontent.com/imoneys10k/schwab-table/main/install.ps1 | iex
 
 To pass options, save the script and run it:
-  .\install.ps1 [-Dir <path>] [-SkipDeps]
+  .\install.ps1 [-Dir <path>] [-Ref <tag-or-branch>] [-SkipDeps] [-Uninstall]
   -Dir        install into <path> (default: $env:CLAUDE_SKILLS_DIR or ~\.claude\skills, + \schwab-performance-table)
+  -Ref        install a tag or branch instead of main, e.g. -Ref v0.4.0 (pin a version)
   -SkipDeps   do not create the Python venv / install Playwright + Chromium
+  -Uninstall  delete the installed skill folder (only if it contains SKILL.md)
 Re-running updates an existing install.
 #>
 param(
   [string]$Dir = "",
-  [switch]$SkipDeps
+  [string]$Ref = "",
+  [switch]$SkipDeps,
+  [switch]$Uninstall
 )
 $ErrorActionPreference = "Stop"
 $ProgressPreference = "SilentlyContinue"
@@ -32,25 +36,44 @@ function Invoke-Checked($exe, [string[]]$arguments) {
   if ($code -ne 0) { throw "$exe $($arguments -join ' ') failed (exit code $code)" }
 }
 
+# 0. Uninstall ----------------------------------------------------------------
+if ($Uninstall) {
+  if (Test-Path (Join-Path $Target "SKILL.md")) {
+    Remove-Item -Recurse -Force $Target
+    Say "Removed $Target"
+    return
+  }
+  throw "$Target does not look like an installed skill (no SKILL.md); nothing removed"
+}
+
 # 1. Fetch the files -----------------------------------------------------------
 New-Item -ItemType Directory -Force -Path (Split-Path -Parent $Target) | Out-Null
 $isEmpty = (-not (Test-Path $Target)) -or (-not (Get-ChildItem -Force $Target | Select-Object -First 1))
 if (Test-Path (Join-Path $Target ".git")) {
   if (-not (Test-Cmd git)) { throw "git is required to update $Target" }
   Say "Updating existing install in $Target"
-  Invoke-Checked git @("-C", $Target, "pull", "--ff-only")
+  if ($Ref) {
+    Invoke-Checked git @("-C", $Target, "fetch", "--depth", "1", "origin", $Ref)
+    Invoke-Checked git @("-C", $Target, "checkout", "-q", "FETCH_HEAD")
+  } else {
+    Invoke-Checked git @("-C", $Target, "pull", "--ff-only")
+  }
 } elseif ((Test-Cmd git) -and $isEmpty) {
   Say "Cloning into $Target"
-  Invoke-Checked git @("clone", "--depth", "1", "$RepoUrl.git", $Target)
+  $gitArgs = @("clone", "--depth", "1")
+  if ($Ref) { $gitArgs += @("--branch", $Ref) }
+  Invoke-Checked git ($gitArgs + @("$RepoUrl.git", $Target))
 } else {
   Say "Downloading into $Target"
   $tmp = Join-Path ([IO.Path]::GetTempPath()) ("schwab-table-" + [Guid]::NewGuid())
   New-Item -ItemType Directory -Force -Path $tmp | Out-Null
-  $zip = Join-Path $tmp "main.zip"
-  Invoke-WebRequest -UseBasicParsing "$RepoUrl/archive/refs/heads/main.zip" -OutFile $zip
+  $zip = Join-Path $tmp "src.zip"
+  $zipRef = if ($Ref) { $Ref } else { "main" }
+  Invoke-WebRequest -UseBasicParsing "$RepoUrl/archive/$zipRef.zip" -OutFile $zip
   Expand-Archive -Path $zip -DestinationPath $tmp -Force
   New-Item -ItemType Directory -Force -Path $Target | Out-Null
-  Copy-Item -Path (Join-Path $tmp "schwab-table-main\*") -Destination $Target -Recurse -Force
+  $inner = Get-ChildItem -Directory $tmp | Where-Object { $_.Name -like "schwab-table-*" } | Select-Object -First 1
+  Copy-Item -Path (Join-Path $inner.FullName "*") -Destination $Target -Recurse -Force
   Remove-Item -Recurse -Force $tmp
 }
 

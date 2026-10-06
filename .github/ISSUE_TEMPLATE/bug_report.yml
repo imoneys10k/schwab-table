@@ -1,0 +1,34 @@
+name: Bug report
+description: Something renders wrongly, a number looks off, or the installer fails
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What did you run and what did you expect? For a wrong number, name the symbol, period and the value you expected.
+    validations:
+      required: true
+  - type: textarea
+    id: cmd
+    attributes:
+      label: Command or prompt
+      description: The exact command line, spec JSON, or the prompt you gave your agent.
+      render: shell
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Release tag or commit (see the latest release page).
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options: [macOS, Linux, Windows]
+    validations:
+      required: true
+  - type: textarea
+    id: out
+    attributes:
+      label: Output / error message
+      render: text

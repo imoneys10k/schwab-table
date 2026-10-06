@@ -200,6 +200,10 @@ The user wants to see how one or more symbols moved over a period, their cumulat
    ```
    - Official exchange daily closes, split-adjusted and excluding dividends, i.e. **price returns**; about 10 years of daily history. Stocks, ETFs and Nasdaq indexes (`COMP`, `NDX`) work
    - The default benchmark is **SPY** (an S&P 500 ETF, same source; the chart and footnote say it is only a proxy for the index). `--benchmark COMP` uses the Nasdaq Composite; `--benchmark SP500` uses the S&P 500 index republished by FRED (FRED sometimes times out); `--benchmark none` draws no benchmark
+   - Separate several benchmarks with commas: `--benchmark SPY,COMP`. `COMP`, `NDX` and a few more are indexes and are looked up as indexes directly (the same letters can also be a US stock ticker, e.g. COMP is Compass Inc); when a code is ambiguous use `index:COMP`, `etf:SPY` or `stock:XXX` to force the class
+   - **US-listed only.** For Hong Kong, A-shares and other markets Nasdaq does not cover, ask the user for a CSV (a broker or exchange export) and convert it with `python3 csv_to_prices.py 0700.HK=tencent.csv --benchmark HSI=hsi.csv -o data/hk.json`; the source is recorded as user-provided data. Do not switch to an aggregator
+   - **Total return:** Nasdaq's dividend data is not split-adjusted and ETFs have none, so total returns cannot be computed automatically. When the user supplies a CSV with an `Adj Close` column, use `csv_to_prices.py --adj-close` and the chart is labelled total return. Price-return and total-return series cannot share a chart
+   - Responses are cached for 12 hours (`--refresh` bypasses it). If the network fails, the last cache is used with a warning, and the footnote's retrieval date is when that cache was actually fetched
    - Never use aggregator sites or numbers from the model's memory. If the script exits with code 2, or `errors` in the JSON is non-empty, some symbol was not fetched: **stop and tell the user which one**; do not fill the gap
    - Claude supplies the company names (English full name + common Chinese name) in the spec's `names`
 3. **Write the spec** (format below) and run:
@@ -235,12 +239,13 @@ The user wants to see how one or more symbols moved over a period, their cumulat
   "symbols": ["NVDA", "MU"],
   "names": {"NVDA": {"en": "NVIDIA Corp", "zh": "英伟达"}, "MU": {"en": "Micron Technology Inc", "zh": "美光科技"}},
   "benchmark_name": {"en": "S&P 500 (SPY)", "zh": "标普 500 (SPY)"},
+  "benchmarks": ["SPY", "COMP"], "colors": {"NVDA": "#2a78d6"},
   "layout": "auto", "y_scale": "auto", "drawdown": true, "table": true,
   "start": "2026-01-01", "end": "2026-10-02",
   "title": {"en": "...", "zh": "..."}, "note": {"en": "...", "zh": "..."}
 }
 ```
-Everything except `data` is optional. Without `start` / `end` the data file's range is used; `note` is put at the start of the footnote (the examples use it to say "Hypothetical example"). Command-line options: `--langs en` renders one language, `--no-png` writes HTML only, `--scale 3` raises the PNG resolution (default 2).
+Everything except `data` is optional. Without `start` / `end` the data file's range is used; `note` is put at the start of the footnote (the examples use it to say "Hypothetical example"). `benchmarks` selects and orders the benchmarks in the data file; `benchmark_name` can be `{"en": ..., "zh": ...}` (for the first benchmark) or given per symbol; `colors` overrides individual line colours with `#rrggbb` (the default palette is checked for colour-blind separability, so check contrast yourself if you change it). Command-line options: `--langs en` renders one language, `--no-png` writes HTML only, `--pdf` also saves a vector PDF, `--scale 3` raises the PNG resolution (default 2), `--theme dark` renders a dark theme (tables and charts). In the HTML files, hovering over a chart shows every line's value for that day.
 
 ## Checklist (charts)
 - [ ] At most 9 symbols; the period matches the request (year to date if none was given)
@@ -249,3 +254,4 @@ Everything except `data` is optional. Without `start` / `end` the data file's ra
 - [ ] One y-axis only; colours fixed per symbol; line-end labels present, not overlapping, not clipped
 - [ ] When an ETF is the benchmark the footnote says it is a proxy; when a log scale is used the subtitle says so
 - [ ] Summary table sorted by return descending, benchmark row bold, numbers consistent with the line-end labels
+- [ ] Symbols outside the US (Hong Kong, A-shares, ...) come from a CSV the user supplied and the footnote says so; total-return charts are used only for user-supplied adjusted prices

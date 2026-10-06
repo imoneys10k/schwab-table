@@ -203,6 +203,10 @@ spec 格式：
    ```
    - 数据是交易所官方日收盘价，已按拆股复权、不含股息，即**价格回报**；约有 10 年日线。股票、ETF、纳斯达克指数（`COMP`、`NDX`）都能取
    - 基准默认 **SPY**（标普 500 的 ETF，同一来源，图和脚注会标明它只是指数的替代）。`--benchmark COMP` 用纳斯达克综合指数；`--benchmark SP500` 走 FRED 转载的标普 500 指数（FRED 偶尔超时）；`--benchmark none` 不画基准
+   - 多个基准用逗号分隔：`--benchmark SPY,COMP`。`COMP`、`NDX` 等是指数，脚本直接按指数查（同样的字母也可能是美股代码，例如 COMP 是 Compass 公司）；代码有歧义时用 `index:COMP`、`etf:SPY`、`stock:XXX` 指定类别
+   - **只覆盖美股。** 港股、A 股等 Nasdaq 没有的市场：请用户提供 CSV（券商或交易所导出），用 `python3 csv_to_prices.py 0700.HK=tencent.csv --benchmark HSI=hsi.csv -o data/hk.json` 转换，来源会记为「用户提供的数据」。不要改用聚合站
+   - **总回报：** Nasdaq 的分红数据没有按拆股调整，ETF 也没有分红，所以不能自动算总回报。用户自己提供带 `Adj Close` 的 CSV 时，用 `csv_to_prices.py --adj-close`，图会标注为总回报。价格回报和总回报不能画在同一张图里
+   - 响应缓存 12 小时（`--refresh` 绕过）。网络失败时会带警告地用上一次缓存，脚注里的获取日期就是缓存实际获取的日期
    - 聚合站和模型记忆里的数字一律不用。脚本以退出码 2 结束、或 JSON 里 `errors` 非空，说明有标的没取到：**停下来告诉用户缺哪只**，不要自己补数
    - 公司名由 Claude 提供（英文全称 + 通用中文名），写进 spec 的 `names`
 3. **写 spec**（格式见下），运行：
@@ -238,12 +242,13 @@ spec 格式：
   "symbols": ["NVDA", "MU"],
   "names": {"NVDA": {"en": "NVIDIA Corp", "zh": "英伟达"}, "MU": {"en": "Micron Technology Inc", "zh": "美光科技"}},
   "benchmark_name": {"en": "S&P 500 (SPY)", "zh": "标普 500 (SPY)"},
+  "benchmarks": ["SPY", "COMP"], "colors": {"NVDA": "#2a78d6"},
   "layout": "auto", "y_scale": "auto", "drawdown": true, "table": true,
   "start": "2026-01-01", "end": "2026-10-02",
   "title": {"en": "...", "zh": "..."}, "note": {"en": "...", "zh": "..."}
 }
 ```
-除 `data` 外都是可选项。`start`、`end` 不写时用数据文件的范围；`note` 会放在脚注开头（示例里用来标注「虚构示例」）。命令行参数：`--langs en` 只出一种语言，`--no-png` 只写 HTML，`--scale 3` 提高 PNG 清晰度（默认 2）。
+除 `data` 外都是可选项。`start`、`end` 不写时用数据文件的范围；`note` 会放在脚注开头（示例里用来标注「虚构示例」）。`benchmarks` 选择并排序数据文件里的基准；`benchmark_name` 可以写成 `{"en": ..., "zh": ...}`（用于第一个基准），也可以按代码分别写；`colors` 用 `#rrggbb` 覆盖个别线条的颜色（默认配色已通过色盲可分辨性检查，改色后自行保证对比度）。命令行参数：`--langs en` 只出一种语言，`--no-png` 只写 HTML，`--pdf` 另存矢量 PDF，`--scale 3` 提高 PNG 清晰度（默认 2），`--theme dark` 输出深色主题（表格和图都支持）。HTML 文件里鼠标悬停在图上会显示当天各条线的数值。
 
 ## 自查清单（走势图）
 - [ ] 标的不超过 9 只；时间段与用户要求一致（没说就是年初至今）
@@ -252,3 +257,4 @@ spec 格式：
 - [ ] 只有一个纵轴；颜色按标的固定；线尾有直接标注，标签不重叠、不被截断
 - [ ] 用 ETF 做基准时，脚注写明它是替代；用对数刻度时，副标题写明
 - [ ] 汇总表按回报降序，基准行加粗，数字与线尾标注一致
+- [ ] 港股、A 股等非美股标的来自用户提供的 CSV，脚注写明「用户提供的数据」；总回报图只用于用户提供的复权价

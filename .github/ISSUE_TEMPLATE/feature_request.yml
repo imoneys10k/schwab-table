@@ -1,0 +1,20 @@
+name: Feature request
+description: Suggest a new table, chart option or data source
+labels: [enhancement]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like to see
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it matters
+      description: Who needs it, and what do you do today instead?
+  - type: textarea
+    id: data
+    attributes:
+      label: Data source (if relevant)
+      description: Where would the numbers come from? Only authoritative sources (exchange, index provider, filings, your own broker data) fit this project.
