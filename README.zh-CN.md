@@ -36,6 +36,7 @@
 
 - `SKILL.md`：Claude 实际加载的 Skill 说明（结构、视觉参数、数据源规定、自查清单）
 - `SKILL.en.md`：`SKILL.md` 的英文译本，供人阅读
+- `install.sh` / `install.ps1`：一键安装脚本（macOS / Linux 与 Windows）
 - `render_table.py`：渲染器，读 JSON spec，输出中英文 HTML 和 2x PNG
 - `requirements.txt`：Python 依赖（Playwright）
 - `examples/`：三种模式各一份 spec 和渲染结果
@@ -43,17 +44,53 @@
 
 ## 安装
 
-把仓库克隆到 Claude 的 skills 目录：
+支持 macOS、Linux 和 Windows。需要 Python 3.9+（用于渲染表格），git 可选。
 
-```bash
-git clone https://github.com/imoneys10k/schwab-table.git ~/.claude/skills/schwab-performance-table
+### 让 AI Agent 帮你安装
+
+把下面这段话直接发给 Claude Code、Codex 或其他编程 Agent：
+
+```text
+请帮我安装 https://github.com/imoneys10k/schwab-table 这个 skill。
+先判断我的操作系统。macOS 或 Linux 运行：
+  curl -fsSL https://raw.githubusercontent.com/imoneys10k/schwab-table/main/install.sh | sh
+Windows 在 PowerShell 里运行：
+  irm https://raw.githubusercontent.com/imoneys10k/schwab-table/main/install.ps1 | iex
+如果我用的不是 Claude，请装到那个 Agent 自己的 skills 目录
+（macOS/Linux 在 `sh -s --` 后面加 `--dir <路径>`；Windows 先保存 install.ps1，再用 -Dir <路径> 运行）。
+装完确认输出了 "Render OK"，然后提醒我重启，让 skill 生效。
 ```
 
-或者下载文件夹，在 claude.ai 的 Skills 设置里上传。
+### 或者自己运行
+
+macOS / Linux：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/imoneys10k/schwab-table/main/install.sh | sh
+```
+
+Windows（PowerShell）：
+
+```powershell
+irm https://raw.githubusercontent.com/imoneys10k/schwab-table/main/install.ps1 | iex
+```
+
+安装脚本会把 skill 放进 `~/.claude/skills/schwab-performance-table`（Windows 为 `%USERPROFILE%\.claude\skills\...`），在里面创建独立的 Python 虚拟环境，安装 Playwright 和 Chromium（约 100 MB），再渲染一张示例表做冒烟测试。一切正常时会输出 `Render OK`。装完重启 Claude，skill 才会被加载。想先看脚本内容，可以打开 [install.sh](install.sh) 或 [install.ps1](install.ps1)。
+
+| 选项（macOS / Linux） | 选项（Windows） | 作用 |
+|---|---|---|
+| `--dir PATH` | `-Dir PATH` | 装到别处（比如其他 Agent 的 skills 目录）。环境变量 `CLAUDE_SKILLS_DIR` 可修改默认根目录 |
+| `--skip-deps` | `-SkipDeps` | 跳过 Python / Playwright / Chromium，只下载文件 |
+
+用管道运行时，选项要放在 `sh -s --` 后面，例如 `curl -fsSL .../install.sh | sh -s -- --dir ~/my-skills/schwab`。Windows 请先保存 `install.ps1`，再运行 `.\install.ps1 -Dir C:\path`。
+
+**更新：** 再运行一遍同样的命令。**卸载：** 删除安装目录。
+
+**常见问题：** Debian/Ubuntu 需要先装 `python3-venv`；Linux 上 Chromium 启动失败时，运行 `sudo <安装目录>/.venv/bin/python -m playwright install-deps chromium`。
 
 ## 手动渲染
 
-需要 Python 3.9 及以上。
+如果用安装脚本装的，`render_table.py` 会自动切换到它的虚拟环境，直接 `python3 render_table.py ...` 就行。否则需要 Python 3.9 及以上：
 
 ```bash
 pip install -r requirements.txt && playwright install chromium

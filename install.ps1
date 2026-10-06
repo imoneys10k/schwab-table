@@ -1,0 +1,90 @@
+<#
+One-click installer for the schwab-table Claude Skill (Windows PowerShell 5.1+ / PowerShell 7).
+
+  irm https://raw.githubusercontent.com/imoneys10k/schwab-table/main/install.ps1 | iex
+
+To pass options, save the script and run it:
+  .\install.ps1 [-Dir <path>] [-SkipDeps]
+  -Dir        install into <path> (default: $env:CLAUDE_SKILLS_DIR or ~\.claude\skills, + \schwab-performance-table)
+  -SkipDeps   do not create the Python venv / install Playwright + Chromium
+Re-running updates an existing install.
+#>
+param(
+  [string]$Dir = "",
+  [switch]$SkipDeps
+)
+$ErrorActionPreference = "Stop"
+$ProgressPreference = "SilentlyContinue"
+
+$RepoUrl   = if ($env:SCHWAB_TABLE_REPO) { $env:SCHWAB_TABLE_REPO } else { "https://github.com/imoneys10k/schwab-table" }
+$SkillName = "schwab-performance-table"
+$SkillsRoot = if ($env:CLAUDE_SKILLS_DIR) { $env:CLAUDE_SKILLS_DIR } else { Join-Path $HOME ".claude\skills" }
+$Target = if ($Dir) { $Dir } else { Join-Path $SkillsRoot $SkillName }
+
+function Say($m) { Write-Host "==> $m" }
+function Test-Cmd($n) { [bool](Get-Command $n -ErrorAction SilentlyContinue) }
+function Invoke-Checked($exe, [string[]]$arguments) {
+  & $exe @arguments
+  if ($LASTEXITCODE -ne 0) { throw "$exe $($arguments -join ' ') failed (exit code $LASTEXITCODE)" }
+}
+
+# 1. Fetch the files -----------------------------------------------------------
+New-Item -ItemType Directory -Force -Path (Split-Path -Parent $Target) | Out-Null
+$isEmpty = (-not (Test-Path $Target)) -or (-not (Get-ChildItem -Force $Target | Select-Object -First 1))
+if (Test-Path (Join-Path $Target ".git")) {
+  if (-not (Test-Cmd git)) { throw "git is required to update $Target" }
+  Say "Updating existing install in $Target"
+  Invoke-Checked git @("-C", $Target, "pull", "--ff-only")
+} elseif ((Test-Cmd git) -and $isEmpty) {
+  Say "Cloning into $Target"
+  Invoke-Checked git @("clone", "--depth", "1", "$RepoUrl.git", $Target)
+} else {
+  Say "Downloading into $Target"
+  $tmp = Join-Path ([IO.Path]::GetTempPath()) ("schwab-table-" + [Guid]::NewGuid())
+  New-Item -ItemType Directory -Force -Path $tmp | Out-Null
+  $zip = Join-Path $tmp "main.zip"
+  Invoke-WebRequest -UseBasicParsing "$RepoUrl/archive/refs/heads/main.zip" -OutFile $zip
+  Expand-Archive -Path $zip -DestinationPath $tmp -Force
+  New-Item -ItemType Directory -Force -Path $Target | Out-Null
+  Copy-Item -Path (Join-Path $tmp "schwab-table-main\*") -Destination $Target -Recurse -Force
+  Remove-Item -Recurse -Force $tmp
+}
+
+# 2. Python dependencies (only needed to render tables) -------------------------
+if ($SkipDeps) {
+  Say "Skipping Python dependencies (-SkipDeps)"
+} else {
+  $py = $null
+  foreach ($cand in @(@("py", "-3"), @("python"), @("python3"))) {
+    if (Test-Cmd $cand[0]) {
+      $extra = if ($cand.Count -gt 1) { $cand[1..($cand.Count - 1)] } else { @() }
+      & $cand[0] @extra -c "import sys; sys.exit(0 if sys.version_info >= (3, 9) else 1)" 2>$null
+      if ($LASTEXITCODE -eq 0) { $py = $cand; break }
+    }
+  }
+  if (-not $py) { throw "Python 3.9+ not found. Install it from https://www.python.org/downloads/ (tick 'Add python.exe to PATH'), or re-run with -SkipDeps." }
+  $pyExe = $py[0]
+  $pyExtra = if ($py.Count -gt 1) { $py[1..($py.Count - 1)] } else { @() }
+
+  Say "Creating virtual environment ($Target\.venv)"
+  Invoke-Checked $pyExe ($pyExtra + @("-m", "venv", (Join-Path $Target ".venv")))
+  $vpy = Join-Path $Target ".venv\Scripts\python.exe"
+  if (-not (Test-Path $vpy)) { $vpy = Join-Path $Target ".venv/bin/python" }  # PowerShell on Linux/macOS
+  Say "Installing Playwright"
+  Invoke-Checked $vpy @("-m", "pip", "install", "--quiet", "--disable-pip-version-check", "-r", (Join-Path $Target "requirements.txt"))
+  Say "Installing Chromium for Playwright (about 100 MB)"
+  Invoke-Checked $vpy @("-m", "playwright", "install", "chromium")
+
+  # 3. Smoke test ----------------------------------------------------------------
+  Say "Smoke test: rendering the example table"
+  $smoke = Join-Path ([IO.Path]::GetTempPath()) ("schwab-smoke-" + [Guid]::NewGuid())
+  New-Item -ItemType Directory -Force -Path $smoke | Out-Null
+  & $vpy (Join-Path $Target "render_table.py") (Join-Path $Target "examples\neural9_spec.json") (Join-Path $smoke "smoke") | Out-Null
+  $ok = ($LASTEXITCODE -eq 0)
+  Remove-Item -Recurse -Force $smoke -ErrorAction SilentlyContinue
+  if (-not $ok) { throw "smoke test failed" }
+  Say "Render OK"
+}
+
+Say "Installed to $Target"
+Write-Host "Restart Claude (or start a new session) so it picks up the skill."

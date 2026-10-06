@@ -1,0 +1,36 @@
+name: install-test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  unix:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install (git clone path)
+        run: sh ./install.sh --dir "$RUNNER_TEMP/skill-git/schwab-performance-table"
+      - name: Install (tarball path, no git)
+        run: |
+          mkdir -p "$RUNNER_TEMP/nogit"
+          for t in curl tar sh mktemp dirname mkdir ls sed uname rm cat python3; do ln -sf "$(command -v $t)" "$RUNNER_TEMP/nogit/$t"; done
+          PATH="$RUNNER_TEMP/nogit" /bin/sh ./install.sh --dir "$RUNNER_TEMP/skill-tar/schwab-performance-table"
+
+  windows:
+    strategy:
+      fail-fast: false
+      matrix:
+        shell: [pwsh, powershell]
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install
+        shell: ${{ matrix.shell }}
+        run: .\install.ps1 -Dir "$env:RUNNER_TEMP\skill\schwab-performance-table"

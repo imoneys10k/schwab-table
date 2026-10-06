@@ -23,6 +23,7 @@ Formats: pct = 1 decimal, money = 2 decimals with thousands separator, raw = str
 import argparse
 import asyncio
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -105,10 +106,22 @@ def pick_langs(spec, wanted):
     return wanted
 
 
+def reexec_in_venv():
+    """If install.sh / install.ps1 created a .venv next to this script, run again with its Python."""
+    here = Path(__file__).resolve().parent
+    venv = here / ".venv"
+    py = venv / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
+    if py.exists() and Path(sys.prefix).resolve() != venv.resolve() and not os.environ.get("SCHWAB_TABLE_REEXEC"):
+        os.environ["SCHWAB_TABLE_REEXEC"] = "1"
+        sys.stdout.flush()
+        os.execv(str(py), [str(py), *sys.argv])
+
+
 async def render_png(htmls, prefix):
     try:
         from playwright.async_api import async_playwright
     except ImportError:
+        reexec_in_venv()
         sys.exit("error: playwright is not installed. Run: pip install playwright && playwright install chromium\n"
                  "(or pass --no-png to write HTML only)")
     async with async_playwright() as p:

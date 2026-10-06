@@ -36,6 +36,7 @@ Uniquement des données faisant autorité : cours de clôture officiels des bour
 
 - `SKILL.md` : la définition du skill chargée par Claude (structure, paramètres visuels, règles sur les sources de données, liste de contrôle), en chinois
 - `SKILL.en.md` : traduction anglaise de `SKILL.md`, pour les lecteurs humains
+- `install.sh` / `install.ps1` : installateurs en une commande (macOS / Linux et Windows)
 - `render_table.py` : le moteur de rendu. Il lit une spécification JSON et produit des fichiers HTML en chinois et en anglais ainsi que des PNG en 2x
 - `requirements.txt` : dépendance Python (Playwright)
 - `examples/` : une spécification et son rendu pour chacun des trois modes
@@ -43,17 +44,53 @@ Uniquement des données faisant autorité : cours de clôture officiels des bour
 
 ## Installation
 
-Clonez le dépôt dans le répertoire de skills de Claude :
+Fonctionne sous macOS, Linux et Windows. Python 3.9+ est nécessaire (pour produire les tableaux) ; git est facultatif.
 
-```bash
-git clone https://github.com/imoneys10k/schwab-table.git ~/.claude/skills/schwab-performance-table
+### Laissez votre agent IA l'installer
+
+Collez ce message dans Claude Code, Codex ou tout autre agent de programmation :
+
+```text
+Installe pour moi le skill de https://github.com/imoneys10k/schwab-table.
+Détecte d'abord mon système d'exploitation. Sous macOS ou Linux, exécute :
+  curl -fsSL https://raw.githubusercontent.com/imoneys10k/schwab-table/main/install.sh | sh
+Sous Windows, dans PowerShell, exécute :
+  irm https://raw.githubusercontent.com/imoneys10k/schwab-table/main/install.ps1 | iex
+Si j'utilise un autre agent que Claude, installe-le plutôt dans le dossier skills de cet agent
+(macOS/Linux : ajoute `--dir <chemin>` après `sh -s --` ; Windows : enregistre install.ps1 et lance-le avec -Dir <chemin>).
+Une fois terminé, vérifie que « Render OK » s'est affiché, puis dis-moi de redémarrer pour que le skill soit chargé.
 ```
 
-Ou téléchargez le dossier et importez-le dans les paramètres Skills de claude.ai.
+### Ou lancez-le vous-même
+
+macOS / Linux :
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/imoneys10k/schwab-table/main/install.sh | sh
+```
+
+Windows (PowerShell) :
+
+```powershell
+irm https://raw.githubusercontent.com/imoneys10k/schwab-table/main/install.ps1 | iex
+```
+
+L'installateur place le skill dans `~/.claude/skills/schwab-performance-table` (`%USERPROFILE%\.claude\skills\...` sous Windows), crée un environnement virtuel Python dédié à l'intérieur, installe Playwright et Chromium (environ 100 Mo), puis génère le tableau d'exemple comme test de bon fonctionnement. Il affiche `Render OK` quand tout fonctionne. Redémarrez ensuite Claude pour que le skill soit pris en compte. Pour lire le script avant de l'exécuter, ouvrez [install.sh](install.sh) ou [install.ps1](install.ps1).
+
+| Option (macOS / Linux) | Option (Windows) | Effet |
+|---|---|---|
+| `--dir PATH` | `-Dir PATH` | Installer ailleurs (par exemple dans le dossier skills d'un autre agent). La variable `CLAUDE_SKILLS_DIR` change la racine par défaut |
+| `--skip-deps` | `-SkipDeps` | Ignorer Python / Playwright / Chromium (récupérer seulement les fichiers) |
+
+Avec un tube (pipe), passez les options après `sh -s --`, par exemple `curl -fsSL .../install.sh | sh -s -- --dir ~/my-skills/schwab`. Sous Windows, enregistrez `install.ps1` puis lancez `.\install.ps1 -Dir C:\path`.
+
+**Mise à jour :** relancez la même commande. **Désinstallation :** supprimez le dossier d'installation.
+
+**Dépannage :** sous Debian/Ubuntu, installez d'abord `python3-venv` ; sous Linux, si Chromium ne démarre pas, exécutez `sudo <dossier d'installation>/.venv/bin/python -m playwright install-deps chromium`.
 
 ## Rendu manuel
 
-Python 3.9 ou supérieur est requis.
+Si vous avez utilisé l'installateur, `render_table.py` bascule automatiquement sur son environnement virtuel : `python3 render_table.py ...` suffit. Sinon, Python 3.9 ou supérieur est requis :
 
 ```bash
 pip install -r requirements.txt && playwright install chromium
