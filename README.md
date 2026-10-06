@@ -1,80 +1,56 @@
+<div align="center">
+
+<img src="assets/banner.png" alt="schwab-table" width="100%">
+
+**Research-desk tables and price charts for your AI agent.**
+
 **English** · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [Français](README.fr.md)
 
-# schwab-table
+<p><a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/License-MIT-2a78d6?style=flat-square"></a> <a href="https://github.com/imoneys10k/schwab-table/actions/workflows/install-test.yml"><img alt="install test" src="https://img.shields.io/github/actions/workflow/status/imoneys10k/schwab-table/install-test.yml?branch=main&style=flat-square&label=install%20test"></a> <a href="https://github.com/imoneys10k/schwab-table/releases"><img alt="release" src="https://img.shields.io/github/v/release/imoneys10k/schwab-table?style=flat-square&color=1B2A4A"></a> <a href="https://github.com/imoneys10k/schwab-table/stargazers"><img alt="stars" src="https://img.shields.io/github/stars/imoneys10k/schwab-table?style=flat-square&color=eda100"></a> <img alt="Python 3.9+" src="https://img.shields.io/badge/Python-3.9%2B-1baf7a?style=flat-square"> <img alt="macOS, Linux, Windows" src="https://img.shields.io/badge/macOS%20%C2%B7%20Linux%20%C2%B7%20Windows-supported-ACDCEC?style=flat-square&labelColor=1B2A4A"> <img alt="Claude Skill" src="https://img.shields.io/badge/Claude-Skill-eb6834?style=flat-square"></p>
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![install-test](https://github.com/imoneys10k/schwab-table/actions/workflows/install-test.yml/badge.svg)](https://github.com/imoneys10k/schwab-table/actions/workflows/install-test.yml)
+<p><a href="#-install"><b>🚀 Install</b></a> · <a href="#-gallery"><b>🎨 Gallery</b></a> · <a href="https://imoneys10k.github.io/schwab-table/"><b>🌐 Website</b></a> · <a href="SKILL.en.md"><b>📘 Skill doc</b></a></p>
+
+</div>
 
 A Claude Skill that turns a stock list, a brokerage holdings screenshot, or ready-made return/rank data into a Charles Schwab research-style performance table, and charts several symbols over any period with the same look. Everything is rendered in both Chinese and English (PNG + HTML).
 
-![English](examples/neural9_en.png)
+## ✨ Highlights
 
-![Chinese](examples/neural9_zh.png)
+<table>
+<tr><td width="50%" valign="top"><h3>🎯 Research-desk look</h3><p>Light-blue title band, thin grey rules and small-print footnotes, like a broker research note.</p></td><td width="50%" valign="top"><h3>📊 Tables and charts</h3><p>Ranking, holdings and watchlist tables, plus line charts and small multiples with drawdown and log scale.</p></td></tr>
+<tr><td width="50%" valign="top"><h3>🌏 Bilingual by default</h3><p>Every output in Chinese and English: 2x PNG and self-contained HTML.</p></td><td width="50%" valign="top"><h3>🔒 Authoritative data only</h3><p>Official exchange closes, no aggregator numbers. Missing data is marked NA, never made up.</p></td></tr>
+<tr><td width="50%" valign="top"><h3>🤖 One-line agent install</h3><p>Paste a prompt into Claude Code or Codex. Works on macOS, Linux and Windows.</p></td><td width="50%" valign="top"><h3>🔤 Same fonts everywhere</h3><p>Inter is bundled and embedded in every HTML file, so output looks the same on every machine.</p></td></tr>
+</table>
 
-## Three modes
+## 🎨 Gallery
 
-| Mode | Input | Columns 2–5 | Example |
-|---|---|---|---|
-| A. Ranking table | Each stock's YTD return and its rank within the S&P 500 / NASDAQ | YTD, S&P 500 performance rank, S&P 500 contribution rank, NASDAQ performance rank | [EN](examples/neural9_en.png) · [中文](examples/neural9_zh.png) |
-| B. Holdings table | A brokerage holdings screenshot or export | Open P/L %, today's P/L, average cost, shares | [EN](examples/holdings_en.png) · [中文](examples/holdings_zh.png) |
-| C. Watchlist table | Tickers only | YTD, 1-month, 1-year, latest close | [EN](examples/watchlist_en.png) · [中文](examples/watchlist_zh.png) |
+<table>
+<tr><td width="50%" align="center"><img src="examples/neural9_en.png" alt="Ranking table"><br><sub><b>Ranking table</b> · EN</sub></td><td width="50%" align="center"><img src="examples/watchlist_zh.png" alt="Watchlist table"><br><sub><b>Watchlist table</b> · 中文</sub></td></tr>
+<tr><td width="50%" align="center"><img src="examples/chart_lines_en.png" alt="Line chart with drawdown"><br><sub><b>Line chart with drawdown</b> · EN</sub></td><td width="50%" align="center"><img src="examples/chart_multiples_zh.png" alt="Small multiples, log scale"><br><sub><b>Small multiples, log scale</b> · 中文</sub></td></tr>
+</table>
 
-Mode A uses data from a public Charles Schwab chart. The mode B and C examples use fictional companies and made-up numbers, for illustration only.
+<sub>The examples use fictional companies and synthetic data, except the ranking table (a public Charles Schwab chart).</sub>
 
-## Price charts
+## 🔄 How it works
 
-Chart up to 9 symbols over any period (default: year to date) in the same research-note style, with a drawdown panel and a summary table. Chinese and English versions, PNG + HTML. The examples use fictional companies and synthetic data.
-
-![Line chart](examples/chart_lines_en.png)
-
-![Small multiples](examples/chart_multiples_en.png)
-
-| Layout | Content | Use for |
-|---|---|---|
-| `lines` | Line chart, drawdown panel, summary table | 2–5 symbols |
-| `multiples` | One small chart per symbol on a shared scale, drawdown strip under each | 6–9 symbols |
-
-`layout: auto` picks one by symbol count.
-
-- **Data:** Nasdaq's official historical-quote API: official daily closes, split-adjusted, price returns, about 10 years. The benchmark defaults to SPY and is labelled as a proxy for the S&P 500. No other sources are used.
-- **Axis:** one y-axis, indexed to 100 at the start. It switches to a log scale automatically when the range is wide (or set `y_scale` yourself).
-
-```bash
-python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 -o data/watch.json
-python3 render_chart.py examples/chart_lines_spec.json out/chart   # copy and edit the spec for your own data
+```mermaid
+flowchart LR
+  A["📝 Tickers, screenshot<br/>or ready-made data"] --> B["🤖 Claude + this skill"]
+  B --> C["🏛 Nasdaq official<br/>daily closes"]
+  C --> D["🖨 render_table<br/>render_chart"]
+  B --> D
+  D --> E["🖼 PNG + HTML<br/>EN and 中文"]
+  classDef n fill:#ACDCEC,stroke:#1B2A4A,color:#1B2A4A,stroke-width:1px;
+  class A,B,C,D,E n;
 ```
 
-## Using it with Claude
-
-Once installed, just ask in plain language, for example:
-
-- Make a performance table for NVDA, AMD and MU.
-- Turn this holdings screenshot into a Schwab-style table. (attach the screenshot)
-- Make a 2026 Neural9 ranking table from this data.
-- Chart NVDA, MU and AAPL for this year.
-- Compare these six stocks from March to June on a log scale.
-
-## Data sources
-
-Authoritative data only: official exchange closing prices, index providers (S&P Dow Jones Indices, Nasdaq Global Indexes, optionally via FRED), company IR / SEC filings, or the user's own brokerage data. Returns are computed from official closing prices; ready-made percentages from aggregator sites are not used. See [SKILL.md](SKILL.md) for the rules (in Chinese; an English translation is in [SKILL.en.md](SKILL.en.md)).
-
-## Files
-
-- `SKILL.md`: the skill definition Claude loads (structure, visual parameters, data-source rules, checklist), in Chinese
-- `SKILL.en.md`: English translation of `SKILL.md`, for human readers
-- `install.sh` / `install.ps1`: one-click installers for macOS / Linux and Windows
-- `render_table.py`: the table renderer. Reads a JSON spec and writes Chinese and English HTML plus 2x PNG
-- `fetch_prices.py`: downloads daily closes from Nasdaq's official API (standard library only)
-- `render_chart.py`: the chart renderer. Reads the fetched prices plus a JSON spec
-- `fonts.py`, `fonts/`: the bundled Inter font (SIL OFL), embedded into every HTML file
-- `requirements.txt`: Python dependency (Playwright)
-- `examples/`: a spec plus rendered output for each of the three table modes and both chart layouts (`sample_prices.json` is synthetic)
-- `assets/`: social preview image
-
-## Install
+## 🚀 Install
 
 Works on macOS, Linux and Windows. You need Python 3.9+ (to render tables); git is optional.
 
-### Let your AI agent install it
+💡 **Easiest way:** paste the prompt below into your AI agent and it installs everything for you.
+
+### 🤖 Let your AI agent install it
 
 Paste this to Claude Code, Codex or any other coding agent:
 
@@ -89,7 +65,7 @@ If I use an agent other than Claude, install into that agent's skills folder ins
 When it finishes, confirm that "Render OK" was printed, then tell me to restart so the skill loads.
 ```
 
-### Or run it yourself
+### 💻 Or run it yourself
 
 macOS / Linux:
 
@@ -116,7 +92,67 @@ When piping, pass options with `sh -s --`, for example `curl -fsSL .../install.s
 
 **Troubleshooting:** on Debian/Ubuntu install `python3-venv` first; on Linux, if Chromium fails to start, run `sudo <install folder>/.venv/bin/python -m playwright install-deps chromium`.
 
-## Manual rendering
+## 💬 Using it with Claude
+
+Once installed, just ask in plain language, for example:
+
+- Make a performance table for NVDA, AMD and MU.
+- Turn this holdings screenshot into a Schwab-style table. (attach the screenshot)
+- Make a 2026 Neural9 ranking table from this data.
+- Chart NVDA, MU and AAPL for this year.
+- Compare these six stocks from March to June on a log scale.
+
+## 🧩 Three modes
+
+| Mode | Input | Columns 2–5 | Example |
+|---|---|---|---|
+| A. Ranking table | Each stock's YTD return and its rank within the S&P 500 / NASDAQ | YTD, S&P 500 performance rank, S&P 500 contribution rank, NASDAQ performance rank | [EN](examples/neural9_en.png) · [中文](examples/neural9_zh.png) |
+| B. Holdings table | A brokerage holdings screenshot or export | Open P/L %, today's P/L, average cost, shares | [EN](examples/holdings_en.png) · [中文](examples/holdings_zh.png) |
+| C. Watchlist table | Tickers only | YTD, 1-month, 1-year, latest close | [EN](examples/watchlist_en.png) · [中文](examples/watchlist_zh.png) |
+
+Mode A uses data from a public Charles Schwab chart. The mode B and C examples use fictional companies and made-up numbers, for illustration only.
+
+## 📊 Price charts
+
+Chart up to 9 symbols over any period (default: year to date) in the same research-note style, with a drawdown panel and a summary table. Chinese and English versions, PNG + HTML. The examples use fictional companies and synthetic data.
+
+| Layout | Content | Use for |
+|---|---|---|
+| `lines` | Line chart, drawdown panel, summary table | 2–5 symbols |
+| `multiples` | One small chart per symbol on a shared scale, drawdown strip under each | 6–9 symbols |
+
+`layout: auto` picks one by symbol count.
+
+- **Data:** Nasdaq's official historical-quote API: official daily closes, split-adjusted, price returns, about 10 years. The benchmark defaults to SPY and is labelled as a proxy for the S&P 500. No other sources are used.
+- **Axis:** one y-axis, indexed to 100 at the start. It switches to a log scale automatically when the range is wide (or set `y_scale` yourself).
+
+```bash
+python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 -o data/watch.json
+python3 render_chart.py examples/chart_lines_spec.json out/chart   # copy and edit the spec for your own data
+```
+
+## 🔍 Data sources
+
+Authoritative data only: official exchange closing prices, index providers (S&P Dow Jones Indices, Nasdaq Global Indexes, optionally via FRED), company IR / SEC filings, or the user's own brokerage data. Returns are computed from official closing prices; ready-made percentages from aggregator sites are not used. See [SKILL.md](SKILL.md) for the rules (in Chinese; an English translation is in [SKILL.en.md](SKILL.en.md)).
+
+<details>
+<summary><b>📁 Files</b></summary>
+
+- `SKILL.md`: the skill definition Claude loads (structure, visual parameters, data-source rules, checklist), in Chinese
+- `SKILL.en.md`: English translation of `SKILL.md`, for human readers
+- `install.sh` / `install.ps1`: one-click installers for macOS / Linux and Windows
+- `render_table.py`: the table renderer. Reads a JSON spec and writes Chinese and English HTML plus 2x PNG
+- `fetch_prices.py`: downloads daily closes from Nasdaq's official API (standard library only)
+- `render_chart.py`: the chart renderer. Reads the fetched prices plus a JSON spec
+- `fonts.py`, `fonts/`: the bundled Inter font (SIL OFL), embedded into every HTML file
+- `requirements.txt`: Python dependency (Playwright)
+- `examples/`: a spec plus rendered output for each of the three table modes and both chart layouts (`sample_prices.json` is synthetic)
+- `assets/`: social preview image
+
+</details>
+
+<details>
+<summary><b>🔧 Manual rendering</b></summary>
 
 If you used the installer, `render_table.py` automatically switches to its virtual environment, so plain `python3 render_table.py ...` works. Otherwise, Python 3.9+ is required:
 
@@ -136,10 +172,14 @@ python3 render_chart.py examples/chart_lines_spec.json out/chart   # copy and ed
 
 Fonts: Inter (bundled in `fonts/`, SIL Open Font License) is embedded in every HTML file for Latin text and numbers, so output looks the same on every machine. Chinese text uses the system CJK font (PingFang SC on macOS, Microsoft YaHei on Windows). On a minimal Linux server install one, e.g. `sudo apt install fonts-noto-cjk`; otherwise the Chinese version renders as boxes.
 
-## Disclaimer
+</details>
+
+## 📌 Disclaimer
 
 This project only generates table styling and does not provide investment advice. The data in the examples is for illustration only.
 
-## License
+## 📄 License
 
 [MIT](LICENSE)
+
+<div align="center"><sub>⭐ If this saves you time, a star helps others find it.</sub></div>

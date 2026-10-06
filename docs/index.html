@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>schwab-table</title>
+<meta name="description" content="A Claude Skill for Schwab research-style performance tables and price charts. Chinese and English, PNG + HTML.">
+<meta property="og:title" content="schwab-table">
+<meta property="og:description" content="Research-desk tables and price charts for your AI agent.">
+<meta property="og:image" content="https://imoneys10k.github.io/schwab-table/img/social-preview.png">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+@font-face{font-family:'Inter';font-style:normal;font-weight:100 900;src:url(fonts/inter-latin-wght-normal.woff2) format('woff2')}
+:root{--bg:#F6F9FB;--surface:#fff;--ink:#14213D;--ink2:#4A5A74;--line:#DDE6EC;--accent:#2a78d6;--band:#ACDCEC;--navy:#1B2A4A;--shadow:0 10px 30px rgba(27,42,74,.10)}
+@media (prefers-color-scheme:dark){:root{--bg:#0C1424;--surface:#131E34;--ink:#EAF1F8;--ink2:#9FB2CC;--line:#23324D;--accent:#6da7ec;--shadow:0 10px 30px rgba(0,0,0,.35)}}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Inter','Helvetica Neue',Arial,'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+/* nav */
+nav{position:absolute;top:0;left:0;right:0;z-index:5}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:68px;gap:12px}
+.brand{color:#fff;font-weight:800;font-size:19px;letter-spacing:-.02em}.brand b{color:var(--band)}
+.nav-r{display:flex;align-items:center;gap:14px}
+.langs{display:flex;gap:2px;background:rgba(255,255,255,.10);border-radius:999px;padding:3px}
+.langs button{border:0;background:transparent;color:#C9D8EA;font:600 13px inherit;font-family:inherit;padding:6px 12px;border-radius:999px;cursor:pointer}
+.langs button.on{background:#fff;color:var(--navy)}
+.gh{color:#fff;font-weight:600;font-size:14px;padding:7px 14px;border:1px solid rgba(255,255,255,.35);border-radius:999px}
+/* hero */
+.hero{position:relative;overflow:hidden;color:#fff;padding:132px 0 96px;background:radial-gradient(800px 460px at 85% 10%,rgba(172,220,236,.30),transparent 60%),radial-gradient(640px 460px at 0% 100%,rgba(42,120,214,.34),transparent 60%),linear-gradient(135deg,#0F1B33 0%,#1B2A4A 50%,#235283 100%)}
+.hero:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:44px 44px;-webkit-mask-image:linear-gradient(90deg,#000,transparent 75%);mask-image:linear-gradient(90deg,#000,transparent 75%)}
+.hero .wrap{position:relative;display:grid;grid-template-columns:1.05fr 1fr;gap:40px;align-items:center}
+.pill{display:inline-block;font-size:12.5px;font-weight:700;letter-spacing:.1em;padding:6px 14px;border:1px solid rgba(172,220,236,.55);border-radius:999px;color:var(--band);background:rgba(172,220,236,.10)}
+h1{font-size:clamp(38px,5.6vw,66px);line-height:1.04;letter-spacing:-.035em;font-weight:800;margin:20px 0 18px}
+h1 span{color:var(--band)}
+.sub{font-size:18px;color:#C7D6E9;max-width:540px;margin:0 0 30px}
+.cta{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-block;font-weight:700;font-size:15.5px;padding:13px 22px;border-radius:12px}
+.btn.p{background:var(--band);color:var(--navy)}.btn.s{background:rgba(255,255,255,.10);color:#fff;border:1px solid rgba(255,255,255,.28)}
+.stack{position:relative;height:380px}
+.stack img{position:absolute;width:88%;border-radius:10px;background:#fff;box-shadow:0 26px 60px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.12)}
+.stack .a{left:0;top:0;transform:rotate(-3.5deg)}.stack .b{right:-4%;top:130px;width:84%;transform:rotate(2.5deg)}
+/* sections */
+section{padding:76px 0}
+h2{font-size:clamp(26px,3.4vw,38px);letter-spacing:-.025em;margin:0 0 30px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:var(--shadow)}
+.card .e{font-size:28px}.card h3{margin:10px 0 6px;font-size:18px}.card p{margin:0;color:var(--ink2);font-size:15px}
+.gal{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+.gal figure{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px;box-shadow:var(--shadow)}
+.gal img{display:block;width:100%;border-radius:8px;background:#fff}
+.gal figcaption{padding:10px 4px 2px;font-size:14px;color:var(--ink2)}.gal figcaption b{color:var(--ink)}
+.note{color:var(--ink2);font-size:13.5px;margin-top:16px}
+.modes{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.chip{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:14px}.chip b{display:block}.chip span{color:var(--ink2);font-size:13px}
+/* install */
+.inst{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.box{background:#0F1B33;color:#E6EEF8;border-radius:16px;padding:18px 18px 20px;box-shadow:var(--shadow)}
+.tabs{display:flex;gap:6px;margin-bottom:12px}
+.tabs button{background:transparent;border:1px solid rgba(255,255,255,.2);color:#B7C7DD;font:600 13px inherit;font-family:inherit;border-radius:8px;padding:6px 12px;cursor:pointer}
+.tabs button.on{background:var(--band);color:var(--navy);border-color:var(--band)}
+pre{margin:0;white-space:pre-wrap;word-break:break-all;font:13.5px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.cp{margin-top:14px;background:rgba(255,255,255,.12);color:#fff;border:0;border-radius:8px;padding:8px 14px;font:600 13px inherit;font-family:inherit;cursor:pointer}
+.box h3{margin:0 0 12px;font-size:15px;color:var(--band)}
+footer{padding:34px 0 50px;color:var(--ink2);font-size:14px;border-top:1px solid var(--line)}
+footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+@media (max-width:860px){.hero .wrap{grid-template-columns:1fr}.stack{height:300px}.grid3{grid-template-columns:1fr 1fr}.inst,.gal{grid-template-columns:1fr}nav .gh{display:none}}
+@media (max-width:560px){.grid3{grid-template-columns:1fr}.hero{padding-top:110px}.langs button{padding:6px 9px}}
+</style>
+</head>
+<body>
+<nav><div class="wrap"><a class="brand" href="#">schwab-<b>table</b></a>
+<div class="nav-r"><div class="langs" id="langs"></div><a class="gh" id="gh" href="https://github.com/imoneys10k/schwab-table">GitHub</a></div></div></nav>
+
+<header class="hero"><div class="wrap">
+<div><span class="pill">CLAUDE SKILL · MIT</span>
+<h1><span id="ha"></span><br><span id="hb" style="color:#fff"></span></h1>
+<p class="sub" id="sub"></p>
+<div class="cta"><a class="btn p" href="#install" id="cta1"></a><a class="btn s" href="https://github.com/imoneys10k/schwab-table" id="cta2"></a></div></div>
+<div class="stack"><img class="a" src="img/neural9_en.png" alt="Ranking table"><img class="b" src="img/chart_lines_en.png" alt="Line chart"></div>
+</div></header>
+
+<section><div class="wrap"><h2 id="t_features"></h2><div class="grid3" id="cards"></div></div></section>
+
+<section style="padding-top:0"><div class="wrap"><h2 id="t_gallery"></h2><div class="gal" id="gal"></div><p class="note" id="gnote"></p>
+<div class="modes" id="modes"></div></div></section>
+
+<section id="install" style="padding-top:20px"><div class="wrap"><h2 id="t_install"></h2>
+<div class="inst">
+<div class="box"><div class="tabs"><button id="tab_unix" class="on"></button><button id="tab_win"></button></div><pre id="cmd"></pre><button class="cp" id="cp1"></button></div>
+<div class="box"><h3 id="or_agent"></h3><pre id="prompt"></pre><button class="cp" id="cp2"></button></div>
+</div></div></section>
+
+<footer><div class="wrap"><span id="foot"></span><a href="https://github.com/imoneys10k/schwab-table#readme" id="more"></a></div></footer>
+
+<script>
+var D = {"en": {"tagline": "Research-desk tables and price charts for your AI agent.", "links": ["🚀 Install", "🎨 Gallery", "🌐 Website", "📘 Skill doc"], "h_high": "Highlights", "h_gallery": "Gallery", "h_flow": "How it works", "cards": [["🎯", "Research-desk look", "Light-blue title band, thin grey rules and small-print footnotes, like a broker research note."], ["📊", "Tables and charts", "Ranking, holdings and watchlist tables, plus line charts and small multiples with drawdown and log scale."], ["🌏", "Bilingual by default", "Every output in Chinese and English: 2x PNG and self-contained HTML."], ["🔒", "Authoritative data only", "Official exchange closes, no aggregator numbers. Missing data is marked NA, never made up."], ["🤖", "One-line agent install", "Paste a prompt into Claude Code or Codex. Works on macOS, Linux and Windows."], ["🔤", "Same fonts everywhere", "Inter is bundled and embedded in every HTML file, so output looks the same on every machine."]], "gallery": [["Ranking table", "EN"], ["Watchlist table", "中文"], ["Line chart with drawdown", "EN"], ["Small multiples, log scale", "中文"]], "gallery_note": "The examples use fictional companies and synthetic data, except the ranking table (a public Charles Schwab chart).", "tip": "💡 **Easiest way:** paste the prompt below into your AI agent and it installs everything for you.", "star": "⭐ If this saves you time, a star helps others find it.", "sum_files": "📁 Files", "sum_manual": "🔧 Manual rendering", "h_agent": "🤖 Let your AI agent install it", "h_self": "💻 Or run it yourself", "hero_a": "Research-desk tables", "hero_b": "and price charts.", "sub": "A Claude Skill that turns tickers, a holdings screenshot or ready-made data into Schwab-style tables, and draws several symbols over any period. Chinese and English, PNG + HTML.", "cta1": "Install in one line", "cta2": "View on GitHub", "t_features": "Highlights", "t_gallery": "Gallery", "t_install": "Install", "t_modes": "Pick a layout", "tab_unix": "macOS / Linux", "tab_win": "Windows", "or_agent": "Or let your AI agent do it", "copy": "Copy", "copied": "Copied", "nav_gh": "GitHub", "nav_docs": "Docs", "modes": [["Ranking table", "YTD plus rank in the S&P 500 and NASDAQ"], ["Holdings table", "From a brokerage screenshot or export"], ["Watchlist table", "Just tickers: YTD, 1M, 1Y, last close"], ["Line chart", "2–5 symbols, drawdown panel, summary table"], ["Small multiples", "6–9 symbols on one shared scale"]], "foot": "MIT licensed. Illustrative only, not investment advice.", "more": "Docs in 4 languages", "prompt": "Install the skill from https://github.com/imoneys10k/schwab-table for me.\nDetect my operating system. On macOS or Linux, run:\n  curl -fsSL https://raw.githubusercontent.com/imoneys10k/schwab-table/main/install.sh | sh\nOn Windows, in PowerShell, run:\n  irm https://raw.githubusercontent.com/imoneys10k/schwab-table/main/install.ps1 | iex\nIf I use an agent other than Claude, install into that agent's skills folder instead\n(macOS/Linux: add `--dir <path>` after `sh -s --`; Windows: save install.ps1 and run it with -Dir <path>).\nWhen it finishes, confirm that \"Render OK\" was printed, then tell me to restart so the skill loads."}, "zh": {"tagline": "给 AI Agent 用的研报风格表格与走势图。", "links": ["🚀 安装", "🎨 效果图", "🌐 项目主页", "📘 Skill 文档"], "h_high": "亮点", "h_gallery": "效果图", "h_flow": "工作流程", "cards": [["🎯", "研报风格", "浅蓝标题带、灰色细线、小字脚注，和券商研报里的表格一个味道。"], ["📊", "表格加走势图", "排名表、持仓表、自选股表，以及带回撤和对数刻度的线图、小图矩阵。"], ["🌏", "默认中英双版", "每次都输出中文和英文两版：2x PNG 加独立的 HTML。"], ["🔒", "只用权威数据", "只用交易所官方收盘价，不用聚合站数字。缺的数据写 NA，绝不编造。"], ["🤖", "一句话让 Agent 安装", "把提示词发给 Claude Code 或 Codex 就行，支持 macOS、Linux、Windows。"], ["🔤", "各处字体一致", "附带 Inter 字体并嵌入每个 HTML，换台机器效果也一样。"]], "gallery": [["排名表", "EN"], ["自选股表", "中文"], ["带回撤的线图", "EN"], ["小图矩阵（对数刻度）", "中文"]], "gallery_note": "除排名表（来自 Charles Schwab 公开图表）外，示例都使用虚构公司和合成数据。", "tip": "💡 **最省事的办法：** 把下面的提示词直接发给你的 AI Agent，它会替你装好。", "star": "⭐ 如果它帮你省了时间，点个 star 能让更多人看到。", "sum_files": "📁 文件", "sum_manual": "🔧 手动渲染", "h_agent": "🤖 让 AI Agent 帮你安装", "h_self": "💻 或者自己运行", "hero_a": "研报风格的表格", "hero_b": "与走势图。", "sub": "一个 Claude Skill：把股票代码、持仓截图或现成数据做成 Schwab 研报风格的表格，也能画出若干标的在任意时间段的走势。中英双版，PNG + HTML。", "cta1": "一行命令安装", "cta2": "在 GitHub 查看", "t_features": "亮点", "t_gallery": "效果图", "t_install": "安装", "t_modes": "选个版式", "tab_unix": "macOS / Linux", "tab_win": "Windows", "or_agent": "或者让 AI Agent 替你装", "copy": "复制", "copied": "已复制", "nav_gh": "GitHub", "nav_docs": "文档", "modes": [["排名表", "年初至今加上在标普 500 和纳斯达克内的排名"], ["持仓表", "来自券商截图或导出文件"], ["自选股表", "只给代码：年初至今、近 1 月、近 1 年、最新价"], ["线图", "2–5 只，带回撤面板和汇总表"], ["小图矩阵", "6–9 只，同一纵轴"]], "foot": "MIT 许可。仅作演示，不构成投资建议。", "more": "四种语言的文档", "prompt": "请帮我安装 https://github.com/imoneys10k/schwab-table 这个 skill。\n先判断我的操作系统。macOS 或 Linux 运行：\n  curl -fsSL https://raw.githubusercontent.com/imoneys10k/schwab-table/main/install.sh | sh\nWindows 在 PowerShell 里运行：\n  irm https://raw.githubusercontent.com/imoneys10k/schwab-table/main/install.ps1 | iex\n如果我用的不是 Claude，请装到那个 Agent 自己的 skills 目录\n（macOS/Linux 在 `sh -s --` 后面加 `--dir <路径>`；Windows 先保存 install.ps1，再用 -Dir <路径> 运行）。\n装完确认输出了 \"Render OK\"，然后提醒我重启，让 skill 生效。"}, "ja": {"tagline": "AI エージェントのための、リサーチレポート風の表と推移チャート。", "links": ["🚀 インストール", "🎨 ギャラリー", "🌐 プロジェクトサイト", "📘 Skill ドキュメント"], "h_high": "特長", "h_gallery": "ギャラリー", "h_flow": "仕組み", "cards": [["🎯", "リサーチ風の見た目", "水色のタイトル帯、細いグレーの罫線、小さな注記。証券会社のレポートそのままの雰囲気です。"], ["📊", "表とチャート", "ランキング表・保有銘柄表・ウォッチリスト表に加え、ドローダウンと対数目盛つきの折れ線とスモールマルチプル。"], ["🌏", "標準で二言語", "出力は常に中国語版と英語版。2x PNG と単体で完結する HTML です。"], ["🔒", "信頼できるデータだけ", "取引所の公式終値のみ。集約サイトの数字は使わず、欠けたデータは NA とし、作り話はしません。"], ["🤖", "ワンフレーズで導入", "プロンプトを Claude Code や Codex に貼るだけ。macOS・Linux・Windows に対応。"], ["🔤", "どこでも同じフォント", "Inter を同梱して HTML に埋め込むので、どのマシンでも同じ見た目になります。"]], "gallery": [["ランキング表", "EN"], ["ウォッチリスト表", "中文"], ["ドローダウン付き折れ線", "EN"], ["スモールマルチプル（対数目盛）", "中文"]], "gallery_note": "ランキング表（Charles Schwab の公開チャート）を除き、サンプルは架空の企業と合成データです。", "tip": "💡 **いちばん簡単な方法：** 下のプロンプトを AI エージェントに貼れば、すべてインストールしてくれます。", "star": "⭐ 役に立ったら、スターをもらえると他の人にも見つけてもらえます。", "sum_files": "📁 ファイル", "sum_manual": "🔧 手動レンダリング", "h_agent": "🤖 AI エージェントにインストールしてもらう", "h_self": "💻 自分で実行する", "hero_a": "リサーチレポート風の表と", "hero_b": "推移チャート。", "sub": "ティッカー、保有銘柄のスクリーンショット、既存データを Schwab 風の表にし、複数銘柄の任意期間の推移も描く Claude Skill。中国語版と英語版、PNG + HTML。", "cta1": "1 行でインストール", "cta2": "GitHub で見る", "t_features": "特長", "t_gallery": "ギャラリー", "t_install": "インストール", "t_modes": "レイアウトを選ぶ", "tab_unix": "macOS / Linux", "tab_win": "Windows", "or_agent": "または AI エージェントにおまかせ", "copy": "コピー", "copied": "コピーしました", "nav_gh": "GitHub", "nav_docs": "ドキュメント", "modes": [["ランキング表", "YTD と S&P 500・NASDAQ 内の順位"], ["保有銘柄表", "証券口座のスクリーンショットやエクスポートから"], ["ウォッチリスト表", "ティッカーだけで：YTD、1 か月、1 年、最新終値"], ["折れ線チャート", "2〜5 銘柄、ドローダウンとサマリー表付き"], ["スモールマルチプル", "6〜9 銘柄を共通スケールで"]], "foot": "MIT ライセンス。例示のみで、投資助言ではありません。", "more": "4 言語のドキュメント", "prompt": "https://github.com/imoneys10k/schwab-table のスキルをインストールしてください。\nまず私の OS を判別してください。macOS または Linux では次を実行します。\n  curl -fsSL https://raw.githubusercontent.com/imoneys10k/schwab-table/main/install.sh | sh\nWindows では PowerShell で次を実行します。\n  irm https://raw.githubusercontent.com/imoneys10k/schwab-table/main/install.ps1 | iex\nClaude 以外のエージェントを使っている場合は、そのエージェントの skills フォルダにインストールしてください\n（macOS/Linux は `sh -s --` の後ろに `--dir <パス>` を付けます。Windows は install.ps1 を保存して -Dir <パス> 付きで実行します）。\n完了したら \"Render OK\" と表示されたことを確認し、スキルを読み込むために再起動するよう伝えてください。"}, "fr": {"tagline": "Tableaux et graphiques de cours façon étude, pour votre agent IA.", "links": ["🚀 Installation", "🎨 Galerie", "🌐 Site du projet", "📘 Doc du skill"], "h_high": "Points forts", "h_gallery": "Galerie", "h_flow": "Fonctionnement", "cards": [["🎯", "Look d'étude financière", "Bandeau de titre bleu clair, filets gris fins et notes en petits caractères, comme dans une étude de courtier."], ["📊", "Tableaux et graphiques", "Tableaux de classement, de positions et de liste de suivi, plus courbes et petits multiples avec drawdown et échelle logarithmique."], ["🌏", "Bilingue par défaut", "Chaque sortie existe en chinois et en anglais : PNG en 2x et HTML autonome."], ["🔒", "Données faisant autorité", "Cours de clôture officiels uniquement, aucun chiffre d'agrégateur. Une donnée manquante est marquée NA, jamais inventée."], ["🤖", "Installation en une phrase", "Collez un message dans Claude Code ou Codex. Fonctionne sous macOS, Linux et Windows."], ["🔤", "Mêmes polices partout", "Inter est fournie et intégrée à chaque fichier HTML : le rendu est identique sur toutes les machines."]], "gallery": [["Tableau de classement", "EN"], ["Tableau de liste de suivi", "中文"], ["Courbes avec drawdown", "EN"], ["Petits multiples, échelle log", "中文"]], "gallery_note": "Les exemples utilisent des sociétés fictives et des données synthétiques, sauf le tableau de classement (graphique public de Charles Schwab).", "tip": "💡 **Le plus simple :** collez le message ci-dessous dans votre agent IA, il installe tout pour vous.", "star": "⭐ Si cela vous fait gagner du temps, une étoile aide d'autres personnes à le trouver.", "sum_files": "📁 Fichiers", "sum_manual": "🔧 Rendu manuel", "h_agent": "🤖 Laissez votre agent IA l'installer", "h_self": "💻 Ou lancez-le vous-même", "hero_a": "Tableaux façon étude", "hero_b": "et graphiques de cours.", "sub": "Un Claude Skill qui transforme des symboles, une capture de positions ou des données prêtes en tableaux de style Schwab, et trace plusieurs valeurs sur une période au choix. Chinois et anglais, PNG + HTML.", "cta1": "Installer en une ligne", "cta2": "Voir sur GitHub", "t_features": "Points forts", "t_gallery": "Galerie", "t_install": "Installation", "t_modes": "Choisissez une disposition", "tab_unix": "macOS / Linux", "tab_win": "Windows", "or_agent": "Ou laissez votre agent IA le faire", "copy": "Copier", "copied": "Copié", "nav_gh": "GitHub", "nav_docs": "Docs", "modes": [["Tableau de classement", "YTD et rang dans le S&P 500 et le NASDAQ"], ["Tableau de positions", "À partir d'une capture ou d'un export de courtier"], ["Tableau de liste de suivi", "Juste des symboles : YTD, 1 mois, 1 an, dernier cours"], ["Courbes", "2 à 5 valeurs, drawdown et tableau de synthèse"], ["Petits multiples", "6 à 9 valeurs sur une échelle commune"]], "foot": "Licence MIT. À titre d'illustration, pas un conseil en investissement.", "more": "Docs en 4 langues", "prompt": "Installe pour moi le skill de https://github.com/imoneys10k/schwab-table.\nDétecte d'abord mon système d'exploitation. Sous macOS ou Linux, exécute :\n  curl -fsSL https://raw.githubusercontent.com/imoneys10k/schwab-table/main/install.sh | sh\nSous Windows, dans PowerShell, exécute :\n  irm https://raw.githubusercontent.com/imoneys10k/schwab-table/main/install.ps1 | iex\nSi j'utilise un autre agent que Claude, installe-le plutôt dans le dossier skills de cet agent\n(macOS/Linux : ajoute `--dir <chemin>` après `sh -s --` ; Windows : enregistre install.ps1 et lance-le avec -Dir <chemin>).\nUne fois terminé, vérifie que « Render OK » s'est affiché, puis dis-moi de redémarrer pour que le skill soit chargé."}};
+var CMDS = {
+  unix: "curl -fsSL https://raw.githubusercontent.com/imoneys10k/schwab-table/main/install.sh | sh",
+  win: "irm https://raw.githubusercontent.com/imoneys10k/schwab-table/main/install.ps1 | iex"
+};
+var NAMES = {en: "EN", zh: "中文", ja: "日本語", fr: "FR"};
+var IMGS = ["neural9_en", "watchlist_zh", "chart_lines_en", "chart_multiples_zh"];
+var lang = "en", tab = "unix";
+function $(id){return document.getElementById(id)}
+function pick(){
+  var saved = null; try { saved = localStorage.getItem("lang"); } catch(e) {}
+  if (saved && D[saved]) return saved;
+  var n = (navigator.language || "en").toLowerCase();
+  return n.indexOf("zh") === 0 ? "zh" : n.indexOf("ja") === 0 ? "ja" : n.indexOf("fr") === 0 ? "fr" : "en";
+}
+function render(){
+  var d = D[lang];
+  document.documentElement.lang = lang === "zh" ? "zh-CN" : lang;
+  $("ha").textContent = d.hero_a; $("hb").textContent = d.hero_b; $("sub").textContent = d.sub;
+  $("cta1").textContent = d.cta1; $("cta2").textContent = d.cta2;
+  $("t_features").textContent = d.h_high; $("t_gallery").textContent = d.h_gallery; $("t_install").textContent = d.t_install;
+  $("cards").innerHTML = d.cards.map(function(c){return '<div class="card"><div class="e">'+c[0]+'</div><h3>'+c[1]+'</h3><p>'+c[2]+'</p></div>'}).join("");
+  $("gal").innerHTML = IMGS.map(function(n,i){return '<figure><img src="img/'+n+'.png" alt="'+d.gallery[i][0]+'" loading="lazy"><figcaption><b>'+d.gallery[i][0]+'</b> · '+d.gallery[i][1]+'</figcaption></figure>'}).join("");
+  $("gnote").textContent = d.gallery_note;
+  $("modes").innerHTML = d.modes.map(function(m){return '<div class="chip"><b>'+m[0]+'</b><span>'+m[1]+'</span></div>'}).join("");
+  $("tab_unix").textContent = d.tab_unix; $("tab_win").textContent = d.tab_win;
+  $("cmd").textContent = CMDS[tab]; $("or_agent").textContent = d.or_agent; $("prompt").textContent = d.prompt;
+  $("cp1").textContent = d.copy; $("cp2").textContent = d.copy;
+  $("foot").textContent = d.foot; $("more").textContent = d.more;
+  Array.prototype.forEach.call($("langs").children, function(b){ b.className = b.getAttribute("data-l") === lang ? "on" : ""; });
+  $("tab_unix").className = tab === "unix" ? "on" : ""; $("tab_win").className = tab === "win" ? "on" : "";
+}
+$("langs").innerHTML = Object.keys(NAMES).map(function(k){return '<button data-l="'+k+'">'+NAMES[k]+'</button>'}).join("");
+$("langs").addEventListener("click", function(e){ var l = e.target.getAttribute("data-l"); if (l) { lang = l; try { localStorage.setItem("lang", l); } catch(x) {} render(); } });
+$("tab_unix").onclick = function(){ tab = "unix"; render(); };
+$("tab_win").onclick = function(){ tab = "win"; render(); };
+function copy(text, btn){
+  var done = function(){ var o = btn.textContent; btn.textContent = D[lang].copied; setTimeout(function(){ btn.textContent = D[lang].copy; }, 1400); };
+  try { navigator.clipboard.writeText(text).then(done, function(){}); } catch(e) {}
+}
+$("cp1").onclick = function(){ copy(CMDS[tab], this); };
+$("cp2").onclick = function(){ copy(D[lang].prompt, this); };
+lang = pick(); render();
+</script>
+</body>
+</html>

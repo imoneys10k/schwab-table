@@ -1,80 +1,56 @@
+<div align="center">
+
+<img src="assets/banner.png" alt="schwab-table" width="100%">
+
+**Tableaux et graphiques de cours façon étude, pour votre agent IA.**
+
 [English](README.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · **Français**
 
-# schwab-table
+<p><a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/License-MIT-2a78d6?style=flat-square"></a> <a href="https://github.com/imoneys10k/schwab-table/actions/workflows/install-test.yml"><img alt="install test" src="https://img.shields.io/github/actions/workflow/status/imoneys10k/schwab-table/install-test.yml?branch=main&style=flat-square&label=install%20test"></a> <a href="https://github.com/imoneys10k/schwab-table/releases"><img alt="release" src="https://img.shields.io/github/v/release/imoneys10k/schwab-table?style=flat-square&color=1B2A4A"></a> <a href="https://github.com/imoneys10k/schwab-table/stargazers"><img alt="stars" src="https://img.shields.io/github/stars/imoneys10k/schwab-table?style=flat-square&color=eda100"></a> <img alt="Python 3.9+" src="https://img.shields.io/badge/Python-3.9%2B-1baf7a?style=flat-square"> <img alt="macOS, Linux, Windows" src="https://img.shields.io/badge/macOS%20%C2%B7%20Linux%20%C2%B7%20Windows-supported-ACDCEC?style=flat-square&labelColor=1B2A4A"> <img alt="Claude Skill" src="https://img.shields.io/badge/Claude-Skill-eb6834?style=flat-square"></p>
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![install-test](https://github.com/imoneys10k/schwab-table/actions/workflows/install-test.yml/badge.svg)](https://github.com/imoneys10k/schwab-table/actions/workflows/install-test.yml)
+<p><a href="#-installation"><b>🚀 Installation</b></a> · <a href="#-galerie"><b>🎨 Galerie</b></a> · <a href="https://imoneys10k.github.io/schwab-table/"><b>🌐 Site du projet</b></a> · <a href="SKILL.en.md"><b>📘 Doc du skill</b></a></p>
+
+</div>
 
 Un Claude Skill qui transforme une liste d'actions, une capture d'écran de positions chez un courtier ou des données de performance/classement déjà prêtes en un tableau de performance dans le style des études de Charles Schwab, et qui trace dans le même style l'évolution de plusieurs valeurs sur une période au choix. Tout est produit en chinois et en anglais (PNG + HTML).
 
-![Version anglaise](examples/neural9_en.png)
+## ✨ Points forts
 
-![Version chinoise](examples/neural9_zh.png)
+<table>
+<tr><td width="50%" valign="top"><h3>🎯 Look d'étude financière</h3><p>Bandeau de titre bleu clair, filets gris fins et notes en petits caractères, comme dans une étude de courtier.</p></td><td width="50%" valign="top"><h3>📊 Tableaux et graphiques</h3><p>Tableaux de classement, de positions et de liste de suivi, plus courbes et petits multiples avec drawdown et échelle logarithmique.</p></td></tr>
+<tr><td width="50%" valign="top"><h3>🌏 Bilingue par défaut</h3><p>Chaque sortie existe en chinois et en anglais : PNG en 2x et HTML autonome.</p></td><td width="50%" valign="top"><h3>🔒 Données faisant autorité</h3><p>Cours de clôture officiels uniquement, aucun chiffre d'agrégateur. Une donnée manquante est marquée NA, jamais inventée.</p></td></tr>
+<tr><td width="50%" valign="top"><h3>🤖 Installation en une phrase</h3><p>Collez un message dans Claude Code ou Codex. Fonctionne sous macOS, Linux et Windows.</p></td><td width="50%" valign="top"><h3>🔤 Mêmes polices partout</h3><p>Inter est fournie et intégrée à chaque fichier HTML : le rendu est identique sur toutes les machines.</p></td></tr>
+</table>
 
-## Trois modes
+## 🎨 Galerie
 
-| Mode | Entrée | Colonnes 2 à 5 | Exemple |
-|---|---|---|---|
-| A. Tableau de classement | Le rendement depuis le début de l'année (YTD) de chaque action et son rang dans le S&P 500 / NASDAQ | YTD, rang de performance S&P 500, rang de contribution S&P 500, rang de performance NASDAQ | [EN](examples/neural9_en.png) · [中文](examples/neural9_zh.png) |
-| B. Tableau de positions | Une capture d'écran ou un export de positions chez un courtier | Gain/perte latent en %, gain/perte du jour, coût moyen, nombre de titres | [EN](examples/holdings_en.png) · [中文](examples/holdings_zh.png) |
-| C. Tableau de liste de suivi | Uniquement des symboles boursiers | YTD, 1 mois, 1 an, dernier cours de clôture | [EN](examples/watchlist_en.png) · [中文](examples/watchlist_zh.png) |
+<table>
+<tr><td width="50%" align="center"><img src="examples/neural9_en.png" alt="Tableau de classement"><br><sub><b>Tableau de classement</b> · EN</sub></td><td width="50%" align="center"><img src="examples/watchlist_zh.png" alt="Tableau de liste de suivi"><br><sub><b>Tableau de liste de suivi</b> · 中文</sub></td></tr>
+<tr><td width="50%" align="center"><img src="examples/chart_lines_en.png" alt="Courbes avec drawdown"><br><sub><b>Courbes avec drawdown</b> · EN</sub></td><td width="50%" align="center"><img src="examples/chart_multiples_zh.png" alt="Petits multiples, échelle log"><br><sub><b>Petits multiples, échelle log</b> · 中文</sub></td></tr>
+</table>
 
-Le mode A utilise les données d'un graphique public de Charles Schwab. Les exemples des modes B et C reposent sur des sociétés fictives et des chiffres inventés, à titre d'illustration uniquement.
+<sub>Les exemples utilisent des sociétés fictives et des données synthétiques, sauf le tableau de classement (graphique public de Charles Schwab).</sub>
 
-## Graphiques de cours
+## 🔄 Fonctionnement
 
-Jusqu'à 9 valeurs sur une période au choix (par défaut : depuis le début de l'année), dans le même style d'étude, avec un panneau de drawdown et un tableau de synthèse. Versions chinoise et anglaise, PNG + HTML. Les exemples utilisent des sociétés fictives et des données synthétiques.
-
-![Graphique en courbes](examples/chart_lines_en.png)
-
-![Petits multiples](examples/chart_multiples_en.png)
-
-| Disposition | Contenu | Pour |
-|---|---|---|
-| `lines` | Courbes, panneau de drawdown, tableau de synthèse | 2 à 5 valeurs |
-| `multiples` | Un petit graphique par valeur à échelle commune, avec une bande de drawdown dessous | 6 à 9 valeurs |
-
-`layout: auto` choisit selon le nombre de valeurs.
-
-- **Données :** l'API officielle d'historique de cours de Nasdaq : cours de clôture quotidiens officiels, ajustés des divisions de titres, rendements de prix, environ 10 ans. La référence par défaut est SPY, indiquée comme substitut du S&P 500. Aucune autre source n'est utilisée.
-- **Axe :** un seul axe vertical, indexé à 100 au départ. Il passe automatiquement en échelle logarithmique quand l'écart est grand (ou fixez `y_scale` vous-même).
-
-```bash
-python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 -o data/watch.json
-python3 render_chart.py examples/chart_lines_spec.json out/chart   # copy and edit the spec for your own data
+```mermaid
+flowchart LR
+  A["📝 Symboles, capture<br/>ou données prêtes"] --> B["🤖 Claude + ce skill"]
+  B --> C["🏛 Clôtures quotidiennes<br/>officielles Nasdaq"]
+  C --> D["🖨 render_table<br/>render_chart"]
+  B --> D
+  D --> E["🖼 PNG + HTML<br/>EN et 中文"]
+  classDef n fill:#ACDCEC,stroke:#1B2A4A,color:#1B2A4A,stroke-width:1px;
+  class A,B,C,D,E n;
 ```
 
-## Utilisation avec Claude
-
-Une fois installé, il suffit de demander en langage naturel, par exemple :
-
-- Fais-moi un tableau de performance pour NVDA, AMD et MU.
-- Transforme cette capture d'écran de positions en tableau de style Schwab. (joindre la capture)
-- Fais un tableau de classement Neural9 2026 à partir de ces données.
-- Trace le cours de NVDA, MU et AAPL depuis le début de l'année.
-- Compare ces six actions de mars à juin en échelle logarithmique.
-
-## Sources de données
-
-Uniquement des données faisant autorité : cours de clôture officiels des bourses, fournisseurs d'indices (S&P Dow Jones Indices, Nasdaq Global Indexes, éventuellement via FRED), communications aux investisseurs des entreprises et documents déposés à la SEC, ou données de courtier de l'utilisateur. Les rendements sont calculés à partir des cours de clôture officiels ; les variations déjà calculées par des sites agrégateurs ne sont pas utilisées. Les règles détaillées sont dans [SKILL.md](SKILL.md) (en chinois) ; une traduction anglaise est disponible dans [SKILL.en.md](SKILL.en.md).
-
-## Fichiers
-
-- `SKILL.md` : la définition du skill chargée par Claude (structure, paramètres visuels, règles sur les sources de données, liste de contrôle), en chinois
-- `SKILL.en.md` : traduction anglaise de `SKILL.md`, pour les lecteurs humains
-- `install.sh` / `install.ps1` : installateurs en une commande (macOS / Linux et Windows)
-- `render_table.py` : le moteur de rendu des tableaux. Il lit une spécification JSON et produit des fichiers HTML en chinois et en anglais ainsi que des PNG en 2x
-- `fetch_prices.py` : télécharge les cours de clôture quotidiens depuis l'API officielle de Nasdaq (bibliothèque standard uniquement)
-- `render_chart.py` : le moteur de rendu des graphiques. Il lit les prix téléchargés et une spécification JSON
-- `fonts.py`, `fonts/` : la police Inter fournie (SIL OFL), intégrée à chaque fichier HTML
-- `requirements.txt` : dépendance Python (Playwright)
-- `examples/` : une spécification et son rendu pour chacun des trois modes de tableau et les deux dispositions de graphique (`sample_prices.json` est synthétique)
-- `assets/` : image d'aperçu social
-
-## Installation
+## 🚀 Installation
 
 Fonctionne sous macOS, Linux et Windows. Python 3.9+ est nécessaire (pour produire les tableaux) ; git est facultatif.
 
-### Laissez votre agent IA l'installer
+💡 **Le plus simple :** collez le message ci-dessous dans votre agent IA, il installe tout pour vous.
+
+### 🤖 Laissez votre agent IA l'installer
 
 Collez ce message dans Claude Code, Codex ou tout autre agent de programmation :
 
@@ -89,7 +65,7 @@ Si j'utilise un autre agent que Claude, installe-le plutôt dans le dossier skil
 Une fois terminé, vérifie que « Render OK » s'est affiché, puis dis-moi de redémarrer pour que le skill soit chargé.
 ```
 
-### Ou lancez-le vous-même
+### 💻 Ou lancez-le vous-même
 
 macOS / Linux :
 
@@ -116,7 +92,67 @@ Avec un tube (pipe), passez les options après `sh -s --`, par exemple `curl -fs
 
 **Dépannage :** sous Debian/Ubuntu, installez d'abord `python3-venv` ; sous Linux, si Chromium ne démarre pas, exécutez `sudo <dossier d'installation>/.venv/bin/python -m playwright install-deps chromium`.
 
-## Rendu manuel
+## 💬 Utilisation avec Claude
+
+Une fois installé, il suffit de demander en langage naturel, par exemple :
+
+- Fais-moi un tableau de performance pour NVDA, AMD et MU.
+- Transforme cette capture d'écran de positions en tableau de style Schwab. (joindre la capture)
+- Fais un tableau de classement Neural9 2026 à partir de ces données.
+- Trace le cours de NVDA, MU et AAPL depuis le début de l'année.
+- Compare ces six actions de mars à juin en échelle logarithmique.
+
+## 🧩 Trois modes
+
+| Mode | Entrée | Colonnes 2 à 5 | Exemple |
+|---|---|---|---|
+| A. Tableau de classement | Le rendement depuis le début de l'année (YTD) de chaque action et son rang dans le S&P 500 / NASDAQ | YTD, rang de performance S&P 500, rang de contribution S&P 500, rang de performance NASDAQ | [EN](examples/neural9_en.png) · [中文](examples/neural9_zh.png) |
+| B. Tableau de positions | Une capture d'écran ou un export de positions chez un courtier | Gain/perte latent en %, gain/perte du jour, coût moyen, nombre de titres | [EN](examples/holdings_en.png) · [中文](examples/holdings_zh.png) |
+| C. Tableau de liste de suivi | Uniquement des symboles boursiers | YTD, 1 mois, 1 an, dernier cours de clôture | [EN](examples/watchlist_en.png) · [中文](examples/watchlist_zh.png) |
+
+Le mode A utilise les données d'un graphique public de Charles Schwab. Les exemples des modes B et C reposent sur des sociétés fictives et des chiffres inventés, à titre d'illustration uniquement.
+
+## 📊 Graphiques de cours
+
+Jusqu'à 9 valeurs sur une période au choix (par défaut : depuis le début de l'année), dans le même style d'étude, avec un panneau de drawdown et un tableau de synthèse. Versions chinoise et anglaise, PNG + HTML. Les exemples utilisent des sociétés fictives et des données synthétiques.
+
+| Disposition | Contenu | Pour |
+|---|---|---|
+| `lines` | Courbes, panneau de drawdown, tableau de synthèse | 2 à 5 valeurs |
+| `multiples` | Un petit graphique par valeur à échelle commune, avec une bande de drawdown dessous | 6 à 9 valeurs |
+
+`layout: auto` choisit selon le nombre de valeurs.
+
+- **Données :** l'API officielle d'historique de cours de Nasdaq : cours de clôture quotidiens officiels, ajustés des divisions de titres, rendements de prix, environ 10 ans. La référence par défaut est SPY, indiquée comme substitut du S&P 500. Aucune autre source n'est utilisée.
+- **Axe :** un seul axe vertical, indexé à 100 au départ. Il passe automatiquement en échelle logarithmique quand l'écart est grand (ou fixez `y_scale` vous-même).
+
+```bash
+python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 -o data/watch.json
+python3 render_chart.py examples/chart_lines_spec.json out/chart   # copy and edit the spec for your own data
+```
+
+## 🔍 Sources de données
+
+Uniquement des données faisant autorité : cours de clôture officiels des bourses, fournisseurs d'indices (S&P Dow Jones Indices, Nasdaq Global Indexes, éventuellement via FRED), communications aux investisseurs des entreprises et documents déposés à la SEC, ou données de courtier de l'utilisateur. Les rendements sont calculés à partir des cours de clôture officiels ; les variations déjà calculées par des sites agrégateurs ne sont pas utilisées. Les règles détaillées sont dans [SKILL.md](SKILL.md) (en chinois) ; une traduction anglaise est disponible dans [SKILL.en.md](SKILL.en.md).
+
+<details>
+<summary><b>📁 Fichiers</b></summary>
+
+- `SKILL.md` : la définition du skill chargée par Claude (structure, paramètres visuels, règles sur les sources de données, liste de contrôle), en chinois
+- `SKILL.en.md` : traduction anglaise de `SKILL.md`, pour les lecteurs humains
+- `install.sh` / `install.ps1` : installateurs en une commande (macOS / Linux et Windows)
+- `render_table.py` : le moteur de rendu des tableaux. Il lit une spécification JSON et produit des fichiers HTML en chinois et en anglais ainsi que des PNG en 2x
+- `fetch_prices.py` : télécharge les cours de clôture quotidiens depuis l'API officielle de Nasdaq (bibliothèque standard uniquement)
+- `render_chart.py` : le moteur de rendu des graphiques. Il lit les prix téléchargés et une spécification JSON
+- `fonts.py`, `fonts/` : la police Inter fournie (SIL OFL), intégrée à chaque fichier HTML
+- `requirements.txt` : dépendance Python (Playwright)
+- `examples/` : une spécification et son rendu pour chacun des trois modes de tableau et les deux dispositions de graphique (`sample_prices.json` est synthétique)
+- `assets/` : image d'aperçu social
+
+</details>
+
+<details>
+<summary><b>🔧 Rendu manuel</b></summary>
 
 Si vous avez utilisé l'installateur, `render_table.py` bascule automatiquement sur son environnement virtuel : `python3 render_table.py ...` suffit. Sinon, Python 3.9 ou supérieur est requis :
 
@@ -136,10 +172,14 @@ python3 render_chart.py examples/chart_lines_spec.json out/chart   # copy and ed
 
 Polices : Inter (fournie dans `fonts/`, licence SIL Open Font) est intégrée à chaque fichier HTML pour les caractères latins et les chiffres, donc le rendu est identique sur toutes les machines. Le chinois utilise la police CJK du système (PingFang SC sous macOS, Microsoft YaHei sous Windows). Sur un serveur Linux minimal, installez-en une, par exemple `sudo apt install fonts-noto-cjk` ; sinon la version chinoise s'affiche en carrés.
 
-## Avertissement
+</details>
+
+## 📌 Avertissement
 
 Ce projet ne produit que la mise en forme de tableaux et ne fournit aucun conseil en investissement. Les données des exemples sont données à titre d'illustration uniquement.
 
-## Licence
+## 📄 Licence
 
 [MIT](LICENSE)
+
+<div align="center"><sub>⭐ Si cela vous fait gagner du temps, une étoile aide d'autres personnes à le trouver.</sub></div>
