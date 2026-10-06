@@ -1,0 +1,102 @@
+"""Render a Schwab-style performance table (EN + ZH) from a JSON spec.
+
+Usage: python3 render_table.py spec.json OUT_PREFIX
+Writes OUT_PREFIX_en.html/.png and OUT_PREFIX_zh.html/.png (2x).
+
+Spec:
+{
+  "langs": {
+    "en": {"title": "...", "h1": [5 strings], "h2": [5 strings], "foot": "html", "foot_size": "10px"},
+    "zh": {...}
+  },
+  "formats": ["pct", "pct", "money", "raw"],        # one per numeric column (cols 2-5)
+  "rows": [
+    {"ticker": "NVDA", "name": {"en": "NVIDIA Corp", "zh": "英伟达"}, "cells": [25.7, 4.4, 24.2, 233.95]},
+    {"name": {"en": "S&P 500", "zh": "标普 500"}, "cells": [12.8, null, null, null], "bench": true}
+  ]
+}
+Rows are sorted by cells[0] descending; bench rows are bold, have no ticker, and null renders as NA.
+Formats: pct = 1 decimal, money = 2 decimals with thousands separator, raw = string as given.
+"""
+import asyncio
+import json
+import sys
+from playwright.async_api import async_playwright
+
+FONT_STACK = ('"Inter", "Helvetica Neue", Helvetica, Arial, '
+              '"Noto Sans CJK SC", "Source Han Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif')
+
+
+def fmt(v, kind):
+    if v is None:
+        return "NA"
+    if kind == "raw":
+        return str(v)
+    t = format(abs(v), ".1f" if kind == "pct" else ",.2f")
+    return f'<span class="sgn">-</span>{t}' if v < 0 else t
+
+
+def build_html(spec, lang):
+    L = spec["langs"][lang]
+    rows = sorted(spec["rows"], key=lambda r: r["cells"][0], reverse=True)
+    body = []
+    for r in rows:
+        name = r["name"][lang]
+        if r.get("ticker") and not r.get("bench"):
+            name += f' <span class="tk">({r["ticker"]})</span>'
+        cells = "".join(f"<td>{fmt(v, k)}</td>" for v, k in zip(r["cells"], spec["formats"]))
+        body.append(f'<tr class="{"bench" if r.get("bench") else ""}"><td class="name">{name}</td>{cells}</tr>')
+    h1 = "".join(f"<th>{t}</th>" for t in L["h1"])
+    h2 = "".join(f"<th>{t}</th>" for t in L["h2"])
+    return f"""<!doctype html><html lang="{'zh-CN' if lang == 'zh' else 'en'}"><head><meta charset="utf-8">
+<title>{L['title']}</title><style>
+body {{ margin:0; background:#fff; font-family:{FONT_STACK}; -webkit-font-smoothing:antialiased; }}
+tbody td:not(.name) {{ font-feature-settings:"tnum" 1, "lnum" 1; }}
+.sgn {{ font-feature-settings:"tnum" 0; }}
+.tk {{ font-family:"Inter", "Helvetica Neue", Helvetica, Arial, sans-serif; letter-spacing:0.2px; }}
+#wrap {{ width:720px; padding:12px; background:#fff; }}
+table {{ width:100%; border-collapse:collapse; border:1px solid #D0D0D0; table-layout:fixed; }}
+col.c1 {{ width:37%; }} col.c2 {{ width:15%; }} col.cx {{ width:16%; }}
+thead th {{ background:#ACDCEC; color:#1B2A4A; font-weight:600; font-size:13.5px; line-height:1.25;
+           text-align:right; padding:2px 12px 2px 10px; vertical-align:bottom; white-space:nowrap; }}
+thead tr.title th {{ text-align:center; font-size:15px; font-weight:700; padding:9px 10px 5px; letter-spacing:0.1px; }}
+thead tr.h2 th {{ padding-bottom:7px; }}
+tbody td {{ font-size:13.5px; color:#595959; height:26px; padding:0 12px 0 10px; text-align:right;
+           border-top:1px solid #D9D9D9; white-space:nowrap; line-height:26px; vertical-align:middle; }}
+tbody td.name {{ text-align:left; padding-left:10px; }}
+tbody tr.bench td {{ color:#2B2B2B; font-weight:600; }}
+.foot {{ margin-top:7px; font-size:{L.get('foot_size', '10px')}; color:#6B6B6B; line-height:1.4; }}
+.foot b {{ font-weight:600; color:#555; }}
+</style></head><body><div id="wrap">
+<table>
+<colgroup><col class="c1"><col class="c2"><col class="cx"><col class="cx"><col class="cx"></colgroup>
+<thead>
+<tr class="title"><th colspan="5">{L['title']}</th></tr>
+<tr class="h1">{h1}</tr>
+<tr class="h2">{h2}</tr>
+</thead>
+<tbody>
+{chr(10).join(body)}
+</tbody></table>
+<div class="foot">{L['foot']}</div>
+</div></body></html>"""
+
+
+async def main(spec_path, prefix):
+    spec = json.load(open(spec_path, encoding="utf-8"))
+    async with async_playwright() as p:
+        b = await p.chromium.launch()
+        for lang in spec["langs"]:
+            html = build_html(spec, lang)
+            with open(f"{prefix}_{lang}.html", "w", encoding="utf-8") as f:
+                f.write(html)
+            pg = await b.new_page(device_scale_factor=2, viewport={"width": 800, "height": 600})
+            await pg.set_content(html)
+            await pg.evaluate("document.fonts.ready")
+            await pg.locator("#wrap").screenshot(path=f"{prefix}_{lang}.png")
+            await pg.close()
+        await b.close()
+
+
+if __name__ == "__main__":
+    asyncio.run(main(sys.argv[1], sys.argv[2]))

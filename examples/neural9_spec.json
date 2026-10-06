@@ -1,0 +1,32 @@
+{
+  "langs": {
+    "en": {
+      "title": "2026 Neural9 Performance",
+      "h1": ["", "", "S&P 500", "S&P 500", "NASDAQ"],
+      "h2": ["", "YTD (%)", "Performance rank", "Contribution rank", "Performance rank"],
+      "foot": "Source: Charles Schwab, Bloomberg, as of 10/2/2026. Performance rank based on performance within the respective index. Contribution rank (not available for NASDAQ) represents price performance multiplied by weight in index. All corporate names and market data shown above are for illustrative purposes only and are not a recommendation, offer to sell, or a solicitation of an offer to buy any security. Indexes are unmanaged, do not incur management fees, costs and expenses and cannot be invested in directly. <b>Past performance is no guarantee of future results.</b>",
+      "foot_size": "10px"
+    },
+    "zh": {
+      "title": "2026 年 Neural9 表现",
+      "h1": ["", "年初", "标普 500", "标普 500", "纳斯达克"],
+      "h2": ["", "至今 (%)", "涨幅排名", "贡献排名", "涨幅排名"],
+      "foot": "资料来源：嘉信理财、彭博，截至 10/2/2026。涨幅排名为在相应指数内按涨跌幅的排名。贡献排名（纳斯达克不适用）为价格表现乘以指数权重后的排名。以上公司名称及市场数据仅作说明用途，不构成任何证券的推荐、出售要约或购买要约邀请。指数不受管理，不产生管理费及其他费用，且不可直接投资。<b>过往业绩不代表未来表现。</b>",
+      "foot_size": "10.5px"
+    }
+  },
+  "formats": ["pct", "raw", "raw", "raw"],
+  "rows": [
+    {"ticker": "MU",    "name": {"en": "Micron Technology Inc", "zh": "美光科技"}, "cells": [276.6, 4, 1, 28]},
+    {"ticker": "NVDA",  "name": {"en": "NVIDIA Corp",           "zh": "英伟达"},   "cells": [25.4, 104, 4, 726]},
+    {"ticker": "AAPL",  "name": {"en": "Apple Inc",             "zh": "苹果"},     "cells": [22.7, 119, 6, 790]},
+    {"name": {"en": "NASDAQ",  "zh": "纳斯达克综合指数"}, "cells": [17.0, null, null, null], "bench": true},
+    {"name": {"en": "S&P 500", "zh": "标普 500"},         "cells": [12.8, null, null, null], "bench": true},
+    {"ticker": "META",  "name": {"en": "Meta Platforms Inc",    "zh": "Meta"},     "cells": [10.3, 184, 29, 1058]},
+    {"ticker": "GOOGL", "name": {"en": "Alphabet Inc",          "zh": "谷歌"},     "cells": [9.7, 192, 21, 1070]},
+    {"ticker": "AMZN",  "name": {"en": "Amazon.com Inc",        "zh": "亚马逊"},   "cells": [9.0, 198, 17, 1090]},
+    {"ticker": "MSFT",  "name": {"en": "Microsoft Corp",        "zh": "微软"},     "cells": [7.0, 219, 15, 1146]},
+    {"ticker": "AVGO",  "name": {"en": "Broadcom Inc",          "zh": "博通"},     "cells": [2.6, 254, 59, 1355]},
+    {"ticker": "TSLA",  "name": {"en": "Tesla Inc",             "zh": "特斯拉"},   "cells": [-17.6, 405, 504, 1994]}
+  ]
+}
