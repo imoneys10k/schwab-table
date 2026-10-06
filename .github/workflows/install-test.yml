@@ -24,13 +24,12 @@ jobs:
           PATH="$RUNNER_TEMP/nogit" /bin/sh ./install.sh --dir "$RUNNER_TEMP/skill-tar/schwab-performance-table"
 
   windows:
-    strategy:
-      fail-fast: false
-      matrix:
-        shell: [pwsh, powershell]
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install
-        shell: ${{ matrix.shell }}
-        run: .\install.ps1 -Dir "$env:RUNNER_TEMP\skill\schwab-performance-table"
+      - name: Install (PowerShell 7)
+        shell: pwsh
+        run: .\install.ps1 -Dir "$env:RUNNER_TEMP\skill-pwsh\schwab-performance-table"
+      - name: Install (Windows PowerShell 5.1)
+        shell: powershell
+        run: .\install.ps1 -Dir "$env:RUNNER_TEMP\skill-ps51\schwab-performance-table"
