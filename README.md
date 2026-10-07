@@ -18,7 +18,7 @@ A Claude Skill that turns a stock list, a brokerage holdings screenshot, or read
 
 <table>
 <tr><td width="50%" valign="top"><h3>🎯 Research-desk look</h3><p>Light-blue title band, thin grey rules and small-print footnotes, like a broker research note.</p></td><td width="50%" valign="top"><h3>📊 Tables and charts</h3><p>Ranking, holdings and watchlist tables, plus line charts and small multiples with drawdown and log scale.</p></td></tr>
-<tr><td width="50%" valign="top"><h3>🌏 Bilingual by default</h3><p>Every output in Chinese and English: 2x PNG and self-contained HTML.</p></td><td width="50%" valign="top"><h3>🔒 Authoritative data only</h3><p>Official exchange closes, no aggregator numbers. Missing data is marked NA, never made up.</p></td></tr>
+<tr><td width="50%" valign="top"><h3>🌏 Bilingual by default</h3><p>Every output in Chinese and English: 2x PNG and self-contained HTML.</p></td><td width="50%" valign="top"><h3>🔒 Explicit data sources</h3><p>Exchange closes plus clearly labelled Yahoo global data. Missing data is marked NA, never made up.</p></td></tr>
 <tr><td width="50%" valign="top"><h3>🤖 One-line agent install</h3><p>Paste a prompt into Claude Code or Codex. Works on macOS, Linux and Windows.</p></td><td width="50%" valign="top"><h3>🔤 Same fonts everywhere</h3><p>Inter is bundled and embedded in every HTML file, so output looks the same on every machine.</p></td></tr>
 </table>
 
@@ -125,19 +125,20 @@ Chart up to 9 symbols over any period (default: year to date) in the same resear
 
 `layout: auto` picks one by symbol count.
 
-- **Data:** Nasdaq's official historical-quote API: official daily closes, split-adjusted, price returns, about 10 years. The benchmark defaults to SPY and is labelled as a proxy for the S&P 500. No other sources are used.
+- **Data:** US listings use Nasdaq; Shanghai/Shenzhen use official exchange website closes (unadjusted); other markets use Yahoo Finance (aggregated). Each listing keeps its currency and last trading date. SPY remains the default benchmark; use `--benchmark none` for a global chart without one.
 - **Axis:** one y-axis, indexed to 100 at the start. It switches to a log scale automatically when the range is wide (or set `y_scale` yourself).
 - **Your own data:** `csv_to_prices.py` turns CSV files (broker exports, Hong Kong or A-share prices, adjusted closes for total return) into the same format.
 - **Options:** `--theme dark`, `--pdf`, several benchmarks (`--benchmark SPY,COMP`), custom line colours, and hover tooltips in the HTML files.
 
 ```bash
 python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 -o data/watch.json
+python3 fetch_prices.py 7203.T 0700.HK SAP.DE 600519.SS 000001.SZ --start 2026-08-01 --benchmark none -o data/global.json
 python3 render_chart.py examples/chart_lines_spec.json out/chart   # copy and edit the spec for your own data
 ```
 
 ## 🔍 Data sources
 
-Authoritative data only: official exchange closing prices, index providers (S&P Dow Jones Indices, Nasdaq Global Indexes, optionally via FRED), company IR / SEC filings, or the user's own brokerage data. Returns are computed from official closing prices; ready-made percentages from aggregator sites are not used. See [SKILL.md](SKILL.md) for the rules (in Chinese; an English translation is in [SKILL.en.md](SKILL.en.md)).
+US and Shanghai/Shenzhen prices use exchange sources; global daily prices may use Yahoo Finance, explicitly labelled as aggregated. Company IR, SEC and official index sources remain preferred. A-share website prices are unadjusted and Shenzhen history is limited; unavailable history is reported, never silently shortened. See [SKILL.md](SKILL.md) and [SKILL.en.md](SKILL.en.md).
 
 <details>
 <summary><b>📁 Files</b></summary>
@@ -146,7 +147,7 @@ Authoritative data only: official exchange closing prices, index providers (S&P 
 - `SKILL.en.md`: English translation of `SKILL.md`, for human readers
 - `install.sh` / `install.ps1`: one-click installers for macOS / Linux and Windows
 - `render_table.py`: the table renderer. Reads a JSON spec and writes Chinese and English HTML plus 2x PNG
-- `fetch_prices.py`: downloads daily closes from Nasdaq's official API (standard library only)
+- `fetch_prices.py`: market-routed daily closes from Nasdaq, Shanghai/Shenzhen and Yahoo (standard library only)
 - `csv_to_prices.py`: converts your own CSV price files into the format `render_chart.py` reads
 - `render_common.py`: shared colour themes and PNG / PDF rendering
 - `tests/`: unit tests for the calculations and parsers (`python3 -m unittest discover -s tests`)
@@ -175,6 +176,7 @@ Charts take two steps: fetch the prices, then render. Pass `--start` / `--end` f
 
 ```bash
 python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 -o data/watch.json
+python3 fetch_prices.py 7203.T 0700.HK SAP.DE 600519.SS 000001.SZ --start 2026-08-01 --benchmark none -o data/global.json
 python3 render_chart.py examples/chart_lines_spec.json out/chart   # copy and edit the spec for your own data
 python3 render_chart.py examples/chart_lines_spec.json out/chart --theme dark --pdf   # dark theme and a vector PDF
 python3 csv_to_prices.py 0700.HK=tencent.csv --benchmark HSI=hsi.csv -o data/hk.json   # your own CSV files

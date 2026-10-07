@@ -18,7 +18,7 @@
 
 <table>
 <tr><td width="50%" valign="top"><h3>🎯 研报风格</h3><p>浅蓝标题带、灰色细线、小字脚注，和券商研报里的表格一个味道。</p></td><td width="50%" valign="top"><h3>📊 表格加走势图</h3><p>排名表、持仓表、自选股表，以及带回撤和对数刻度的线图、小图矩阵。</p></td></tr>
-<tr><td width="50%" valign="top"><h3>🌏 默认中英双版</h3><p>每次都输出中文和英文两版：2x PNG 加独立的 HTML。</p></td><td width="50%" valign="top"><h3>🔒 只用权威数据</h3><p>只用交易所官方收盘价，不用聚合站数字。缺的数据写 NA，绝不编造。</p></td></tr>
+<tr><td width="50%" valign="top"><h3>🌏 默认中英双版</h3><p>每次都输出中文和英文两版：2x PNG 加独立的 HTML。</p></td><td width="50%" valign="top"><h3>🔒 来源明确</h3><p>交易所收盘价与明确标注的 Yahoo 全球行情。缺的数据写 NA，绝不编造。</p></td></tr>
 <tr><td width="50%" valign="top"><h3>🤖 一句话让 Agent 安装</h3><p>把提示词发给 Claude Code 或 Codex 就行，支持 macOS、Linux、Windows。</p></td><td width="50%" valign="top"><h3>🔤 各处字体一致</h3><p>附带 Inter 字体并嵌入每个 HTML，换台机器效果也一样。</p></td></tr>
 </table>
 
@@ -125,19 +125,20 @@ irm https://raw.githubusercontent.com/imoneys10k/schwab-table/main/install.ps1 |
 
 `layout: auto` 会按标的数量自动选择。
 
-- **数据：** Nasdaq 官方历史行情接口：交易所官方日收盘价，已按拆股复权，价格回报，约 10 年。基准默认用 SPY，图上标注为标普 500 的替代。不使用其他来源。
+- **数据：** 美股使用 Nasdaq；沪深 A 股使用交易所官网日线（未复权）；其他市场使用 Yahoo Finance 聚合行情。保留各币种、最后交易日与来源。默认基准仍为 SPY，全球图无基准时用 `--benchmark none`。
 - **纵轴：** 只有一个纵轴，起点为 100。涨幅差距很大时自动改用对数刻度（也可用 `y_scale` 手动指定）。
 - **自己的数据：** `csv_to_prices.py` 可以把 CSV 文件（券商导出、港股或 A 股价格、用于总回报的复权价）转成同样的格式。
 - **选项：** `--theme dark` 深色主题、`--pdf` 矢量 PDF、多个基准（`--benchmark SPY,COMP`）、自定义线条颜色，HTML 文件里还有鼠标悬停提示。
 
 ```bash
 python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 -o data/watch.json
+python3 fetch_prices.py 7203.T 0700.HK SAP.DE 600519.SS 000001.SZ --start 2026-08-01 --benchmark none -o data/global.json
 python3 render_chart.py examples/chart_lines_spec.json out/chart   # copy and edit the spec for your own data
 ```
 
 ## 🔍 数据源
 
-只用权威数据：交易所官方收盘价、指数编制方（S&P Dow Jones Indices、Nasdaq Global Indexes，可经 FRED 转载）、公司 IR / SEC 文件，或用户自己的券商数据。回报由官方收盘价计算，不采用聚合网站上的现成涨跌幅。详见 [SKILL.md](SKILL.md)（中文原文；英文译本见 [SKILL.en.md](SKILL.en.md)）。
+美股与沪深行情优先交易所来源，全球日线允许使用明确标注的 Yahoo Finance 聚合行情；公司 IR、SEC 与指数官方来源规则继续保留。沪深官网价格未复权，深交所历史窗口有限；历史不足会报错，不会缩短区间冒充完整回报。详见 [SKILL.md](SKILL.md)。
 
 <details>
 <summary><b>📁 文件</b></summary>
@@ -146,7 +147,7 @@ python3 render_chart.py examples/chart_lines_spec.json out/chart   # copy and ed
 - `SKILL.en.md`：`SKILL.md` 的英文译本，供人阅读
 - `install.sh` / `install.ps1`：一键安装脚本（macOS / Linux 与 Windows）
 - `render_table.py`：表格渲染器，读 JSON spec，输出中英文 HTML 和 2x PNG
-- `fetch_prices.py`：从 Nasdaq 官方接口下载日收盘价（仅用标准库）
+- `fetch_prices.py`：自动按市场取日线：Nasdaq、沪深交易所官网、Yahoo（仅用标准库）
 - `csv_to_prices.py`：把你自己的 CSV 价格文件转成 `render_chart.py` 能读的格式
 - `render_common.py`：共用的配色主题和 PNG / PDF 渲染
 - `tests/`：计算和解析逻辑的单元测试（`python3 -m unittest discover -s tests`）
@@ -175,6 +176,7 @@ python3 render_table.py examples/neural9_spec.json out/neural9
 
 ```bash
 python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 -o data/watch.json
+python3 fetch_prices.py 7203.T 0700.HK SAP.DE 600519.SS 000001.SZ --start 2026-08-01 --benchmark none -o data/global.json
 python3 render_chart.py examples/chart_lines_spec.json out/chart   # 复制并修改 spec 用于你自己的数据
 python3 render_chart.py examples/chart_lines_spec.json out/chart --theme dark --pdf   # 深色主题和矢量 PDF
 python3 csv_to_prices.py 0700.HK=tencent.csv --benchmark HSI=hsi.csv -o data/hk.json   # 你自己的 CSV 文件

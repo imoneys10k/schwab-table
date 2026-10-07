@@ -18,7 +18,7 @@ Un Claude Skill qui transforme une liste d'actions, une capture d'écran de posi
 
 <table>
 <tr><td width="50%" valign="top"><h3>🎯 Look d'étude financière</h3><p>Bandeau de titre bleu clair, filets gris fins et notes en petits caractères, comme dans une étude de courtier.</p></td><td width="50%" valign="top"><h3>📊 Tableaux et graphiques</h3><p>Tableaux de classement, de positions et de liste de suivi, plus courbes et petits multiples avec drawdown et échelle logarithmique.</p></td></tr>
-<tr><td width="50%" valign="top"><h3>🌏 Bilingue par défaut</h3><p>Chaque sortie existe en chinois et en anglais : PNG en 2x et HTML autonome.</p></td><td width="50%" valign="top"><h3>🔒 Données faisant autorité</h3><p>Cours de clôture officiels uniquement, aucun chiffre d'agrégateur. Une donnée manquante est marquée NA, jamais inventée.</p></td></tr>
+<tr><td width="50%" valign="top"><h3>🌏 Bilingue par défaut</h3><p>Chaque sortie existe en chinois et en anglais : PNG en 2x et HTML autonome.</p></td><td width="50%" valign="top"><h3>🔒 Sources explicites</h3><p>Cours officiels et données mondiales Yahoo clairement identifiées. Une donnée manquante est marquée NA, jamais inventée.</p></td></tr>
 <tr><td width="50%" valign="top"><h3>🤖 Installation en une phrase</h3><p>Collez un message dans Claude Code ou Codex. Fonctionne sous macOS, Linux et Windows.</p></td><td width="50%" valign="top"><h3>🔤 Mêmes polices partout</h3><p>Inter est fournie et intégrée à chaque fichier HTML : le rendu est identique sur toutes les machines.</p></td></tr>
 </table>
 
@@ -125,19 +125,20 @@ Jusqu'à 9 valeurs sur une période au choix (par défaut : depuis le début de 
 
 `layout: auto` choisit selon le nombre de valeurs.
 
-- **Données :** l'API officielle d'historique de cours de Nasdaq : cours de clôture quotidiens officiels, ajustés des divisions de titres, rendements de prix, environ 10 ans. La référence par défaut est SPY, indiquée comme substitut du S&P 500. Aucune autre source n'est utilisée.
+- **Données :** Nasdaq pour les États-Unis ; sites officiels des bourses de Shanghai/Shenzhen (cours non ajustés) ; Yahoo Finance pour les autres marchés (données agrégées). Devise et dernière séance sont indiquées. `--benchmark none` désactive la référence.
 - **Axe :** un seul axe vertical, indexé à 100 au départ. Il passe automatiquement en échelle logarithmique quand l'écart est grand (ou fixez `y_scale` vous-même).
 - **Vos propres données :** `csv_to_prices.py` convertit des fichiers CSV (exports de courtier, cours de Hong Kong ou des actions A, cours ajustés pour le rendement total) dans le même format.
 - **Options :** `--theme dark` (thème sombre), `--pdf` (PDF vectoriel), plusieurs références (`--benchmark SPY,COMP`), couleurs de courbes personnalisées et infobulles au survol dans les fichiers HTML.
 
 ```bash
 python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 -o data/watch.json
+python3 fetch_prices.py 7203.T 0700.HK SAP.DE 600519.SS 000001.SZ --start 2026-08-01 --benchmark none -o data/global.json
 python3 render_chart.py examples/chart_lines_spec.json out/chart   # copy and edit the spec for your own data
 ```
 
 ## 🔍 Sources de données
 
-Uniquement des données faisant autorité : cours de clôture officiels des bourses, fournisseurs d'indices (S&P Dow Jones Indices, Nasdaq Global Indexes, éventuellement via FRED), communications aux investisseurs des entreprises et documents déposés à la SEC, ou données de courtier de l'utilisateur. Les rendements sont calculés à partir des cours de clôture officiels ; les variations déjà calculées par des sites agrégateurs ne sont pas utilisées. Les règles détaillées sont dans [SKILL.md](SKILL.md) (en chinois) ; une traduction anglaise est disponible dans [SKILL.en.md](SKILL.en.md).
+Sources officielles pour les États-Unis et Shanghai/Shenzhen ; Yahoo Finance est autorisé pour les cours quotidiens mondiaux et identifié comme agrégateur. Les cours des actions A ne sont pas ajustés et l'historique de Shenzhen est limité. Voir [SKILL.md](SKILL.md) et [SKILL.en.md](SKILL.en.md).
 
 <details>
 <summary><b>📁 Fichiers</b></summary>
@@ -175,6 +176,7 @@ Les graphiques se font en deux étapes : télécharger les prix, puis les rendre
 
 ```bash
 python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 -o data/watch.json
+python3 fetch_prices.py 7203.T 0700.HK SAP.DE 600519.SS 000001.SZ --start 2026-08-01 --benchmark none -o data/global.json
 python3 render_chart.py examples/chart_lines_spec.json out/chart   # copiez et modifiez la spécification pour vos données
 python3 render_chart.py examples/chart_lines_spec.json out/chart --theme dark --pdf   # thème sombre et PDF vectoriel
 python3 csv_to_prices.py 0700.HK=tencent.csv --benchmark HSI=hsi.csv -o data/hk.json   # vos propres fichiers CSV

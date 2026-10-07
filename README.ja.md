@@ -18,7 +18,7 @@
 
 <table>
 <tr><td width="50%" valign="top"><h3>🎯 リサーチ風の見た目</h3><p>水色のタイトル帯、細いグレーの罫線、小さな注記。証券会社のレポートそのままの雰囲気です。</p></td><td width="50%" valign="top"><h3>📊 表とチャート</h3><p>ランキング表・保有銘柄表・ウォッチリスト表に加え、ドローダウンと対数目盛つきの折れ線とスモールマルチプル。</p></td></tr>
-<tr><td width="50%" valign="top"><h3>🌏 標準で二言語</h3><p>出力は常に中国語版と英語版。2x PNG と単体で完結する HTML です。</p></td><td width="50%" valign="top"><h3>🔒 信頼できるデータだけ</h3><p>取引所の公式終値のみ。集約サイトの数字は使わず、欠けたデータは NA とし、作り話はしません。</p></td></tr>
+<tr><td width="50%" valign="top"><h3>🌏 標準で二言語</h3><p>出力は常に中国語版と英語版。2x PNG と単体で完結する HTML です。</p></td><td width="50%" valign="top"><h3>🔒 出典を明示</h3><p>取引所公式終値と出典を明示した Yahoo の世界市場データを使用します。欠損は NA と表示し、数値を作りません。</p></td></tr>
 <tr><td width="50%" valign="top"><h3>🤖 ワンフレーズで導入</h3><p>プロンプトを Claude Code や Codex に貼るだけ。macOS・Linux・Windows に対応。</p></td><td width="50%" valign="top"><h3>🔤 どこでも同じフォント</h3><p>Inter を同梱して HTML に埋め込むので、どのマシンでも同じ見た目になります。</p></td></tr>
 </table>
 
@@ -125,19 +125,20 @@ irm https://raw.githubusercontent.com/imoneys10k/schwab-table/main/install.ps1 |
 
 `layout: auto` は銘柄数に応じて自動で選びます。
 
-- **データ：** Nasdaq の公式ヒストリカル API。取引所の公式日次終値で、株式分割調整済み、価格リターン、約 10 年分。ベンチマークは既定で SPY で、S&P 500 の代用であることを明記します。他のデータソースは使いません。
+- **データ：** 米国株は Nasdaq、上海・深圳は取引所公式サイト（未調整終値）、その他の市場は Yahoo Finance（集約データ）を使用。通貨と最終取引日を表示します。`--benchmark none` でベンチマークを省略できます。
 - **軸：** Y 軸は 1 本だけで、開始時点を 100 に指数化します。値幅が大きいときは自動で対数目盛に切り替わります（`y_scale` で手動指定も可能）。
 - **自分のデータ：** `csv_to_prices.py` が CSV ファイル（証券会社のエクスポート、香港株や A 株の価格、総リターン用の調整後終値）を同じ形式に変換します。
 - **オプション：** `--theme dark`（ダークテーマ）、`--pdf`（ベクター PDF）、複数のベンチマーク（`--benchmark SPY,COMP`）、線の色の指定、HTML でのマウスオーバー表示。
 
 ```bash
 python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 -o data/watch.json
+python3 fetch_prices.py 7203.T 0700.HK SAP.DE 600519.SS 000001.SZ --start 2026-08-01 --benchmark none -o data/global.json
 python3 render_chart.py examples/chart_lines_spec.json out/chart   # copy and edit the spec for your own data
 ```
 
 ## 🔍 データソース
 
-信頼できるデータのみを使用します。取引所の公式終値、指数提供会社（S&P Dow Jones Indices、Nasdaq Global Indexes。FRED 経由も可）、企業の IR / SEC 提出書類、またはユーザー自身の証券口座データです。リターンは公式終値から計算し、集約サイトの既製の騰落率は使いません。ルールの詳細は [SKILL.md](SKILL.md)（中国語）を参照してください。英語訳は [SKILL.en.md](SKILL.en.md) です。
+米国株と上海・深圳は取引所のデータ、その他の市場の日次価格は出典を明示した Yahoo Finance を使用します。中国 A 株の終値は未調整で、深圳の履歴範囲は限定されています。詳細は [SKILL.md](SKILL.md) と [SKILL.en.md](SKILL.en.md) を参照してください。
 
 <details>
 <summary><b>📁 ファイル</b></summary>
@@ -175,6 +176,7 @@ python3 render_table.py examples/neural9_spec.json out/neural9
 
 ```bash
 python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 -o data/watch.json
+python3 fetch_prices.py 7203.T 0700.HK SAP.DE 600519.SS 000001.SZ --start 2026-08-01 --benchmark none -o data/global.json
 python3 render_chart.py examples/chart_lines_spec.json out/chart   # spec をコピーして自分のデータ用に編集
 python3 render_chart.py examples/chart_lines_spec.json out/chart --theme dark --pdf   # ダークテーマとベクター PDF
 python3 csv_to_prices.py 0700.HK=tencent.csv --benchmark HSI=hsi.csv -o data/hk.json   # 自分の CSV ファイル

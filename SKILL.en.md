@@ -39,12 +39,15 @@ If the mode is unclear, ask one question. If the user gives only tickers and no 
 - No benchmark row unless the user mentions a comparison; if they do, fetch benchmarks with `--benchmark SPY,COMP` and say that SPY is only a proxy for the S&P 500
 - With more than 15 stocks, confirm with the user first whether to include them all; a table that long loses the research-note look
 
-## Data-source rules: authoritative data only
+## Data-source rules: official sources first, explicitly labelled global data
 
-"Authoritative" means the **original publisher** of the data, or an official body that republishes the publisher's data verbatim with attribution. Aggregator sites, quote apps and finance blogs never count.
+"Authoritative" means the **original publisher** of the data, or an official body that republishes the publisher's data verbatim with attribution. Aggregator sites are not original publishers; Yahoo is the explicitly labelled exception for global daily closes.
 
 ### 1. Allowed sources
-| Data | Authoritative source | How to get it |
+
+US listings retain Nasdaq; Shanghai/Shenzhen use exchange website endpoints. Other markets may use Yahoo Finance daily closes, explicitly labelled as aggregated data. Include currency, exchange-local trading dates and retrieval times; never label Yahoo prices as official exchange closes.
+
+| Data | Allowed source | How to get it |
 |---|---|---|
 | The user's own data | Brokerage screenshots, exports or web pages the user provides | Use as given; do not rewrite |
 | Stock closing prices | The listing exchange's official close: Nasdaq.com historical quotes (including consolidated closes for NYSE-listed stocks), NYSE.com | The page is JS-rendered, so WebFetch cannot read it; open `https://www.nasdaq.com/market-activity/stocks/{ticker}/historical` in Claude in Chrome and read the table |
@@ -55,18 +58,18 @@ If the mode is unclear, ask one question. If the user gives only tickers and no 
 | Rank within an index (mode A) | Only accepted from the user (from Schwab, Bloomberg, etc.) | Never computed by Claude |
 
 ### 2. Forbidden sources
-- Aggregators such as ChartRow, stockanalysis.com, Yahoo Finance, Google Finance, Investing.com, MarketBeat, Seeking Alpha, Stocktwits (Google Finance was observed to return stale prices)
+- Aggregators such as ChartRow, stockanalysis.com, Google Finance, Investing.com, MarketBeat, Seeking Alpha, Stocktwits (Google Finance was observed to return stale prices)
 - Forums, blogs, auto-generated SEO pages, AI summaries
 - Any number from the model's memory
 - When no authoritative source can be found, **do not fall back** to the above. Instead: stop and tell the user which ticker and what is missing and ask them to supply it (e.g. a Schwab export), or fill that cell with `NA` and say so in the reply
 
 ### 3. Compute returns yourself from official closes
-Ready-made "YTD %" figures on web pages mostly come from aggregators and are not used directly. Always compute from official closing prices:
+Ready-made "YTD %" figures on web pages mostly come from aggregators and are not used directly. Compute from the allowed sources above:
 - **YTD** = close on the cutoff date ÷ close on the last trading day of the previous year − 1
 - **1-month** = close on the cutoff date ÷ close on the same day one month earlier − 1 (if that day was a market holiday, use the nearest earlier trading day)
 - **1-year** = same, one year earlier
 - If a split or reverse split falls inside the window, adjust the older prices by the ratio in the IR announcement
-- The basis is always **price return** (excluding dividends), consistent with the S&P 500 and Nasdaq Composite
+- Nasdaq uses split-adjusted price returns; Yahoo uses close rather than dividend-adjusted adjclose. Shanghai/Shenzhen closes are unadjusted and corporate actions may distort returns. Verify corporate actions before describing those changes as investment returns. Cross-currency comparisons use each listing currency, without FX conversion
 - Do the computation in code, keep the raw closing prices, and include the two prices used in the reply so they can be checked
 
 ### 4. Cutoff alignment
@@ -179,7 +182,7 @@ Without `render_table.py`, hand-write a single-file HTML following the structure
 - [ ] Mode identified correctly; columns match the mode
 - [ ] Both Chinese and English versions produced
 - [ ] Every stock carries `(TICKER)`; benchmark/total rows do not
-- [ ] All data comes from authoritative sources; no aggregator data
+- [ ] All data comes from allowed sources; Yahoo is labelled aggregated; no model-memory numbers
 - [ ] All data shares one cutoff date; footnote date, source and return basis are correct
 - [ ] Sorted descending by column 2; benchmark/total rows at the correct position and bold
 - [ ] No header wrapping; no `%` or `$` in cells; no gap after the minus sign
@@ -196,17 +199,18 @@ The user wants to see how one or more symbols moved over a period, their cumulat
 
 ## Workflow
 1. **Fix the symbols and the period.** Use the dates the user gives exactly; with none, use **year to date**. The start is indexed to 100 at the close on or before the start date (YTD = the last close of the previous year)
-2. **Fetch the data** (the only source is Nasdaq's official historical-quote API):
+2. **Fetch the data** (US: Nasdaq; Shanghai/Shenzhen: official exchange website endpoints; other markets: Yahoo):
    ```bash
    python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 --end 2026-10-02 -o data/watch.json
    ```
-   - Official exchange daily closes, split-adjusted and excluding dividends, i.e. **price returns**; about 10 years of daily history. Stocks, ETFs and Nasdaq indexes (`COMP`, `NDX`) work
+   - US Nasdaq daily closes are official and split-adjusted, excluding dividends, with about 10 years of history. Other markets have the source and adjustment limitations below.
    - The default benchmark is **SPY** (an S&P 500 ETF, same source; the chart and footnote say it is only a proxy for the index). `--benchmark COMP` uses the Nasdaq Composite; `--benchmark SP500` uses the S&P 500 index republished by FRED (FRED sometimes times out); `--benchmark none` draws no benchmark
    - Separate several benchmarks with commas: `--benchmark SPY,COMP`. `COMP`, `NDX` and a few more are indexes and are looked up as indexes directly (the same letters can also be a US stock ticker, e.g. COMP is Compass Inc); when a code is ambiguous use `index:COMP`, `etf:SPY` or `stock:XXX` to force the class
-   - **US-listed only.** For Hong Kong, A-shares and other markets Nasdaq does not cover, ask the user for a CSV (a broker or exchange export) and convert it with `python3 csv_to_prices.py 0700.HK=tencent.csv --benchmark HSI=hsi.csv -o data/hk.json`; the source is recorded as user-provided data. Do not switch to an aggregator
+   - **Global symbols:** `7203.T`, `0700.HK`, `SAP.DE`, `600519.SS`, `000001.SZ`. Numeric codes require an explicit exchange suffix. Beijing is not supported by the official adapter; use a user CSV. Use `--benchmark none` unless a benchmark was requested.
+   - Exchange A-share closes are unadjusted; Shenzhen history is limited. Missing base prices cause an error, never a silently shortened return period. Yahoo is aggregated; coverage varies. Unfinished current-day bars are excluded.
    - **Total return:** Nasdaq's dividend data is not split-adjusted and ETFs have none, so total returns cannot be computed automatically. When the user supplies a CSV with an `Adj Close` column, use `csv_to_prices.py --adj-close` and the chart is labelled total return. Price-return and total-return series cannot share a chart
    - Responses are cached for 12 hours (`--refresh` bypasses it). If the network fails, the last cache is used with a warning, and the footnote's retrieval date is when that cache was actually fetched
-   - Never use aggregator sites or numbers from the model's memory. If the script exits with code 2, or `errors` in the JSON is non-empty, some symbol was not fetched: **stop and tell the user which one**; do not fill the gap
+   - Use only the configured sources, never other aggregators or numbers from the model's memory. If the script exits with code 2, or `errors` in the JSON is non-empty, some symbol was not fetched: **stop and tell the user which one**; do not fill the gap
    - Claude supplies the company names (English full name + common Chinese name) in the spec's `names`
 3. **Write the spec** (format below) and run:
    ```bash
@@ -251,9 +255,9 @@ Everything except `data` is optional. Without `start` / `end` the data file's ra
 
 ## Checklist (charts)
 - [ ] At most 9 symbols; the period matches the request (year to date if none was given)
-- [ ] Data comes from `fetch_prices.py` (Nasdaq official closes), with no aggregator or memory numbers; symbols that could not be fetched were reported to the user
+- [ ] Data comes from allowed endpoints; Yahoo, currency, last trading dates and warnings are labelled; missing symbols were reported
 - [ ] Both language versions produced; source, cutoff date and start in the footnote are correct
 - [ ] One y-axis only; colours fixed per symbol; line-end labels present, not overlapping, not clipped
 - [ ] When an ETF is the benchmark the footnote says it is a proxy; when a log scale is used the subtitle says so
 - [ ] Summary table sorted by return descending, benchmark row bold, numbers consistent with the line-end labels
-- [ ] Symbols outside the US (Hong Kong, A-shares, ...) come from a CSV the user supplied and the footnote says so; total-return charts are used only for user-supplied adjusted prices
+- [ ] A-share unadjusted-price risks and local currencies are disclosed; Yahoo is not called official; total-return charts use user-supplied dividend-adjusted closes

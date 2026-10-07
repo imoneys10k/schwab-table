@@ -26,6 +26,7 @@ import json
 import math
 import re
 import sys
+from html import escape
 from pathlib import Path
 
 from fonts import font_face_css
@@ -48,7 +49,12 @@ S = {
                  "returns × √252; maximum drawdown is the largest peak-to-trough decline over the period. {bench}All corporate names and market data shown above "
                  "are for illustrative purposes only and are not a recommendation, offer to sell, or a solicitation of an offer to buy any security. "
                  "<b>Past performance is no guarantee of future results.</b>"),
-        "basis_price": "Returns are price returns (excluding dividends) computed from official closing prices. ",
+        "basis_price": "Returns are changes in the closing prices supplied by the sources (excluding dividends). ",
+        "local_currency": "Returns are measured in each listing's currency, without FX conversion. ",
+        "unadjusted": "Shanghai/Shenzhen exchange closes are unadjusted; corporate actions may distort returns and drawdowns. ",
+        "last_dates": "Last close by symbol: {dates}. ",
+        "base_dates": "Base close by symbol: {dates}. ",
+        "warnings": "Data warnings: {warnings}. ",
         "basis_total": "Returns are total returns (dividends reinvested) computed from adjusted closing prices supplied by the user. ",
         "bench_etf": "{b}: exchange-traded fund(s) used here as proxies for their indexes; not the indexes themselves and cannot replicate them exactly. ",
         "bench_idx": "Indexes are unmanaged, do not incur management fees, costs and expenses and cannot be invested in directly. ",
@@ -64,7 +70,12 @@ S = {
         "foot": ("资料来源：{src}，截至 {end}，数据获取于 {got}。以 {base} 收盘价为 100。{basis}"
                  "年化波动率为日回报标准差 × √252；最大回撤为区间内自前高的最大跌幅。{bench}"
                  "以上公司名称及市场数据仅作说明用途，不构成任何证券的推荐、出售要约或购买要约邀请。<b>过往业绩不代表未来表现。</b>"),
-        "basis_price": "回报为由官方收盘价计算的价格回报（不含股息）。",
+        "basis_price": "涨跌幅由各来源提供的收盘价计算（不含股息）。",
+        "local_currency": "涨跌幅按各标的上市币种计算，未作汇率换算。",
+        "unadjusted": "沪深交易所收盘价未复权，除权事件可能影响涨跌幅和回撤。",
+        "last_dates": "各标的最后收盘日：{dates}。",
+        "base_dates": "各标的起点收盘日：{dates}。",
+        "warnings": "数据警告：{warnings}。",
         "basis_total": "回报为由用户提供的复权收盘价计算的总回报（股息再投资）。",
         "bench_etf": "{b}：交易所交易基金，此处仅用作其对应指数的替代，并非指数本身，也无法完全复制指数。",
         "bench_idx": "指数不受管理，不产生管理费及其他费用，且不可直接投资。",
@@ -75,7 +86,10 @@ S = {
 ZH_SRC = {"Nasdaq (official closing prices, split-adjusted)": "纳斯达克（官方收盘价，已按拆股调整）",
           "S&P 500 (S&P Dow Jones Indices, via FRED)": "标普 500（标普道琼斯指数公司，经 FRED 转载）",
           "Nasdaq Composite (Nasdaq Global Indexes, via FRED)": "纳斯达克综合指数（Nasdaq Global Indexes，经 FRED 转载）",
-          "Synthetic sample data (not real market data)": "虚构示例数据（非真实行情）"}
+          "Synthetic sample data (not real market data)": "虚构示例数据（非真实行情）",
+          "Shanghai Stock Exchange (official website, unadjusted closes)": "上海证券交易所（官网收盘价，未复权）",
+          "Shenzhen Stock Exchange (official website, unadjusted closes)": "深圳证券交易所（官网收盘价，未复权）",
+          "Yahoo Finance (aggregated daily closes)": "Yahoo Finance（聚合日收盘价）"}
 
 
 def fdate(d):
@@ -95,8 +109,8 @@ class Series:
         self.sym, self.is_bench, self.basis, self.source = sym, is_bench, basis, source
         pts = sorted((dt.date.fromisoformat(d), c) for d, c in raw_pts)
         i = bisect.bisect_right([d for d, _ in pts], base) - 1
-        if i < 0 or (base - pts[i][0]).days > 7:
-            raise ValueError(f"{sym}: no close on or within 7 days before the base date {base}")
+        if i < 0 or (base - pts[i][0]).days > 14:
+            raise ValueError(f"{sym}: no close on or within 14 days before the base date {base}")
         self.base_date, base_close = pts[i]
         pts = [(d, c) for d, c in pts[i:] if d <= end]
         if len(pts) < 2:
@@ -435,9 +449,13 @@ def layout_lines(c):
         for s in sorted(allk, key=lambda s: -s.ret):
             nm = c.bench_label(s) if s.is_bench else c.name_of(s.sym)
             last = "NA" if (s.is_bench or c.total) else f"{s.close[-1]:,.2f}"
+            currency = c.d["series"][s.sym].get("currency")
+            if last != "NA" and currency:
+                last = f"{escape(currency)} {last}"
             rows.append(f'<tr class="{"bench" if s.is_bench else ""}"><td>{swatch(c.col[s.sym], c.dash(s), 18)}{nm}</td><td>{sg(s.ret)}</td><td>{s.vol:.1f}</td><td>{sg(s.mdd)}</td><td>{last}</td></tr>')
         rh = L["ret_ytd"] if is_ytd(c.start, c.end) else L["ret"]
-        th = "".join(f"<th>{a}<br>{b}</th>" for a, b in [("", ""), rh, L["vol"], L["mdd"], L["last"]])
+        last_label = (("Last", "close") if c.lang == "en" else ("最新", "收盘价")) if any("currency" in c.d["series"][s.sym] for s in allk) else L["last"]
+        th = "".join(f"<th>{a}<br>{b}</th>" for a, b in [("", ""), rh, L["vol"], L["mdd"], last_label])
         parts.append('<table style="margin-top:6px"><colgroup><col style="width:39%"><col style="width:14%"><col style="width:16%"><col style="width:15%"><col style="width:16%"></colgroup>'
                      f'<thead><tr>{th}</tr></thead><tbody>{"".join(rows)}</tbody></table>')
     return "".join(parts)
@@ -515,6 +533,18 @@ def footnote(c):
     if c.benches:
         bench = (L["bench_etf"].format(b=("、" if c.lang == "zh" else ", ").join(etf)) if etf else "") + L["bench_idx"]
     basis = L["basis_total"] if c.total else L["basis_price"]
+    if any("currency" in c.d["series"][s.sym] for s in c.allk):
+        basis += L["local_currency"]
+        dates = ", ".join(f"{escape(s.sym)} {escape(c.d['series'][s.sym].get('currency') or '')} {s.dates[-1].isoformat()}" for s in c.allk)
+        basis += L["last_dates"].format(dates=dates)
+        if len({s.base_date for s in c.allk}) > 1:
+            dates = ", ".join(f"{escape(s.sym)} {s.base_date.isoformat()}" for s in c.allk)
+            basis += L["base_dates"].format(dates=dates)
+    if any(c.d["series"][s.sym].get("adjustment") == "unadjusted" for s in c.allk):
+        basis += L["unadjusted"]
+    warnings = [w for w in c.d.get("warnings", []) if "exchange closes are unadjusted" not in w]
+    if warnings:
+        basis += L["warnings"].format(warnings=escape("; ".join(warnings)))
     sep = "；" if c.lang == "zh" else "; "
     return c.spec.get("note", {}).get(c.lang, "") + L["foot"].format(src=sep.join(srcs), end=fdate(c.end), got=fdate(got), base=fdate(c.base), basis=basis, bench=bench)
 
