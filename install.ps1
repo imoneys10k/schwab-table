@@ -39,6 +39,14 @@ function Invoke-Checked($exe, [string[]]$arguments) {
 # 0. Uninstall ----------------------------------------------------------------
 if ($Uninstall) {
   if (Test-Path (Join-Path $Target "SKILL.md")) {
+    $helper = Join-Path $Target "install_earnings_skill.py"
+    if (Test-Path $helper) {
+      $cleanPy = Join-Path $Target ".venv\Scripts\python.exe"
+      if (Test-Path $cleanPy) { Invoke-Checked $cleanPy @($helper, "--remove") }
+      elseif (Test-Cmd python3) { Invoke-Checked python3 @($helper, "--remove") }
+      elseif (Test-Cmd python) { Invoke-Checked python @($helper, "--remove") }
+      elseif (Test-Cmd py) { Invoke-Checked py @("-3", $helper, "--remove") }
+    }
     Remove-Item -Recurse -Force $Target
     Say "Removed $Target"
     return
@@ -119,10 +127,21 @@ if ($SkipDeps) {
     foreach ($reportStyle in @("morgan", "blackstone", "ibkr")) {
       Invoke-Checked $vpy @((Join-Path $Target "render_table.py"), (Join-Path $Target ("examples\{0}_spec.json" -f $reportStyle)), (Join-Path $smoke $reportStyle)) | Out-Null
     }
+    Invoke-Checked $vpy @((Join-Path $Target "quarterly_earnings.py"), "AAPL", "--period", "FY2025Q3", "--facts", (Join-Path $Target "examples\earnings\aapl_2025q3_facts.json"), "--analysis", (Join-Path $Target "examples\earnings\aapl_2025q3_analysis.json"), "-o", (Join-Path $smoke "earnings")) | Out-Null
   } catch { $ok = $false; Write-Host $_.Exception.Message }
   Remove-Item -Recurse -Force $smoke -ErrorAction SilentlyContinue
   if (-not $ok) { throw "smoke test failed" }
-  Say "Render OK (Schwab, Morgan, Blackstone, IBKR, chart)"
+  Say "Render OK (Schwab, Morgan, Blackstone, IBKR, HSBC earnings, chart)"
+}
+
+$helper = Join-Path $Target "install_earnings_skill.py"
+if (Test-Path $helper) {
+  Say "Registering quarterly-earnings-review beside the main skill"
+  if ($vpy -and (Test-Path $vpy)) { Invoke-Checked $vpy @($helper) }
+  elseif (Test-Cmd python3) { Invoke-Checked python3 @($helper) }
+  elseif (Test-Cmd python) { Invoke-Checked python @($helper) }
+  elseif (Test-Cmd py) { Invoke-Checked py @("-3", $helper) }
+  else { Write-Host "Register the earnings skill after installing Python: python install_earnings_skill.py" }
 }
 
 Say "Installed to $Target"

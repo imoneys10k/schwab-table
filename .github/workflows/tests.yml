@@ -36,7 +36,9 @@ jobs:
           for m in neural9 holdings watchlist; do python3 render_table.py examples/${m}_spec.json examples/$m --no-png >/dev/null; done
           for m in morgan blackstone ibkr; do python3 render_table.py examples/${m}_spec.json examples/$m --no-png >/dev/null; done
           for m in chart_lines chart_multiples; do python3 render_chart.py examples/${m}_spec.json examples/$m --no-png >/dev/null; done
+          for q in 3 4; do python3 quarterly_earnings.py AAPL --period FY2025Q$q --facts examples/earnings/aapl_2025q${q}_facts.json --analysis examples/earnings/aapl_2025q${q}_analysis.json -o examples/earnings/aapl_2025q$q --no-png >/dev/null; done
           git diff --exit-code -- 'examples/*.html' examples/sample_prices.json
+          git diff --exit-code -- 'examples/earnings/*_en.html' 'examples/earnings/*_zh.html'
 
   # Hits Nasdaq's real API. It is allowed to fail (rate limits, outages) but the result is visible on every push.
   fetch-smoke:

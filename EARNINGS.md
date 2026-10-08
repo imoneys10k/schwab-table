@@ -1,6 +1,6 @@
-# HSBC 季度財報研究（本機開發版）
+# HSBC 季度財報研究
 
-輸入股票代碼與公司財季，輸出 HSBC 矩陣版式的財報解讀：繁體中文／英文 HTML 與 PNG，另附原始事實和計算臺帳。這項功能位於 `feature/quarterly-earnings-review` 本機分支，未推送，也不包含在公開 v0.5.0 發布中。
+輸入股票代碼與公司財季，輸出 HSBC 矩陣版式的財報解讀：繁體中文／英文 HTML 與 PNG，另附原始事實和計算臺帳。此功能自 v0.6.0 起納入正式版。
 
 ## 使用
 
@@ -14,10 +14,14 @@ python3 quarterly_earnings.py AAPL --period FY2025Q3 -o out/aapl_q3
 
 安裝的 Skill 為 [quarterly-earnings-review](skills/quarterly-earnings-review/SKILL.md)，可用「幫我看看 FY2025Q3 的 AAPL 財報，用 HSBC 表」觸發。Skill 先取得官方數據、讀來源原件，再編寫研究評論。單獨執行腳本會產生數據表；加入 `--analysis analysis.json` 才附上來源支持的研究解讀。
 
+安裝器會將 `quarterly-earnings-review` 註冊在主 Skill 同層，共用主專案的虛擬環境。從 git 下載後也可執行 `python3 install_earnings_skill.py`；`--target <skill-directory>` 可指定新的 Skill 位置。既有非本專案管理的同名 Skill 會保留並回報衝突。卸載主專案時，只刪除屬於該專案的財報 Skill。
+
+[線上季度示例](https://imoneys10k.github.io/schwab-table/earnings/)提供兩個季度及中英文切換。
+
 ## 來源與計算
 
 - AAPL：Apple 官方季度財務 PDF。已用 FY2025Q3、FY2025Q4 真實原件端到端驗證；先核對報表標題、欄位數、單位與日期，再讀取對應行。
-- 其他 US-GAAP 公司：SEC Company Facts，必要時傳入已核實的 `--cik`。這台機器對 SEC 自動請求回傳 403，因此 SEC 解析／第四季推導已以固定測試資料驗證，尚未通過本機即時取數驗證。可設定合規的 `SEC_USER_AGENT`，或者匯入核實的官方財報事實。
+- 其他 US-GAAP 公司：SEC Company Facts，必要時傳入已核實的 `--cik`。開發環境對 SEC 自動請求回傳 403，因此 SEC 解析／第四季推導已以固定測試資料驗證，尚未通過本機即時取數驗證。可設定合規的 `SEC_USER_AGENT`，或者匯入核實的官方財報事實。
 - 其他市場：閱讀公司 IR／交易所原件，按 [事實格式](skills/quarterly-earnings-review/references/facts-schema.md) 匯入 `--facts verified.json`。本版沒有宣稱全球財報自動覆蓋。
 - 原始來源保留 URL、取得時間與 SHA256；快取 12 小時。無法取得指定季度時回報失敗，不改用另一季度、不捏造數字。
 - 現金流按單季拆分；累計相減必須屬同一財年且期間銜接。全年減九個月可推導第四季金額，但不能直接相減 EPS。利潤率比較用百分點；比較基期非正值時不計百分比。缺失資料保留 NA。
@@ -40,4 +44,4 @@ python3 quarterly_earnings.py AAPL --period FY2025Q4 --facts examples/earnings/a
 python3 -m unittest discover -s tests -v
 ```
 
-本機 58 項測試通過；兩個 Apple 真實財季的數字與拆季計算核對通過。四張中英文表完成瀏覽器檢查，離線預覽完成季度／語言切換與窄螢幕檢查。來源／期間規則見 [financial-review.md](skills/quarterly-earnings-review/references/financial-review.md)。
+本機 60 項測試通過；兩個 Apple 真實財季的數字與拆季計算核對通過。四張中英文表完成瀏覽器檢查，離線預覽完成季度／語言切換與窄螢幕檢查。來源／期間規則見 [financial-review.md](skills/quarterly-earnings-review/references/financial-review.md)。

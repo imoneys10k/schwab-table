@@ -22,7 +22,7 @@ description: 解讀指定股票與財季的季度財報，核對單季、同比�
    python3 <skill_dir>/scripts/review.py AAPL --period FY2025Q3 -o out/aapl_q3 --no-png
    ```
 
-   腳本隨本專案使用。AAPL讀Apple官方財務PDF；其他US-GAAP 10-Q/10-K公司使用SEC Company Facts，必要時提供核實的 --cik。SEC請求可設定 SEC_USER_AGENT；快取12小時，保留取得時間，網路拒絕時不補造資料。依賴在所屬專案以 `pip install -r requirements.txt` 安裝。
+   腳本隨本專案使用。複製安裝的 Skill 從 `project.json` 讀所屬專案路徑；使用該專案 `.venv/bin/python`（Windows為 `.venv/Scripts/python.exe`）執行，或以已安裝依賴的 Python 執行。AAPL讀Apple官方財務PDF；其他US-GAAP 10-Q/10-K公司使用SEC Company Facts，必要時提供核實的 --cik。SEC請求可設定 SEC_USER_AGENT；快取12小時，保留取得時間，網路拒絕時不補造資料。依賴在所屬專案以 `pip install -r requirements.txt` 安裝。
 
 2. 讀 _facts.json、_audit.json，打開來源文件核對期間、幣別、單位與數字。重要不變條件見 [references/financial-review.md](references/financial-review.md)。SEC的fy/fp是申報焦點，前期比較數據也可能帶當期fy；實際日期不可省略。
 

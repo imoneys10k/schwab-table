@@ -10,6 +10,8 @@ description: 把股票清單、券商持倉截圖或現成的漲跌幅/排名數
 使用者指定摩根士丹利、黑石或 IBKR 報表時，先讀 [references/institutional-tables.md](references/institutional-tables.md)，依其實際用途準備字段。
 Schwab 是原有預設；三個新增模板使用各自的報表結構，不會猜補持倉、市值、權重或研究觀點。
 
+使用者要求指定股票與季度的財報解讀／HSBC 表時，轉到 [季度財報 Skill](skills/quarterly-earnings-review/SKILL.md)。財報使用公司／監管機構原件，不能用股價數據代替財務事實。
+
 ## 何時使用
 用戶想把一組股票做成 Schwab 研報裏那種「淺藍標題表頭 + 灰色細分隔線 + 小字免責腳註」的表格。默認同時輸出**中文版和英文版**，每版一個 HTML，再用 Playwright 以 2x 渲染成 PNG。
 

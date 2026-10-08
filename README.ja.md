@@ -231,3 +231,9 @@ seven/nine-column report does not invent missing facts. See
 [template schemas, source samples and font substitutions](references/institutional-tables.md).
 New templates are calibrated for white paper; Schwab tables and charts retain
 light/dark modes. Examples use fictional companies and synthetic values.
+
+## 四半期決算レビュー · HSBC 形式
+
+v0.6.0 で `quarterly-earnings-review` を追加。インストーラーはメインスキルと同じ階層に登録し、Python 環境を共有します。「AAPL FY2025Q3 の決算を HSBC 形式でレビューして」と依頼できます。企業の会計四半期と原資料を確認し、単独四半期・前年同期比・前四半期比と出典付きコメントを繁体字中国語／英語で出力します。
+
+[2四半期のデモ](https://imoneys10k.github.io/schwab-table/earnings/) · [利用方法・対応範囲](EARNINGS.md)。AAPL の公式 PDF は実取得を検証済み。他の US-GAAP 企業は SEC Company Facts を利用しますが、アクセス拒否の場合があります。他市場は `--facts` で確認済みの公式資料を取り込みます。欠損は NA、累計値と単独四半期値を区別します。

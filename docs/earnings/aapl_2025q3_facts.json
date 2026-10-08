@@ -1,0 +1,2344 @@
+{
+  "symbol": "AAPL",
+  "company_name": "Apple Inc.",
+  "currency": "USD",
+  "quarters": {
+    "FY2025Q2": {
+      "start": "2024-12-29",
+      "end": "2025-03-29",
+      "metrics": {
+        "revenue": {
+          "value": 95359000000.0,
+          "unit": "USD",
+          "start": "2024-12-29",
+          "end": "2025-03-29",
+          "source_ids": [
+            "apple-FY2025Q2"
+          ],
+          "method": "reported",
+          "reported_label": "Total net sales (1)",
+          "page": 1
+        },
+        "gross_profit": {
+          "value": 44867000000.0,
+          "unit": "USD",
+          "start": "2024-12-29",
+          "end": "2025-03-29",
+          "source_ids": [
+            "apple-FY2025Q2"
+          ],
+          "method": "reported",
+          "reported_label": "Gross margin",
+          "page": 1
+        },
+        "operating_income": {
+          "value": 29589000000.0,
+          "unit": "USD",
+          "start": "2024-12-29",
+          "end": "2025-03-29",
+          "source_ids": [
+            "apple-FY2025Q2"
+          ],
+          "method": "reported",
+          "reported_label": "Operating income",
+          "page": 1
+        },
+        "net_income": {
+          "value": 24780000000.0,
+          "unit": "USD",
+          "start": "2024-12-29",
+          "end": "2025-03-29",
+          "source_ids": [
+            "apple-FY2025Q2"
+          ],
+          "method": "reported",
+          "reported_label": "Net income",
+          "page": 1
+        },
+        "rd": {
+          "value": 8550000000.0,
+          "unit": "USD",
+          "start": "2024-12-29",
+          "end": "2025-03-29",
+          "source_ids": [
+            "apple-FY2025Q2"
+          ],
+          "method": "reported",
+          "reported_label": "Research and development",
+          "page": 1
+        },
+        "iphone": {
+          "value": 46841000000.0,
+          "unit": "USD",
+          "start": "2024-12-29",
+          "end": "2025-03-29",
+          "source_ids": [
+            "apple-FY2025Q2"
+          ],
+          "method": "reported",
+          "reported_label": "iPhone",
+          "page": 1
+        },
+        "mac": {
+          "value": 7949000000.0,
+          "unit": "USD",
+          "start": "2024-12-29",
+          "end": "2025-03-29",
+          "source_ids": [
+            "apple-FY2025Q2"
+          ],
+          "method": "reported",
+          "reported_label": "Mac",
+          "page": 1
+        },
+        "ipad": {
+          "value": 6402000000.0,
+          "unit": "USD",
+          "start": "2024-12-29",
+          "end": "2025-03-29",
+          "source_ids": [
+            "apple-FY2025Q2"
+          ],
+          "method": "reported",
+          "reported_label": "iPad",
+          "page": 1
+        },
+        "wearables": {
+          "value": 7522000000.0,
+          "unit": "USD",
+          "start": "2024-12-29",
+          "end": "2025-03-29",
+          "source_ids": [
+            "apple-FY2025Q2"
+          ],
+          "method": "reported",
+          "reported_label": "Wearables, Home and Accessories",
+          "page": 1
+        },
+        "services": {
+          "value": 26645000000.0,
+          "unit": "USD",
+          "start": "2024-12-29",
+          "end": "2025-03-29",
+          "source_ids": [
+            "apple-FY2025Q2"
+          ],
+          "method": "reported",
+          "reported_label": "Services",
+          "page": 1
+        },
+        "greater_china": {
+          "value": 16002000000.0,
+          "unit": "USD",
+          "start": "2024-12-29",
+          "end": "2025-03-29",
+          "source_ids": [
+            "apple-FY2025Q2"
+          ],
+          "method": "reported",
+          "reported_label": "Greater China",
+          "page": 1
+        },
+        "eps": {
+          "value": 1.65,
+          "unit": "USD/shares",
+          "start": "2024-12-29",
+          "end": "2025-03-29",
+          "source_ids": [
+            "apple-FY2025Q2"
+          ],
+          "method": "reported",
+          "reported_label": "Diluted EPS",
+          "page": 1
+        },
+        "cash": {
+          "value": 28162000000.0,
+          "unit": "USD",
+          "start": null,
+          "end": "2025-03-29",
+          "source_ids": [
+            "apple-FY2025Q2"
+          ],
+          "method": "reported",
+          "page": 2,
+          "reported_label": "Cash and cash equivalents"
+        },
+        "assets": {
+          "value": 331233000000.0,
+          "unit": "USD",
+          "start": null,
+          "end": "2025-03-29",
+          "source_ids": [
+            "apple-FY2025Q2"
+          ],
+          "method": "reported",
+          "page": 2,
+          "reported_label": "Total assets"
+        },
+        "equity": {
+          "value": 66796000000.0,
+          "unit": "USD",
+          "start": null,
+          "end": "2025-03-29",
+          "source_ids": [
+            "apple-FY2025Q2"
+          ],
+          "method": "reported",
+          "page": 2,
+          "reported_label": "Total shareholders’ equity"
+        },
+        "debt": {
+          "value": 98186000000.0,
+          "unit": "USD",
+          "start": null,
+          "end": "2025-03-29",
+          "source_ids": [
+            "apple-FY2025Q2"
+          ],
+          "method": "sum of commercial paper and current/non-current term debt",
+          "page": 2
+        },
+        "cfo": {
+          "value": 23952000000.0,
+          "unit": "USD",
+          "start": "2024-12-29",
+          "end": "2025-03-29",
+          "source_ids": [
+            "apple-FY2025Q2",
+            "apple-FY2025Q1"
+          ],
+          "method": "YTD difference",
+          "components": [
+            {
+              "value": 53887000000.0,
+              "unit": "USD",
+              "start": null,
+              "end": "2025-03-29",
+              "source_ids": [
+                "apple-FY2025Q2"
+              ],
+              "method": "reported cumulative cash flow",
+              "fiscal_year": 2025,
+              "fiscal_quarter": 2,
+              "page": 3,
+              "reported_value": 53887.0,
+              "reported_unit": "USD million"
+            },
+            {
+              "value": 29935000000.0,
+              "unit": "USD",
+              "start": null,
+              "end": "2024-12-28",
+              "source_ids": [
+                "apple-FY2025Q1"
+              ],
+              "method": "reported cumulative cash flow",
+              "fiscal_year": 2025,
+              "fiscal_quarter": 1,
+              "page": 3,
+              "reported_value": 29935.0,
+              "reported_unit": "USD million"
+            }
+          ]
+        },
+        "capex": {
+          "value": 3071000000.0,
+          "unit": "USD",
+          "start": "2024-12-29",
+          "end": "2025-03-29",
+          "source_ids": [
+            "apple-FY2025Q2",
+            "apple-FY2025Q1"
+          ],
+          "method": "YTD difference",
+          "components": [
+            {
+              "value": 6011000000.0,
+              "unit": "USD",
+              "start": null,
+              "end": "2025-03-29",
+              "source_ids": [
+                "apple-FY2025Q2"
+              ],
+              "method": "reported cumulative cash flow",
+              "fiscal_year": 2025,
+              "fiscal_quarter": 2,
+              "page": 3,
+              "reported_value": -6011.0,
+              "reported_unit": "USD million"
+            },
+            {
+              "value": 2940000000.0,
+              "unit": "USD",
+              "start": null,
+              "end": "2024-12-28",
+              "source_ids": [
+                "apple-FY2025Q1"
+              ],
+              "method": "reported cumulative cash flow",
+              "fiscal_year": 2025,
+              "fiscal_quarter": 1,
+              "page": 3,
+              "reported_value": -2940.0,
+              "reported_unit": "USD million"
+            }
+          ]
+        },
+        "gross_margin": {
+          "value": 47.050619238876244,
+          "unit": "%",
+          "start": "2024-12-29",
+          "end": "2025-03-29",
+          "source_ids": [
+            "apple-FY2025Q2"
+          ],
+          "method": "ratio",
+          "components": [
+            {
+              "value": 44867000000.0,
+              "unit": "USD",
+              "start": "2024-12-29",
+              "end": "2025-03-29",
+              "source_ids": [
+                "apple-FY2025Q2"
+              ],
+              "method": "reported",
+              "reported_label": "Gross margin",
+              "page": 1
+            },
+            {
+              "value": 95359000000.0,
+              "unit": "USD",
+              "start": "2024-12-29",
+              "end": "2025-03-29",
+              "source_ids": [
+                "apple-FY2025Q2"
+              ],
+              "method": "reported",
+              "reported_label": "Total net sales (1)",
+              "page": 1
+            }
+          ]
+        },
+        "operating_margin": {
+          "value": 31.029058610094484,
+          "unit": "%",
+          "start": "2024-12-29",
+          "end": "2025-03-29",
+          "source_ids": [
+            "apple-FY2025Q2"
+          ],
+          "method": "ratio",
+          "components": [
+            {
+              "value": 29589000000.0,
+              "unit": "USD",
+              "start": "2024-12-29",
+              "end": "2025-03-29",
+              "source_ids": [
+                "apple-FY2025Q2"
+              ],
+              "method": "reported",
+              "reported_label": "Operating income",
+              "page": 1
+            },
+            {
+              "value": 95359000000.0,
+              "unit": "USD",
+              "start": "2024-12-29",
+              "end": "2025-03-29",
+              "source_ids": [
+                "apple-FY2025Q2"
+              ],
+              "method": "reported",
+              "reported_label": "Total net sales (1)",
+              "page": 1
+            }
+          ]
+        },
+        "net_margin": {
+          "value": 25.986010759341017,
+          "unit": "%",
+          "start": "2024-12-29",
+          "end": "2025-03-29",
+          "source_ids": [
+            "apple-FY2025Q2"
+          ],
+          "method": "ratio",
+          "components": [
+            {
+              "value": 24780000000.0,
+              "unit": "USD",
+              "start": "2024-12-29",
+              "end": "2025-03-29",
+              "source_ids": [
+                "apple-FY2025Q2"
+              ],
+              "method": "reported",
+              "reported_label": "Net income",
+              "page": 1
+            },
+            {
+              "value": 95359000000.0,
+              "unit": "USD",
+              "start": "2024-12-29",
+              "end": "2025-03-29",
+              "source_ids": [
+                "apple-FY2025Q2"
+              ],
+              "method": "reported",
+              "reported_label": "Total net sales (1)",
+              "page": 1
+            }
+          ]
+        },
+        "fcf": {
+          "value": 20881000000.0,
+          "unit": "USD",
+          "start": "2024-12-29",
+          "end": "2025-03-29",
+          "source_ids": [
+            "apple-FY2025Q2",
+            "apple-FY2025Q1"
+          ],
+          "method": "CFO minus PPE expenditure",
+          "components": [
+            {
+              "value": 23952000000.0,
+              "unit": "USD",
+              "start": "2024-12-29",
+              "end": "2025-03-29",
+              "source_ids": [
+                "apple-FY2025Q2",
+                "apple-FY2025Q1"
+              ],
+              "method": "YTD difference",
+              "components": [
+                {
+                  "value": 53887000000.0,
+                  "unit": "USD",
+                  "start": null,
+                  "end": "2025-03-29",
+                  "source_ids": [
+                    "apple-FY2025Q2"
+                  ],
+                  "method": "reported cumulative cash flow",
+                  "fiscal_year": 2025,
+                  "fiscal_quarter": 2,
+                  "page": 3,
+                  "reported_value": 53887.0,
+                  "reported_unit": "USD million"
+                },
+                {
+                  "value": 29935000000.0,
+                  "unit": "USD",
+                  "start": null,
+                  "end": "2024-12-28",
+                  "source_ids": [
+                    "apple-FY2025Q1"
+                  ],
+                  "method": "reported cumulative cash flow",
+                  "fiscal_year": 2025,
+                  "fiscal_quarter": 1,
+                  "page": 3,
+                  "reported_value": 29935.0,
+                  "reported_unit": "USD million"
+                }
+              ]
+            },
+            {
+              "value": 3071000000.0,
+              "unit": "USD",
+              "start": "2024-12-29",
+              "end": "2025-03-29",
+              "source_ids": [
+                "apple-FY2025Q2",
+                "apple-FY2025Q1"
+              ],
+              "method": "YTD difference",
+              "components": [
+                {
+                  "value": 6011000000.0,
+                  "unit": "USD",
+                  "start": null,
+                  "end": "2025-03-29",
+                  "source_ids": [
+                    "apple-FY2025Q2"
+                  ],
+                  "method": "reported cumulative cash flow",
+                  "fiscal_year": 2025,
+                  "fiscal_quarter": 2,
+                  "page": 3,
+                  "reported_value": -6011.0,
+                  "reported_unit": "USD million"
+                },
+                {
+                  "value": 2940000000.0,
+                  "unit": "USD",
+                  "start": null,
+                  "end": "2024-12-28",
+                  "source_ids": [
+                    "apple-FY2025Q1"
+                  ],
+                  "method": "reported cumulative cash flow",
+                  "fiscal_year": 2025,
+                  "fiscal_quarter": 1,
+                  "page": 3,
+                  "reported_value": -2940.0,
+                  "reported_unit": "USD million"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "FY2024Q2": {
+      "start": "2023-12-31",
+      "end": "2024-03-30",
+      "metrics": {
+        "revenue": {
+          "value": 90753000000.0,
+          "unit": "USD",
+          "start": "2023-12-31",
+          "end": "2024-03-30",
+          "source_ids": [
+            "apple-FY2025Q2"
+          ],
+          "method": "reported",
+          "reported_label": "Total net sales (1)",
+          "page": 1
+        },
+        "gross_profit": {
+          "value": 42271000000.0,
+          "unit": "USD",
+          "start": "2023-12-31",
+          "end": "2024-03-30",
+          "source_ids": [
+            "apple-FY2025Q2"
+          ],
+          "method": "reported",
+          "reported_label": "Gross margin",
+          "page": 1
+        },
+        "operating_income": {
+          "value": 27900000000.0,
+          "unit": "USD",
+          "start": "2023-12-31",
+          "end": "2024-03-30",
+          "source_ids": [
+            "apple-FY2025Q2"
+          ],
+          "method": "reported",
+          "reported_label": "Operating income",
+          "page": 1
+        },
+        "net_income": {
+          "value": 23636000000.0,
+          "unit": "USD",
+          "start": "2023-12-31",
+          "end": "2024-03-30",
+          "source_ids": [
+            "apple-FY2025Q2"
+          ],
+          "method": "reported",
+          "reported_label": "Net income",
+          "page": 1
+        },
+        "rd": {
+          "value": 7903000000.0,
+          "unit": "USD",
+          "start": "2023-12-31",
+          "end": "2024-03-30",
+          "source_ids": [
+            "apple-FY2025Q2"
+          ],
+          "method": "reported",
+          "reported_label": "Research and development",
+          "page": 1
+        },
+        "iphone": {
+          "value": 45963000000.0,
+          "unit": "USD",
+          "start": "2023-12-31",
+          "end": "2024-03-30",
+          "source_ids": [
+            "apple-FY2025Q2"
+          ],
+          "method": "reported",
+          "reported_label": "iPhone",
+          "page": 1
+        },
+        "mac": {
+          "value": 7451000000.0,
+          "unit": "USD",
+          "start": "2023-12-31",
+          "end": "2024-03-30",
+          "source_ids": [
+            "apple-FY2025Q2"
+          ],
+          "method": "reported",
+          "reported_label": "Mac",
+          "page": 1
+        },
+        "ipad": {
+          "value": 5559000000.0,
+          "unit": "USD",
+          "start": "2023-12-31",
+          "end": "2024-03-30",
+          "source_ids": [
+            "apple-FY2025Q2"
+          ],
+          "method": "reported",
+          "reported_label": "iPad",
+          "page": 1
+        },
+        "wearables": {
+          "value": 7913000000.0,
+          "unit": "USD",
+          "start": "2023-12-31",
+          "end": "2024-03-30",
+          "source_ids": [
+            "apple-FY2025Q2"
+          ],
+          "method": "reported",
+          "reported_label": "Wearables, Home and Accessories",
+          "page": 1
+        },
+        "services": {
+          "value": 23867000000.0,
+          "unit": "USD",
+          "start": "2023-12-31",
+          "end": "2024-03-30",
+          "source_ids": [
+            "apple-FY2025Q2"
+          ],
+          "method": "reported",
+          "reported_label": "Services",
+          "page": 1
+        },
+        "greater_china": {
+          "value": 16372000000.0,
+          "unit": "USD",
+          "start": "2023-12-31",
+          "end": "2024-03-30",
+          "source_ids": [
+            "apple-FY2025Q2"
+          ],
+          "method": "reported",
+          "reported_label": "Greater China",
+          "page": 1
+        },
+        "eps": {
+          "value": 1.53,
+          "unit": "USD/shares",
+          "start": "2023-12-31",
+          "end": "2024-03-30",
+          "source_ids": [
+            "apple-FY2025Q2"
+          ],
+          "method": "reported",
+          "reported_label": "Diluted EPS",
+          "page": 1
+        },
+        "cfo": {
+          "value": 22690000000.0,
+          "unit": "USD",
+          "start": "2023-12-31",
+          "end": "2024-03-30",
+          "source_ids": [
+            "apple-FY2025Q2",
+            "apple-FY2025Q1"
+          ],
+          "method": "YTD difference",
+          "components": [
+            {
+              "value": 62585000000.0,
+              "unit": "USD",
+              "start": null,
+              "end": "2024-03-30",
+              "source_ids": [
+                "apple-FY2025Q2"
+              ],
+              "method": "reported cumulative cash flow",
+              "fiscal_year": 2024,
+              "fiscal_quarter": 2,
+              "page": 3,
+              "reported_value": 62585.0,
+              "reported_unit": "USD million"
+            },
+            {
+              "value": 39895000000.0,
+              "unit": "USD",
+              "start": null,
+              "end": "2023-12-30",
+              "source_ids": [
+                "apple-FY2025Q1"
+              ],
+              "method": "reported cumulative cash flow",
+              "fiscal_year": 2024,
+              "fiscal_quarter": 1,
+              "page": 3,
+              "reported_value": 39895.0,
+              "reported_unit": "USD million"
+            }
+          ]
+        },
+        "capex": {
+          "value": 1996000000.0,
+          "unit": "USD",
+          "start": "2023-12-31",
+          "end": "2024-03-30",
+          "source_ids": [
+            "apple-FY2025Q2",
+            "apple-FY2025Q1"
+          ],
+          "method": "YTD difference",
+          "components": [
+            {
+              "value": 4388000000.0,
+              "unit": "USD",
+              "start": null,
+              "end": "2024-03-30",
+              "source_ids": [
+                "apple-FY2025Q2"
+              ],
+              "method": "reported cumulative cash flow",
+              "fiscal_year": 2024,
+              "fiscal_quarter": 2,
+              "page": 3,
+              "reported_value": -4388.0,
+              "reported_unit": "USD million"
+            },
+            {
+              "value": 2392000000.0,
+              "unit": "USD",
+              "start": null,
+              "end": "2023-12-30",
+              "source_ids": [
+                "apple-FY2025Q1"
+              ],
+              "method": "reported cumulative cash flow",
+              "fiscal_year": 2024,
+              "fiscal_quarter": 1,
+              "page": 3,
+              "reported_value": -2392.0,
+              "reported_unit": "USD million"
+            }
+          ]
+        },
+        "gross_margin": {
+          "value": 46.578074554009234,
+          "unit": "%",
+          "start": "2023-12-31",
+          "end": "2024-03-30",
+          "source_ids": [
+            "apple-FY2025Q2"
+          ],
+          "method": "ratio",
+          "components": [
+            {
+              "value": 42271000000.0,
+              "unit": "USD",
+              "start": "2023-12-31",
+              "end": "2024-03-30",
+              "source_ids": [
+                "apple-FY2025Q2"
+              ],
+              "method": "reported",
+              "reported_label": "Gross margin",
+              "page": 1
+            },
+            {
+              "value": 90753000000.0,
+              "unit": "USD",
+              "start": "2023-12-31",
+              "end": "2024-03-30",
+              "source_ids": [
+                "apple-FY2025Q2"
+              ],
+              "method": "reported",
+              "reported_label": "Total net sales (1)",
+              "page": 1
+            }
+          ]
+        },
+        "operating_margin": {
+          "value": 30.742785362467355,
+          "unit": "%",
+          "start": "2023-12-31",
+          "end": "2024-03-30",
+          "source_ids": [
+            "apple-FY2025Q2"
+          ],
+          "method": "ratio",
+          "components": [
+            {
+              "value": 27900000000.0,
+              "unit": "USD",
+              "start": "2023-12-31",
+              "end": "2024-03-30",
+              "source_ids": [
+                "apple-FY2025Q2"
+              ],
+              "method": "reported",
+              "reported_label": "Operating income",
+              "page": 1
+            },
+            {
+              "value": 90753000000.0,
+              "unit": "USD",
+              "start": "2023-12-31",
+              "end": "2024-03-30",
+              "source_ids": [
+                "apple-FY2025Q2"
+              ],
+              "method": "reported",
+              "reported_label": "Total net sales (1)",
+              "page": 1
+            }
+          ]
+        },
+        "net_margin": {
+          "value": 26.044318094167686,
+          "unit": "%",
+          "start": "2023-12-31",
+          "end": "2024-03-30",
+          "source_ids": [
+            "apple-FY2025Q2"
+          ],
+          "method": "ratio",
+          "components": [
+            {
+              "value": 23636000000.0,
+              "unit": "USD",
+              "start": "2023-12-31",
+              "end": "2024-03-30",
+              "source_ids": [
+                "apple-FY2025Q2"
+              ],
+              "method": "reported",
+              "reported_label": "Net income",
+              "page": 1
+            },
+            {
+              "value": 90753000000.0,
+              "unit": "USD",
+              "start": "2023-12-31",
+              "end": "2024-03-30",
+              "source_ids": [
+                "apple-FY2025Q2"
+              ],
+              "method": "reported",
+              "reported_label": "Total net sales (1)",
+              "page": 1
+            }
+          ]
+        },
+        "fcf": {
+          "value": 20694000000.0,
+          "unit": "USD",
+          "start": "2023-12-31",
+          "end": "2024-03-30",
+          "source_ids": [
+            "apple-FY2025Q2",
+            "apple-FY2025Q1"
+          ],
+          "method": "CFO minus PPE expenditure",
+          "components": [
+            {
+              "value": 22690000000.0,
+              "unit": "USD",
+              "start": "2023-12-31",
+              "end": "2024-03-30",
+              "source_ids": [
+                "apple-FY2025Q2",
+                "apple-FY2025Q1"
+              ],
+              "method": "YTD difference",
+              "components": [
+                {
+                  "value": 62585000000.0,
+                  "unit": "USD",
+                  "start": null,
+                  "end": "2024-03-30",
+                  "source_ids": [
+                    "apple-FY2025Q2"
+                  ],
+                  "method": "reported cumulative cash flow",
+                  "fiscal_year": 2024,
+                  "fiscal_quarter": 2,
+                  "page": 3,
+                  "reported_value": 62585.0,
+                  "reported_unit": "USD million"
+                },
+                {
+                  "value": 39895000000.0,
+                  "unit": "USD",
+                  "start": null,
+                  "end": "2023-12-30",
+                  "source_ids": [
+                    "apple-FY2025Q1"
+                  ],
+                  "method": "reported cumulative cash flow",
+                  "fiscal_year": 2024,
+                  "fiscal_quarter": 1,
+                  "page": 3,
+                  "reported_value": 39895.0,
+                  "reported_unit": "USD million"
+                }
+              ]
+            },
+            {
+              "value": 1996000000.0,
+              "unit": "USD",
+              "start": "2023-12-31",
+              "end": "2024-03-30",
+              "source_ids": [
+                "apple-FY2025Q2",
+                "apple-FY2025Q1"
+              ],
+              "method": "YTD difference",
+              "components": [
+                {
+                  "value": 4388000000.0,
+                  "unit": "USD",
+                  "start": null,
+                  "end": "2024-03-30",
+                  "source_ids": [
+                    "apple-FY2025Q2"
+                  ],
+                  "method": "reported cumulative cash flow",
+                  "fiscal_year": 2024,
+                  "fiscal_quarter": 2,
+                  "page": 3,
+                  "reported_value": -4388.0,
+                  "reported_unit": "USD million"
+                },
+                {
+                  "value": 2392000000.0,
+                  "unit": "USD",
+                  "start": null,
+                  "end": "2023-12-30",
+                  "source_ids": [
+                    "apple-FY2025Q1"
+                  ],
+                  "method": "reported cumulative cash flow",
+                  "fiscal_year": 2024,
+                  "fiscal_quarter": 1,
+                  "page": 3,
+                  "reported_value": -2392.0,
+                  "reported_unit": "USD million"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "FY2025Q1": {
+      "start": "2024-09-29",
+      "end": "2024-12-28",
+      "metrics": {
+        "revenue": {
+          "value": 124300000000.0,
+          "unit": "USD",
+          "start": "2024-09-29",
+          "end": "2024-12-28",
+          "source_ids": [
+            "apple-FY2025Q1"
+          ],
+          "method": "reported",
+          "reported_label": "Total net sales (1)",
+          "page": 1
+        },
+        "gross_profit": {
+          "value": 58275000000.0,
+          "unit": "USD",
+          "start": "2024-09-29",
+          "end": "2024-12-28",
+          "source_ids": [
+            "apple-FY2025Q1"
+          ],
+          "method": "reported",
+          "reported_label": "Gross margin",
+          "page": 1
+        },
+        "operating_income": {
+          "value": 42832000000.0,
+          "unit": "USD",
+          "start": "2024-09-29",
+          "end": "2024-12-28",
+          "source_ids": [
+            "apple-FY2025Q1"
+          ],
+          "method": "reported",
+          "reported_label": "Operating income",
+          "page": 1
+        },
+        "net_income": {
+          "value": 36330000000.0,
+          "unit": "USD",
+          "start": "2024-09-29",
+          "end": "2024-12-28",
+          "source_ids": [
+            "apple-FY2025Q1"
+          ],
+          "method": "reported",
+          "reported_label": "Net income",
+          "page": 1
+        },
+        "rd": {
+          "value": 8268000000.0,
+          "unit": "USD",
+          "start": "2024-09-29",
+          "end": "2024-12-28",
+          "source_ids": [
+            "apple-FY2025Q1"
+          ],
+          "method": "reported",
+          "reported_label": "Research and development",
+          "page": 1
+        },
+        "iphone": {
+          "value": 69138000000.0,
+          "unit": "USD",
+          "start": "2024-09-29",
+          "end": "2024-12-28",
+          "source_ids": [
+            "apple-FY2025Q1"
+          ],
+          "method": "reported",
+          "reported_label": "iPhone",
+          "page": 1
+        },
+        "mac": {
+          "value": 8987000000.0,
+          "unit": "USD",
+          "start": "2024-09-29",
+          "end": "2024-12-28",
+          "source_ids": [
+            "apple-FY2025Q1"
+          ],
+          "method": "reported",
+          "reported_label": "Mac",
+          "page": 1
+        },
+        "ipad": {
+          "value": 8088000000.0,
+          "unit": "USD",
+          "start": "2024-09-29",
+          "end": "2024-12-28",
+          "source_ids": [
+            "apple-FY2025Q1"
+          ],
+          "method": "reported",
+          "reported_label": "iPad",
+          "page": 1
+        },
+        "wearables": {
+          "value": 11747000000.0,
+          "unit": "USD",
+          "start": "2024-09-29",
+          "end": "2024-12-28",
+          "source_ids": [
+            "apple-FY2025Q1"
+          ],
+          "method": "reported",
+          "reported_label": "Wearables, Home and Accessories",
+          "page": 1
+        },
+        "services": {
+          "value": 26340000000.0,
+          "unit": "USD",
+          "start": "2024-09-29",
+          "end": "2024-12-28",
+          "source_ids": [
+            "apple-FY2025Q1"
+          ],
+          "method": "reported",
+          "reported_label": "Services",
+          "page": 1
+        },
+        "greater_china": {
+          "value": 18513000000.0,
+          "unit": "USD",
+          "start": "2024-09-29",
+          "end": "2024-12-28",
+          "source_ids": [
+            "apple-FY2025Q1"
+          ],
+          "method": "reported",
+          "reported_label": "Greater China",
+          "page": 1
+        },
+        "eps": {
+          "value": 2.4,
+          "unit": "USD/shares",
+          "start": "2024-09-29",
+          "end": "2024-12-28",
+          "source_ids": [
+            "apple-FY2025Q1"
+          ],
+          "method": "reported",
+          "reported_label": "Diluted EPS",
+          "page": 1
+        },
+        "cash": {
+          "value": 30299000000.0,
+          "unit": "USD",
+          "start": null,
+          "end": "2024-12-28",
+          "source_ids": [
+            "apple-FY2025Q1"
+          ],
+          "method": "reported",
+          "page": 2,
+          "reported_label": "Cash and cash equivalents"
+        },
+        "assets": {
+          "value": 344085000000.0,
+          "unit": "USD",
+          "start": null,
+          "end": "2024-12-28",
+          "source_ids": [
+            "apple-FY2025Q1"
+          ],
+          "method": "reported",
+          "page": 2,
+          "reported_label": "Total assets"
+        },
+        "equity": {
+          "value": 66758000000.0,
+          "unit": "USD",
+          "start": null,
+          "end": "2024-12-28",
+          "source_ids": [
+            "apple-FY2025Q1"
+          ],
+          "method": "reported",
+          "page": 2,
+          "reported_label": "Total shareholders’ equity"
+        },
+        "debt": {
+          "value": 96799000000.0,
+          "unit": "USD",
+          "start": null,
+          "end": "2024-12-28",
+          "source_ids": [
+            "apple-FY2025Q1"
+          ],
+          "method": "sum of commercial paper and current/non-current term debt",
+          "page": 2
+        },
+        "cfo": {
+          "value": 29935000000.0,
+          "unit": "USD",
+          "start": "2024-09-29",
+          "end": "2024-12-28",
+          "source_ids": [
+            "apple-FY2025Q1"
+          ],
+          "method": "reported",
+          "fiscal_year": 2025,
+          "fiscal_quarter": 1,
+          "page": 3,
+          "reported_value": 29935.0,
+          "reported_unit": "USD million",
+          "cashflow_scope": "first quarter"
+        },
+        "capex": {
+          "value": 2940000000.0,
+          "unit": "USD",
+          "start": "2024-09-29",
+          "end": "2024-12-28",
+          "source_ids": [
+            "apple-FY2025Q1"
+          ],
+          "method": "reported",
+          "fiscal_year": 2025,
+          "fiscal_quarter": 1,
+          "page": 3,
+          "reported_value": -2940.0,
+          "reported_unit": "USD million",
+          "cashflow_scope": "first quarter"
+        },
+        "gross_margin": {
+          "value": 46.882542236524536,
+          "unit": "%",
+          "start": "2024-09-29",
+          "end": "2024-12-28",
+          "source_ids": [
+            "apple-FY2025Q1"
+          ],
+          "method": "ratio",
+          "components": [
+            {
+              "value": 58275000000.0,
+              "unit": "USD",
+              "start": "2024-09-29",
+              "end": "2024-12-28",
+              "source_ids": [
+                "apple-FY2025Q1"
+              ],
+              "method": "reported",
+              "reported_label": "Gross margin",
+              "page": 1
+            },
+            {
+              "value": 124300000000.0,
+              "unit": "USD",
+              "start": "2024-09-29",
+              "end": "2024-12-28",
+              "source_ids": [
+                "apple-FY2025Q1"
+              ],
+              "method": "reported",
+              "reported_label": "Total net sales (1)",
+              "page": 1
+            }
+          ]
+        },
+        "operating_margin": {
+          "value": 34.458567980691875,
+          "unit": "%",
+          "start": "2024-09-29",
+          "end": "2024-12-28",
+          "source_ids": [
+            "apple-FY2025Q1"
+          ],
+          "method": "ratio",
+          "components": [
+            {
+              "value": 42832000000.0,
+              "unit": "USD",
+              "start": "2024-09-29",
+              "end": "2024-12-28",
+              "source_ids": [
+                "apple-FY2025Q1"
+              ],
+              "method": "reported",
+              "reported_label": "Operating income",
+              "page": 1
+            },
+            {
+              "value": 124300000000.0,
+              "unit": "USD",
+              "start": "2024-09-29",
+              "end": "2024-12-28",
+              "source_ids": [
+                "apple-FY2025Q1"
+              ],
+              "method": "reported",
+              "reported_label": "Total net sales (1)",
+              "page": 1
+            }
+          ]
+        },
+        "net_margin": {
+          "value": 29.227674979887368,
+          "unit": "%",
+          "start": "2024-09-29",
+          "end": "2024-12-28",
+          "source_ids": [
+            "apple-FY2025Q1"
+          ],
+          "method": "ratio",
+          "components": [
+            {
+              "value": 36330000000.0,
+              "unit": "USD",
+              "start": "2024-09-29",
+              "end": "2024-12-28",
+              "source_ids": [
+                "apple-FY2025Q1"
+              ],
+              "method": "reported",
+              "reported_label": "Net income",
+              "page": 1
+            },
+            {
+              "value": 124300000000.0,
+              "unit": "USD",
+              "start": "2024-09-29",
+              "end": "2024-12-28",
+              "source_ids": [
+                "apple-FY2025Q1"
+              ],
+              "method": "reported",
+              "reported_label": "Total net sales (1)",
+              "page": 1
+            }
+          ]
+        },
+        "fcf": {
+          "value": 26995000000.0,
+          "unit": "USD",
+          "start": "2024-09-29",
+          "end": "2024-12-28",
+          "source_ids": [
+            "apple-FY2025Q1"
+          ],
+          "method": "CFO minus PPE expenditure",
+          "components": [
+            {
+              "value": 29935000000.0,
+              "unit": "USD",
+              "start": "2024-09-29",
+              "end": "2024-12-28",
+              "source_ids": [
+                "apple-FY2025Q1"
+              ],
+              "method": "reported",
+              "fiscal_year": 2025,
+              "fiscal_quarter": 1,
+              "page": 3,
+              "reported_value": 29935.0,
+              "reported_unit": "USD million",
+              "cashflow_scope": "first quarter"
+            },
+            {
+              "value": 2940000000.0,
+              "unit": "USD",
+              "start": "2024-09-29",
+              "end": "2024-12-28",
+              "source_ids": [
+                "apple-FY2025Q1"
+              ],
+              "method": "reported",
+              "fiscal_year": 2025,
+              "fiscal_quarter": 1,
+              "page": 3,
+              "reported_value": -2940.0,
+              "reported_unit": "USD million",
+              "cashflow_scope": "first quarter"
+            }
+          ]
+        }
+      }
+    },
+    "FY2024Q3": {
+      "start": "2024-03-31",
+      "end": "2024-06-29",
+      "metrics": {
+        "revenue": {
+          "value": 85777000000.0,
+          "unit": "USD",
+          "start": "2024-03-31",
+          "end": "2024-06-29",
+          "source_ids": [
+            "apple-FY2025Q3"
+          ],
+          "method": "reported",
+          "reported_label": "Total net sales (1)",
+          "page": 1
+        },
+        "gross_profit": {
+          "value": 39678000000.0,
+          "unit": "USD",
+          "start": "2024-03-31",
+          "end": "2024-06-29",
+          "source_ids": [
+            "apple-FY2025Q3"
+          ],
+          "method": "reported",
+          "reported_label": "Gross margin",
+          "page": 1
+        },
+        "operating_income": {
+          "value": 25352000000.0,
+          "unit": "USD",
+          "start": "2024-03-31",
+          "end": "2024-06-29",
+          "source_ids": [
+            "apple-FY2025Q3"
+          ],
+          "method": "reported",
+          "reported_label": "Operating income",
+          "page": 1
+        },
+        "net_income": {
+          "value": 21448000000.0,
+          "unit": "USD",
+          "start": "2024-03-31",
+          "end": "2024-06-29",
+          "source_ids": [
+            "apple-FY2025Q3"
+          ],
+          "method": "reported",
+          "reported_label": "Net income",
+          "page": 1
+        },
+        "rd": {
+          "value": 8006000000.0,
+          "unit": "USD",
+          "start": "2024-03-31",
+          "end": "2024-06-29",
+          "source_ids": [
+            "apple-FY2025Q3"
+          ],
+          "method": "reported",
+          "reported_label": "Research and development",
+          "page": 1
+        },
+        "iphone": {
+          "value": 39296000000.0,
+          "unit": "USD",
+          "start": "2024-03-31",
+          "end": "2024-06-29",
+          "source_ids": [
+            "apple-FY2025Q3"
+          ],
+          "method": "reported",
+          "reported_label": "iPhone",
+          "page": 1
+        },
+        "mac": {
+          "value": 7009000000.0,
+          "unit": "USD",
+          "start": "2024-03-31",
+          "end": "2024-06-29",
+          "source_ids": [
+            "apple-FY2025Q3"
+          ],
+          "method": "reported",
+          "reported_label": "Mac",
+          "page": 1
+        },
+        "ipad": {
+          "value": 7162000000.0,
+          "unit": "USD",
+          "start": "2024-03-31",
+          "end": "2024-06-29",
+          "source_ids": [
+            "apple-FY2025Q3"
+          ],
+          "method": "reported",
+          "reported_label": "iPad",
+          "page": 1
+        },
+        "wearables": {
+          "value": 8097000000.0,
+          "unit": "USD",
+          "start": "2024-03-31",
+          "end": "2024-06-29",
+          "source_ids": [
+            "apple-FY2025Q3"
+          ],
+          "method": "reported",
+          "reported_label": "Wearables, Home and Accessories",
+          "page": 1
+        },
+        "services": {
+          "value": 24213000000.0,
+          "unit": "USD",
+          "start": "2024-03-31",
+          "end": "2024-06-29",
+          "source_ids": [
+            "apple-FY2025Q3"
+          ],
+          "method": "reported",
+          "reported_label": "Services",
+          "page": 1
+        },
+        "greater_china": {
+          "value": 14728000000.0,
+          "unit": "USD",
+          "start": "2024-03-31",
+          "end": "2024-06-29",
+          "source_ids": [
+            "apple-FY2025Q3"
+          ],
+          "method": "reported",
+          "reported_label": "Greater China",
+          "page": 1
+        },
+        "eps": {
+          "value": 1.4,
+          "unit": "USD/shares",
+          "start": "2024-03-31",
+          "end": "2024-06-29",
+          "source_ids": [
+            "apple-FY2025Q3"
+          ],
+          "method": "reported",
+          "reported_label": "Diluted EPS",
+          "page": 1
+        },
+        "cash": {
+          "value": 25565000000.0,
+          "unit": "USD",
+          "start": null,
+          "end": "2024-06-29",
+          "source_ids": [
+            "apple-FY2024Q3"
+          ],
+          "method": "reported",
+          "page": 2,
+          "reported_label": "Cash and cash equivalents"
+        },
+        "assets": {
+          "value": 331612000000.0,
+          "unit": "USD",
+          "start": null,
+          "end": "2024-06-29",
+          "source_ids": [
+            "apple-FY2024Q3"
+          ],
+          "method": "reported",
+          "page": 2,
+          "reported_label": "Total assets"
+        },
+        "equity": {
+          "value": 66708000000.0,
+          "unit": "USD",
+          "start": null,
+          "end": "2024-06-29",
+          "source_ids": [
+            "apple-FY2024Q3"
+          ],
+          "method": "reported",
+          "page": 2,
+          "reported_label": "Total shareholders’ equity"
+        },
+        "debt": {
+          "value": 101304000000.0,
+          "unit": "USD",
+          "start": null,
+          "end": "2024-06-29",
+          "source_ids": [
+            "apple-FY2024Q3"
+          ],
+          "method": "sum of commercial paper and current/non-current term debt",
+          "page": 2
+        },
+        "cfo": {
+          "value": 28858000000.0,
+          "unit": "USD",
+          "start": "2024-03-31",
+          "end": "2024-06-29",
+          "source_ids": [
+            "apple-FY2025Q3",
+            "apple-FY2025Q2"
+          ],
+          "method": "YTD difference",
+          "components": [
+            {
+              "value": 91443000000.0,
+              "unit": "USD",
+              "start": null,
+              "end": "2024-06-29",
+              "source_ids": [
+                "apple-FY2025Q3"
+              ],
+              "method": "reported cumulative cash flow",
+              "fiscal_year": 2024,
+              "fiscal_quarter": 3,
+              "page": 3,
+              "reported_value": 91443.0,
+              "reported_unit": "USD million"
+            },
+            {
+              "value": 62585000000.0,
+              "unit": "USD",
+              "start": null,
+              "end": "2024-03-30",
+              "source_ids": [
+                "apple-FY2025Q2"
+              ],
+              "method": "reported cumulative cash flow",
+              "fiscal_year": 2024,
+              "fiscal_quarter": 2,
+              "page": 3,
+              "reported_value": 62585.0,
+              "reported_unit": "USD million"
+            }
+          ]
+        },
+        "capex": {
+          "value": 2151000000.0,
+          "unit": "USD",
+          "start": "2024-03-31",
+          "end": "2024-06-29",
+          "source_ids": [
+            "apple-FY2025Q3",
+            "apple-FY2025Q2"
+          ],
+          "method": "YTD difference",
+          "components": [
+            {
+              "value": 6539000000.0,
+              "unit": "USD",
+              "start": null,
+              "end": "2024-06-29",
+              "source_ids": [
+                "apple-FY2025Q3"
+              ],
+              "method": "reported cumulative cash flow",
+              "fiscal_year": 2024,
+              "fiscal_quarter": 3,
+              "page": 3,
+              "reported_value": -6539.0,
+              "reported_unit": "USD million"
+            },
+            {
+              "value": 4388000000.0,
+              "unit": "USD",
+              "start": null,
+              "end": "2024-03-30",
+              "source_ids": [
+                "apple-FY2025Q2"
+              ],
+              "method": "reported cumulative cash flow",
+              "fiscal_year": 2024,
+              "fiscal_quarter": 2,
+              "page": 3,
+              "reported_value": -4388.0,
+              "reported_unit": "USD million"
+            }
+          ]
+        },
+        "gross_margin": {
+          "value": 46.2571551814589,
+          "unit": "%",
+          "start": "2024-03-31",
+          "end": "2024-06-29",
+          "source_ids": [
+            "apple-FY2025Q3"
+          ],
+          "method": "ratio",
+          "components": [
+            {
+              "value": 39678000000.0,
+              "unit": "USD",
+              "start": "2024-03-31",
+              "end": "2024-06-29",
+              "source_ids": [
+                "apple-FY2025Q3"
+              ],
+              "method": "reported",
+              "reported_label": "Gross margin",
+              "page": 1
+            },
+            {
+              "value": 85777000000.0,
+              "unit": "USD",
+              "start": "2024-03-31",
+              "end": "2024-06-29",
+              "source_ids": [
+                "apple-FY2025Q3"
+              ],
+              "method": "reported",
+              "reported_label": "Total net sales (1)",
+              "page": 1
+            }
+          ]
+        },
+        "operating_margin": {
+          "value": 29.555708406682445,
+          "unit": "%",
+          "start": "2024-03-31",
+          "end": "2024-06-29",
+          "source_ids": [
+            "apple-FY2025Q3"
+          ],
+          "method": "ratio",
+          "components": [
+            {
+              "value": 25352000000.0,
+              "unit": "USD",
+              "start": "2024-03-31",
+              "end": "2024-06-29",
+              "source_ids": [
+                "apple-FY2025Q3"
+              ],
+              "method": "reported",
+              "reported_label": "Operating income",
+              "page": 1
+            },
+            {
+              "value": 85777000000.0,
+              "unit": "USD",
+              "start": "2024-03-31",
+              "end": "2024-06-29",
+              "source_ids": [
+                "apple-FY2025Q3"
+              ],
+              "method": "reported",
+              "reported_label": "Total net sales (1)",
+              "page": 1
+            }
+          ]
+        },
+        "net_margin": {
+          "value": 25.004371801298714,
+          "unit": "%",
+          "start": "2024-03-31",
+          "end": "2024-06-29",
+          "source_ids": [
+            "apple-FY2025Q3"
+          ],
+          "method": "ratio",
+          "components": [
+            {
+              "value": 21448000000.0,
+              "unit": "USD",
+              "start": "2024-03-31",
+              "end": "2024-06-29",
+              "source_ids": [
+                "apple-FY2025Q3"
+              ],
+              "method": "reported",
+              "reported_label": "Net income",
+              "page": 1
+            },
+            {
+              "value": 85777000000.0,
+              "unit": "USD",
+              "start": "2024-03-31",
+              "end": "2024-06-29",
+              "source_ids": [
+                "apple-FY2025Q3"
+              ],
+              "method": "reported",
+              "reported_label": "Total net sales (1)",
+              "page": 1
+            }
+          ]
+        },
+        "fcf": {
+          "value": 26707000000.0,
+          "unit": "USD",
+          "start": "2024-03-31",
+          "end": "2024-06-29",
+          "source_ids": [
+            "apple-FY2025Q3",
+            "apple-FY2025Q2"
+          ],
+          "method": "CFO minus PPE expenditure",
+          "components": [
+            {
+              "value": 28858000000.0,
+              "unit": "USD",
+              "start": "2024-03-31",
+              "end": "2024-06-29",
+              "source_ids": [
+                "apple-FY2025Q3",
+                "apple-FY2025Q2"
+              ],
+              "method": "YTD difference",
+              "components": [
+                {
+                  "value": 91443000000.0,
+                  "unit": "USD",
+                  "start": null,
+                  "end": "2024-06-29",
+                  "source_ids": [
+                    "apple-FY2025Q3"
+                  ],
+                  "method": "reported cumulative cash flow",
+                  "fiscal_year": 2024,
+                  "fiscal_quarter": 3,
+                  "page": 3,
+                  "reported_value": 91443.0,
+                  "reported_unit": "USD million"
+                },
+                {
+                  "value": 62585000000.0,
+                  "unit": "USD",
+                  "start": null,
+                  "end": "2024-03-30",
+                  "source_ids": [
+                    "apple-FY2025Q2"
+                  ],
+                  "method": "reported cumulative cash flow",
+                  "fiscal_year": 2024,
+                  "fiscal_quarter": 2,
+                  "page": 3,
+                  "reported_value": 62585.0,
+                  "reported_unit": "USD million"
+                }
+              ]
+            },
+            {
+              "value": 2151000000.0,
+              "unit": "USD",
+              "start": "2024-03-31",
+              "end": "2024-06-29",
+              "source_ids": [
+                "apple-FY2025Q3",
+                "apple-FY2025Q2"
+              ],
+              "method": "YTD difference",
+              "components": [
+                {
+                  "value": 6539000000.0,
+                  "unit": "USD",
+                  "start": null,
+                  "end": "2024-06-29",
+                  "source_ids": [
+                    "apple-FY2025Q3"
+                  ],
+                  "method": "reported cumulative cash flow",
+                  "fiscal_year": 2024,
+                  "fiscal_quarter": 3,
+                  "page": 3,
+                  "reported_value": -6539.0,
+                  "reported_unit": "USD million"
+                },
+                {
+                  "value": 4388000000.0,
+                  "unit": "USD",
+                  "start": null,
+                  "end": "2024-03-30",
+                  "source_ids": [
+                    "apple-FY2025Q2"
+                  ],
+                  "method": "reported cumulative cash flow",
+                  "fiscal_year": 2024,
+                  "fiscal_quarter": 2,
+                  "page": 3,
+                  "reported_value": -4388.0,
+                  "reported_unit": "USD million"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "FY2025Q3": {
+      "start": "2025-03-30",
+      "end": "2025-06-28",
+      "metrics": {
+        "revenue": {
+          "value": 94036000000.0,
+          "unit": "USD",
+          "start": "2025-03-30",
+          "end": "2025-06-28",
+          "source_ids": [
+            "apple-FY2025Q3"
+          ],
+          "method": "reported",
+          "reported_label": "Total net sales (1)",
+          "page": 1
+        },
+        "gross_profit": {
+          "value": 43718000000.0,
+          "unit": "USD",
+          "start": "2025-03-30",
+          "end": "2025-06-28",
+          "source_ids": [
+            "apple-FY2025Q3"
+          ],
+          "method": "reported",
+          "reported_label": "Gross margin",
+          "page": 1
+        },
+        "operating_income": {
+          "value": 28202000000.0,
+          "unit": "USD",
+          "start": "2025-03-30",
+          "end": "2025-06-28",
+          "source_ids": [
+            "apple-FY2025Q3"
+          ],
+          "method": "reported",
+          "reported_label": "Operating income",
+          "page": 1
+        },
+        "net_income": {
+          "value": 23434000000.0,
+          "unit": "USD",
+          "start": "2025-03-30",
+          "end": "2025-06-28",
+          "source_ids": [
+            "apple-FY2025Q3"
+          ],
+          "method": "reported",
+          "reported_label": "Net income",
+          "page": 1
+        },
+        "rd": {
+          "value": 8866000000.0,
+          "unit": "USD",
+          "start": "2025-03-30",
+          "end": "2025-06-28",
+          "source_ids": [
+            "apple-FY2025Q3"
+          ],
+          "method": "reported",
+          "reported_label": "Research and development",
+          "page": 1
+        },
+        "iphone": {
+          "value": 44582000000.0,
+          "unit": "USD",
+          "start": "2025-03-30",
+          "end": "2025-06-28",
+          "source_ids": [
+            "apple-FY2025Q3"
+          ],
+          "method": "reported",
+          "reported_label": "iPhone",
+          "page": 1
+        },
+        "mac": {
+          "value": 8046000000.0,
+          "unit": "USD",
+          "start": "2025-03-30",
+          "end": "2025-06-28",
+          "source_ids": [
+            "apple-FY2025Q3"
+          ],
+          "method": "reported",
+          "reported_label": "Mac",
+          "page": 1
+        },
+        "ipad": {
+          "value": 6581000000.0,
+          "unit": "USD",
+          "start": "2025-03-30",
+          "end": "2025-06-28",
+          "source_ids": [
+            "apple-FY2025Q3"
+          ],
+          "method": "reported",
+          "reported_label": "iPad",
+          "page": 1
+        },
+        "wearables": {
+          "value": 7404000000.0,
+          "unit": "USD",
+          "start": "2025-03-30",
+          "end": "2025-06-28",
+          "source_ids": [
+            "apple-FY2025Q3"
+          ],
+          "method": "reported",
+          "reported_label": "Wearables, Home and Accessories",
+          "page": 1
+        },
+        "services": {
+          "value": 27423000000.0,
+          "unit": "USD",
+          "start": "2025-03-30",
+          "end": "2025-06-28",
+          "source_ids": [
+            "apple-FY2025Q3"
+          ],
+          "method": "reported",
+          "reported_label": "Services",
+          "page": 1
+        },
+        "greater_china": {
+          "value": 15369000000.0,
+          "unit": "USD",
+          "start": "2025-03-30",
+          "end": "2025-06-28",
+          "source_ids": [
+            "apple-FY2025Q3"
+          ],
+          "method": "reported",
+          "reported_label": "Greater China",
+          "page": 1
+        },
+        "eps": {
+          "value": 1.57,
+          "unit": "USD/shares",
+          "start": "2025-03-30",
+          "end": "2025-06-28",
+          "source_ids": [
+            "apple-FY2025Q3"
+          ],
+          "method": "reported",
+          "reported_label": "Diluted EPS",
+          "page": 1
+        },
+        "cash": {
+          "value": 36269000000.0,
+          "unit": "USD",
+          "start": null,
+          "end": "2025-06-28",
+          "source_ids": [
+            "apple-FY2025Q3"
+          ],
+          "method": "reported",
+          "page": 2,
+          "reported_label": "Cash and cash equivalents"
+        },
+        "assets": {
+          "value": 331495000000.0,
+          "unit": "USD",
+          "start": null,
+          "end": "2025-06-28",
+          "source_ids": [
+            "apple-FY2025Q3"
+          ],
+          "method": "reported",
+          "page": 2,
+          "reported_label": "Total assets"
+        },
+        "equity": {
+          "value": 65830000000.0,
+          "unit": "USD",
+          "start": null,
+          "end": "2025-06-28",
+          "source_ids": [
+            "apple-FY2025Q3"
+          ],
+          "method": "reported",
+          "page": 2,
+          "reported_label": "Total shareholders’ equity"
+        },
+        "debt": {
+          "value": 101698000000.0,
+          "unit": "USD",
+          "start": null,
+          "end": "2025-06-28",
+          "source_ids": [
+            "apple-FY2025Q3"
+          ],
+          "method": "sum of commercial paper and current/non-current term debt",
+          "page": 2
+        },
+        "cfo": {
+          "value": 27867000000.0,
+          "unit": "USD",
+          "start": "2025-03-30",
+          "end": "2025-06-28",
+          "source_ids": [
+            "apple-FY2025Q3",
+            "apple-FY2025Q2"
+          ],
+          "method": "YTD difference",
+          "components": [
+            {
+              "value": 81754000000.0,
+              "unit": "USD",
+              "start": null,
+              "end": "2025-06-28",
+              "source_ids": [
+                "apple-FY2025Q3"
+              ],
+              "method": "reported cumulative cash flow",
+              "fiscal_year": 2025,
+              "fiscal_quarter": 3,
+              "page": 3,
+              "reported_value": 81754.0,
+              "reported_unit": "USD million"
+            },
+            {
+              "value": 53887000000.0,
+              "unit": "USD",
+              "start": null,
+              "end": "2025-03-29",
+              "source_ids": [
+                "apple-FY2025Q2"
+              ],
+              "method": "reported cumulative cash flow",
+              "fiscal_year": 2025,
+              "fiscal_quarter": 2,
+              "page": 3,
+              "reported_value": 53887.0,
+              "reported_unit": "USD million"
+            }
+          ]
+        },
+        "capex": {
+          "value": 3462000000.0,
+          "unit": "USD",
+          "start": "2025-03-30",
+          "end": "2025-06-28",
+          "source_ids": [
+            "apple-FY2025Q3",
+            "apple-FY2025Q2"
+          ],
+          "method": "YTD difference",
+          "components": [
+            {
+              "value": 9473000000.0,
+              "unit": "USD",
+              "start": null,
+              "end": "2025-06-28",
+              "source_ids": [
+                "apple-FY2025Q3"
+              ],
+              "method": "reported cumulative cash flow",
+              "fiscal_year": 2025,
+              "fiscal_quarter": 3,
+              "page": 3,
+              "reported_value": -9473.0,
+              "reported_unit": "USD million"
+            },
+            {
+              "value": 6011000000.0,
+              "unit": "USD",
+              "start": null,
+              "end": "2025-03-29",
+              "source_ids": [
+                "apple-FY2025Q2"
+              ],
+              "method": "reported cumulative cash flow",
+              "fiscal_year": 2025,
+              "fiscal_quarter": 2,
+              "page": 3,
+              "reported_value": -6011.0,
+              "reported_unit": "USD million"
+            }
+          ]
+        },
+        "gross_margin": {
+          "value": 46.490705687183635,
+          "unit": "%",
+          "start": "2025-03-30",
+          "end": "2025-06-28",
+          "source_ids": [
+            "apple-FY2025Q3"
+          ],
+          "method": "ratio",
+          "components": [
+            {
+              "value": 43718000000.0,
+              "unit": "USD",
+              "start": "2025-03-30",
+              "end": "2025-06-28",
+              "source_ids": [
+                "apple-FY2025Q3"
+              ],
+              "method": "reported",
+              "reported_label": "Gross margin",
+              "page": 1
+            },
+            {
+              "value": 94036000000.0,
+              "unit": "USD",
+              "start": "2025-03-30",
+              "end": "2025-06-28",
+              "source_ids": [
+                "apple-FY2025Q3"
+              ],
+              "method": "reported",
+              "reported_label": "Total net sales (1)",
+              "page": 1
+            }
+          ]
+        },
+        "operating_margin": {
+          "value": 29.99064188183249,
+          "unit": "%",
+          "start": "2025-03-30",
+          "end": "2025-06-28",
+          "source_ids": [
+            "apple-FY2025Q3"
+          ],
+          "method": "ratio",
+          "components": [
+            {
+              "value": 28202000000.0,
+              "unit": "USD",
+              "start": "2025-03-30",
+              "end": "2025-06-28",
+              "source_ids": [
+                "apple-FY2025Q3"
+              ],
+              "method": "reported",
+              "reported_label": "Operating income",
+              "page": 1
+            },
+            {
+              "value": 94036000000.0,
+              "unit": "USD",
+              "start": "2025-03-30",
+              "end": "2025-06-28",
+              "source_ids": [
+                "apple-FY2025Q3"
+              ],
+              "method": "reported",
+              "reported_label": "Total net sales (1)",
+              "page": 1
+            }
+          ]
+        },
+        "net_margin": {
+          "value": 24.920243311072355,
+          "unit": "%",
+          "start": "2025-03-30",
+          "end": "2025-06-28",
+          "source_ids": [
+            "apple-FY2025Q3"
+          ],
+          "method": "ratio",
+          "components": [
+            {
+              "value": 23434000000.0,
+              "unit": "USD",
+              "start": "2025-03-30",
+              "end": "2025-06-28",
+              "source_ids": [
+                "apple-FY2025Q3"
+              ],
+              "method": "reported",
+              "reported_label": "Net income",
+              "page": 1
+            },
+            {
+              "value": 94036000000.0,
+              "unit": "USD",
+              "start": "2025-03-30",
+              "end": "2025-06-28",
+              "source_ids": [
+                "apple-FY2025Q3"
+              ],
+              "method": "reported",
+              "reported_label": "Total net sales (1)",
+              "page": 1
+            }
+          ]
+        },
+        "fcf": {
+          "value": 24405000000.0,
+          "unit": "USD",
+          "start": "2025-03-30",
+          "end": "2025-06-28",
+          "source_ids": [
+            "apple-FY2025Q3",
+            "apple-FY2025Q2"
+          ],
+          "method": "CFO minus PPE expenditure",
+          "components": [
+            {
+              "value": 27867000000.0,
+              "unit": "USD",
+              "start": "2025-03-30",
+              "end": "2025-06-28",
+              "source_ids": [
+                "apple-FY2025Q3",
+                "apple-FY2025Q2"
+              ],
+              "method": "YTD difference",
+              "components": [
+                {
+                  "value": 81754000000.0,
+                  "unit": "USD",
+                  "start": null,
+                  "end": "2025-06-28",
+                  "source_ids": [
+                    "apple-FY2025Q3"
+                  ],
+                  "method": "reported cumulative cash flow",
+                  "fiscal_year": 2025,
+                  "fiscal_quarter": 3,
+                  "page": 3,
+                  "reported_value": 81754.0,
+                  "reported_unit": "USD million"
+                },
+                {
+                  "value": 53887000000.0,
+                  "unit": "USD",
+                  "start": null,
+                  "end": "2025-03-29",
+                  "source_ids": [
+                    "apple-FY2025Q2"
+                  ],
+                  "method": "reported cumulative cash flow",
+                  "fiscal_year": 2025,
+                  "fiscal_quarter": 2,
+                  "page": 3,
+                  "reported_value": 53887.0,
+                  "reported_unit": "USD million"
+                }
+              ]
+            },
+            {
+              "value": 3462000000.0,
+              "unit": "USD",
+              "start": "2025-03-30",
+              "end": "2025-06-28",
+              "source_ids": [
+                "apple-FY2025Q3",
+                "apple-FY2025Q2"
+              ],
+              "method": "YTD difference",
+              "components": [
+                {
+                  "value": 9473000000.0,
+                  "unit": "USD",
+                  "start": null,
+                  "end": "2025-06-28",
+                  "source_ids": [
+                    "apple-FY2025Q3"
+                  ],
+                  "method": "reported cumulative cash flow",
+                  "fiscal_year": 2025,
+                  "fiscal_quarter": 3,
+                  "page": 3,
+                  "reported_value": -9473.0,
+                  "reported_unit": "USD million"
+                },
+                {
+                  "value": 6011000000.0,
+                  "unit": "USD",
+                  "start": null,
+                  "end": "2025-03-29",
+                  "source_ids": [
+                    "apple-FY2025Q2"
+                  ],
+                  "method": "reported cumulative cash flow",
+                  "fiscal_year": 2025,
+                  "fiscal_quarter": 2,
+                  "page": 3,
+                  "reported_value": -6011.0,
+                  "reported_unit": "USD million"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  },
+  "sources": [
+    {
+      "url": "https://www.apple.com/newsroom/pdfs/fy2025-q3/FY25_Q3_Consolidated_Financial_Statements.pdf",
+      "retrieved_at": "2026-10-08T06:49:03.190558+00:00",
+      "saved_at": 1791442143.190593,
+      "sha256": "7c982ae6fed09ee53acab12afb1ad374b3fd6a5905c44bf0ef3130f8a8bd67fe",
+      "id": "apple-FY2025Q3",
+      "title": "Apple FY2025 Q3 financial statements",
+      "kind": "company_ir",
+      "supplemental_pages": 0
+    },
+    {
+      "url": "https://www.apple.com/newsroom/pdfs/fy2025-q2/FY25_Q2_Consolidated_Financial_Statements.pdf",
+      "retrieved_at": "2026-10-08T06:49:05.708113+00:00",
+      "saved_at": 1791442145.708138,
+      "sha256": "e333dd821d9ef827e82d8e0b696493a127c4ee171ea63aca3a80dc1dfea60e89",
+      "id": "apple-FY2025Q2",
+      "title": "Apple FY2025 Q2 financial statements",
+      "kind": "company_ir",
+      "supplemental_pages": 0
+    },
+    {
+      "url": "https://www.apple.com/newsroom/pdfs/fy2025-q1/FY25_Q1_Consolidated_Financial_Statements.pdf",
+      "retrieved_at": "2026-10-08T06:49:06.544382+00:00",
+      "saved_at": 1791442146.544404,
+      "sha256": "b45c21d81378d635103ac213cddf853599716b42b4df4646b2f5c07e5079c748",
+      "id": "apple-FY2025Q1",
+      "title": "Apple FY2025 Q1 financial statements",
+      "kind": "company_ir",
+      "supplemental_pages": 0
+    },
+    {
+      "url": "https://www.apple.com/newsroom/pdfs/fy2024-q3/FY24_Q3_Consolidated_Financial_Statements.pdf",
+      "retrieved_at": "2026-10-08T06:49:08.532067+00:00",
+      "saved_at": 1791442148.5321012,
+      "sha256": "e435ff39122eab86559349cc7795f91d81b2a0fda8e920e258a7803be8d4573b",
+      "id": "apple-FY2024Q3",
+      "title": "Apple FY2024 Q3 financial statements",
+      "kind": "company_ir",
+      "supplemental_pages": 0
+    }
+  ],
+  "warnings": []
+}

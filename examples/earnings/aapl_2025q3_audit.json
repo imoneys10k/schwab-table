@@ -1,0 +1,1069 @@
+{
+  "symbol": "AAPL",
+  "company_name": "Apple Inc.",
+  "period": "FY2025Q3",
+  "start": "2025-03-30",
+  "end": "2025-06-28",
+  "currency": "USD",
+  "rows": [
+    {
+      "key": "revenue",
+      "label": {
+        "zh": "營收",
+        "en": "Revenue"
+      },
+      "group": "income",
+      "format": "money",
+      "fact": {
+        "value": 94036000000.0,
+        "unit": "USD",
+        "start": "2025-03-30",
+        "end": "2025-06-28",
+        "source_ids": [
+          "apple-FY2025Q3"
+        ],
+        "method": "reported",
+        "reported_label": "Total net sales (1)",
+        "page": 1
+      },
+      "yoy": {
+        "value": 9.628455180293095,
+        "unit": "%",
+        "delta": 8259000000.0
+      },
+      "qoq": {
+        "value": -1.387388710032611,
+        "unit": "%",
+        "delta": -1323000000.0
+      },
+      "view": "up",
+      "comparison_sources": [
+        "apple-FY2025Q3",
+        "apple-FY2025Q2"
+      ]
+    },
+    {
+      "key": "gross_profit",
+      "label": {
+        "zh": "毛利",
+        "en": "Gross profit"
+      },
+      "group": "income",
+      "format": "money",
+      "fact": {
+        "value": 43718000000.0,
+        "unit": "USD",
+        "start": "2025-03-30",
+        "end": "2025-06-28",
+        "source_ids": [
+          "apple-FY2025Q3"
+        ],
+        "method": "reported",
+        "reported_label": "Gross margin",
+        "page": 1
+      },
+      "yoy": {
+        "value": 10.181964816775047,
+        "unit": "%",
+        "delta": 4040000000.0
+      },
+      "qoq": {
+        "value": -2.5609022221231625,
+        "unit": "%",
+        "delta": -1149000000.0
+      },
+      "view": "up",
+      "comparison_sources": [
+        "apple-FY2025Q3",
+        "apple-FY2025Q2"
+      ]
+    },
+    {
+      "key": "gross_margin",
+      "label": {
+        "zh": "毛利率",
+        "en": "Gross margin"
+      },
+      "group": "income",
+      "format": "pct",
+      "fact": {
+        "value": 46.490705687183635,
+        "unit": "%",
+        "start": "2025-03-30",
+        "end": "2025-06-28",
+        "source_ids": [
+          "apple-FY2025Q3"
+        ],
+        "method": "ratio",
+        "components": [
+          {
+            "value": 43718000000.0,
+            "unit": "USD",
+            "start": "2025-03-30",
+            "end": "2025-06-28",
+            "source_ids": [
+              "apple-FY2025Q3"
+            ],
+            "method": "reported",
+            "reported_label": "Gross margin",
+            "page": 1
+          },
+          {
+            "value": 94036000000.0,
+            "unit": "USD",
+            "start": "2025-03-30",
+            "end": "2025-06-28",
+            "source_ids": [
+              "apple-FY2025Q3"
+            ],
+            "method": "reported",
+            "reported_label": "Total net sales (1)",
+            "page": 1
+          }
+        ]
+      },
+      "yoy": {
+        "value": 0.233550505724736,
+        "unit": "pp",
+        "delta": 0.233550505724736
+      },
+      "qoq": {
+        "value": -0.5599135516926097,
+        "unit": "pp",
+        "delta": -0.5599135516926097
+      },
+      "view": "up",
+      "comparison_sources": [
+        "apple-FY2025Q3",
+        "apple-FY2025Q2"
+      ]
+    },
+    {
+      "key": "operating_income",
+      "label": {
+        "zh": "營業利益",
+        "en": "Operating income"
+      },
+      "group": "income",
+      "format": "money",
+      "fact": {
+        "value": 28202000000.0,
+        "unit": "USD",
+        "start": "2025-03-30",
+        "end": "2025-06-28",
+        "source_ids": [
+          "apple-FY2025Q3"
+        ],
+        "method": "reported",
+        "reported_label": "Operating income",
+        "page": 1
+      },
+      "yoy": {
+        "value": 11.241716629851695,
+        "unit": "%",
+        "delta": 2850000000.0
+      },
+      "qoq": {
+        "value": -4.687552806786311,
+        "unit": "%",
+        "delta": -1387000000.0
+      },
+      "view": "up",
+      "comparison_sources": [
+        "apple-FY2025Q3",
+        "apple-FY2025Q2"
+      ]
+    },
+    {
+      "key": "operating_margin",
+      "label": {
+        "zh": "營業利潤率",
+        "en": "Operating margin"
+      },
+      "group": "income",
+      "format": "pct",
+      "fact": {
+        "value": 29.99064188183249,
+        "unit": "%",
+        "start": "2025-03-30",
+        "end": "2025-06-28",
+        "source_ids": [
+          "apple-FY2025Q3"
+        ],
+        "method": "ratio",
+        "components": [
+          {
+            "value": 28202000000.0,
+            "unit": "USD",
+            "start": "2025-03-30",
+            "end": "2025-06-28",
+            "source_ids": [
+              "apple-FY2025Q3"
+            ],
+            "method": "reported",
+            "reported_label": "Operating income",
+            "page": 1
+          },
+          {
+            "value": 94036000000.0,
+            "unit": "USD",
+            "start": "2025-03-30",
+            "end": "2025-06-28",
+            "source_ids": [
+              "apple-FY2025Q3"
+            ],
+            "method": "reported",
+            "reported_label": "Total net sales (1)",
+            "page": 1
+          }
+        ]
+      },
+      "yoy": {
+        "value": 0.43493347515004643,
+        "unit": "pp",
+        "delta": 0.43493347515004643
+      },
+      "qoq": {
+        "value": -1.0384167282619927,
+        "unit": "pp",
+        "delta": -1.0384167282619927
+      },
+      "view": "up",
+      "comparison_sources": [
+        "apple-FY2025Q3",
+        "apple-FY2025Q2"
+      ]
+    },
+    {
+      "key": "net_income",
+      "label": {
+        "zh": "淨利潤",
+        "en": "Net income"
+      },
+      "group": "income",
+      "format": "money",
+      "fact": {
+        "value": 23434000000.0,
+        "unit": "USD",
+        "start": "2025-03-30",
+        "end": "2025-06-28",
+        "source_ids": [
+          "apple-FY2025Q3"
+        ],
+        "method": "reported",
+        "reported_label": "Net income",
+        "page": 1
+      },
+      "yoy": {
+        "value": 9.259604625139882,
+        "unit": "%",
+        "delta": 1986000000.0
+      },
+      "qoq": {
+        "value": -5.431799838579499,
+        "unit": "%",
+        "delta": -1346000000.0
+      },
+      "view": "up",
+      "comparison_sources": [
+        "apple-FY2025Q3",
+        "apple-FY2025Q2"
+      ]
+    },
+    {
+      "key": "net_margin",
+      "label": {
+        "zh": "淨利率",
+        "en": "Net margin"
+      },
+      "group": "income",
+      "format": "pct",
+      "fact": {
+        "value": 24.920243311072355,
+        "unit": "%",
+        "start": "2025-03-30",
+        "end": "2025-06-28",
+        "source_ids": [
+          "apple-FY2025Q3"
+        ],
+        "method": "ratio",
+        "components": [
+          {
+            "value": 23434000000.0,
+            "unit": "USD",
+            "start": "2025-03-30",
+            "end": "2025-06-28",
+            "source_ids": [
+              "apple-FY2025Q3"
+            ],
+            "method": "reported",
+            "reported_label": "Net income",
+            "page": 1
+          },
+          {
+            "value": 94036000000.0,
+            "unit": "USD",
+            "start": "2025-03-30",
+            "end": "2025-06-28",
+            "source_ids": [
+              "apple-FY2025Q3"
+            ],
+            "method": "reported",
+            "reported_label": "Total net sales (1)",
+            "page": 1
+          }
+        ]
+      },
+      "yoy": {
+        "value": -0.08412849022635882,
+        "unit": "pp",
+        "delta": -0.08412849022635882
+      },
+      "qoq": {
+        "value": -1.0657674482686623,
+        "unit": "pp",
+        "delta": -1.0657674482686623
+      },
+      "view": "down",
+      "comparison_sources": [
+        "apple-FY2025Q3",
+        "apple-FY2025Q2"
+      ]
+    },
+    {
+      "key": "eps",
+      "label": {
+        "zh": "稀釋每股收益",
+        "en": "Diluted EPS"
+      },
+      "group": "income",
+      "format": "eps",
+      "fact": {
+        "value": 1.57,
+        "unit": "USD/shares",
+        "start": "2025-03-30",
+        "end": "2025-06-28",
+        "source_ids": [
+          "apple-FY2025Q3"
+        ],
+        "method": "reported",
+        "reported_label": "Diluted EPS",
+        "page": 1
+      },
+      "yoy": {
+        "value": 12.142857142857144,
+        "unit": "%",
+        "delta": 0.17000000000000015
+      },
+      "qoq": {
+        "value": -4.848484848484835,
+        "unit": "%",
+        "delta": -0.07999999999999985
+      },
+      "view": "up",
+      "comparison_sources": [
+        "apple-FY2025Q3",
+        "apple-FY2025Q2"
+      ]
+    },
+    {
+      "key": "cfo",
+      "label": {
+        "zh": "營運現金流",
+        "en": "Operating cash flow"
+      },
+      "group": "cashflow",
+      "format": "money",
+      "fact": {
+        "value": 27867000000.0,
+        "unit": "USD",
+        "start": "2025-03-30",
+        "end": "2025-06-28",
+        "source_ids": [
+          "apple-FY2025Q3",
+          "apple-FY2025Q2"
+        ],
+        "method": "YTD difference",
+        "components": [
+          {
+            "value": 81754000000.0,
+            "unit": "USD",
+            "start": null,
+            "end": "2025-06-28",
+            "source_ids": [
+              "apple-FY2025Q3"
+            ],
+            "method": "reported cumulative cash flow",
+            "fiscal_year": 2025,
+            "fiscal_quarter": 3,
+            "page": 3,
+            "reported_value": 81754.0,
+            "reported_unit": "USD million"
+          },
+          {
+            "value": 53887000000.0,
+            "unit": "USD",
+            "start": null,
+            "end": "2025-03-29",
+            "source_ids": [
+              "apple-FY2025Q2"
+            ],
+            "method": "reported cumulative cash flow",
+            "fiscal_year": 2025,
+            "fiscal_quarter": 2,
+            "page": 3,
+            "reported_value": 53887.0,
+            "reported_unit": "USD million"
+          }
+        ]
+      },
+      "yoy": {
+        "value": -3.4340564141659202,
+        "unit": "%",
+        "delta": -991000000.0
+      },
+      "qoq": {
+        "value": 16.345190380761522,
+        "unit": "%",
+        "delta": 3915000000.0
+      },
+      "view": "down",
+      "comparison_sources": [
+        "apple-FY2025Q3",
+        "apple-FY2025Q2",
+        "apple-FY2025Q1"
+      ]
+    },
+    {
+      "key": "capex",
+      "label": {
+        "zh": "購置固定資產支出",
+        "en": "Capital expenditure"
+      },
+      "group": "cashflow",
+      "format": "money",
+      "fact": {
+        "value": 3462000000.0,
+        "unit": "USD",
+        "start": "2025-03-30",
+        "end": "2025-06-28",
+        "source_ids": [
+          "apple-FY2025Q3",
+          "apple-FY2025Q2"
+        ],
+        "method": "YTD difference",
+        "components": [
+          {
+            "value": 9473000000.0,
+            "unit": "USD",
+            "start": null,
+            "end": "2025-06-28",
+            "source_ids": [
+              "apple-FY2025Q3"
+            ],
+            "method": "reported cumulative cash flow",
+            "fiscal_year": 2025,
+            "fiscal_quarter": 3,
+            "page": 3,
+            "reported_value": -9473.0,
+            "reported_unit": "USD million"
+          },
+          {
+            "value": 6011000000.0,
+            "unit": "USD",
+            "start": null,
+            "end": "2025-03-29",
+            "source_ids": [
+              "apple-FY2025Q2"
+            ],
+            "method": "reported cumulative cash flow",
+            "fiscal_year": 2025,
+            "fiscal_quarter": 2,
+            "page": 3,
+            "reported_value": -6011.0,
+            "reported_unit": "USD million"
+          }
+        ]
+      },
+      "yoy": {
+        "value": 60.948396094839616,
+        "unit": "%",
+        "delta": 1311000000.0
+      },
+      "qoq": {
+        "value": 12.732009117551279,
+        "unit": "%",
+        "delta": 391000000.0
+      },
+      "view": "neutral",
+      "comparison_sources": [
+        "apple-FY2025Q3",
+        "apple-FY2025Q2",
+        "apple-FY2025Q1"
+      ]
+    },
+    {
+      "key": "fcf",
+      "label": {
+        "zh": "自由現金流",
+        "en": "Free cash flow"
+      },
+      "group": "cashflow",
+      "format": "money",
+      "fact": {
+        "value": 24405000000.0,
+        "unit": "USD",
+        "start": "2025-03-30",
+        "end": "2025-06-28",
+        "source_ids": [
+          "apple-FY2025Q3",
+          "apple-FY2025Q2"
+        ],
+        "method": "CFO minus PPE expenditure",
+        "components": [
+          {
+            "value": 27867000000.0,
+            "unit": "USD",
+            "start": "2025-03-30",
+            "end": "2025-06-28",
+            "source_ids": [
+              "apple-FY2025Q3",
+              "apple-FY2025Q2"
+            ],
+            "method": "YTD difference",
+            "components": [
+              {
+                "value": 81754000000.0,
+                "unit": "USD",
+                "start": null,
+                "end": "2025-06-28",
+                "source_ids": [
+                  "apple-FY2025Q3"
+                ],
+                "method": "reported cumulative cash flow",
+                "fiscal_year": 2025,
+                "fiscal_quarter": 3,
+                "page": 3,
+                "reported_value": 81754.0,
+                "reported_unit": "USD million"
+              },
+              {
+                "value": 53887000000.0,
+                "unit": "USD",
+                "start": null,
+                "end": "2025-03-29",
+                "source_ids": [
+                  "apple-FY2025Q2"
+                ],
+                "method": "reported cumulative cash flow",
+                "fiscal_year": 2025,
+                "fiscal_quarter": 2,
+                "page": 3,
+                "reported_value": 53887.0,
+                "reported_unit": "USD million"
+              }
+            ]
+          },
+          {
+            "value": 3462000000.0,
+            "unit": "USD",
+            "start": "2025-03-30",
+            "end": "2025-06-28",
+            "source_ids": [
+              "apple-FY2025Q3",
+              "apple-FY2025Q2"
+            ],
+            "method": "YTD difference",
+            "components": [
+              {
+                "value": 9473000000.0,
+                "unit": "USD",
+                "start": null,
+                "end": "2025-06-28",
+                "source_ids": [
+                  "apple-FY2025Q3"
+                ],
+                "method": "reported cumulative cash flow",
+                "fiscal_year": 2025,
+                "fiscal_quarter": 3,
+                "page": 3,
+                "reported_value": -9473.0,
+                "reported_unit": "USD million"
+              },
+              {
+                "value": 6011000000.0,
+                "unit": "USD",
+                "start": null,
+                "end": "2025-03-29",
+                "source_ids": [
+                  "apple-FY2025Q2"
+                ],
+                "method": "reported cumulative cash flow",
+                "fiscal_year": 2025,
+                "fiscal_quarter": 2,
+                "page": 3,
+                "reported_value": -6011.0,
+                "reported_unit": "USD million"
+              }
+            ]
+          }
+        ]
+      },
+      "yoy": {
+        "value": -8.619463062118548,
+        "unit": "%",
+        "delta": -2302000000.0
+      },
+      "qoq": {
+        "value": 16.87658637038456,
+        "unit": "%",
+        "delta": 3524000000.0
+      },
+      "view": "down",
+      "comparison_sources": [
+        "apple-FY2025Q3",
+        "apple-FY2025Q2",
+        "apple-FY2025Q1"
+      ]
+    },
+    {
+      "key": "rd",
+      "label": {
+        "zh": "研發費用",
+        "en": "Research and development"
+      },
+      "group": "cashflow",
+      "format": "money",
+      "fact": {
+        "value": 8866000000.0,
+        "unit": "USD",
+        "start": "2025-03-30",
+        "end": "2025-06-28",
+        "source_ids": [
+          "apple-FY2025Q3"
+        ],
+        "method": "reported",
+        "reported_label": "Research and development",
+        "page": 1
+      },
+      "yoy": {
+        "value": 10.741943542343236,
+        "unit": "%",
+        "delta": 860000000.0
+      },
+      "qoq": {
+        "value": 3.6959064327485303,
+        "unit": "%",
+        "delta": 316000000.0
+      },
+      "view": "neutral",
+      "comparison_sources": [
+        "apple-FY2025Q3",
+        "apple-FY2025Q2"
+      ]
+    },
+    {
+      "key": "cash",
+      "label": {
+        "zh": "現金及約當現金",
+        "en": "Cash and equivalents"
+      },
+      "group": "balance",
+      "format": "money",
+      "fact": {
+        "value": 36269000000.0,
+        "unit": "USD",
+        "start": null,
+        "end": "2025-06-28",
+        "source_ids": [
+          "apple-FY2025Q3"
+        ],
+        "method": "reported",
+        "page": 2,
+        "reported_label": "Cash and cash equivalents"
+      },
+      "yoy": {
+        "value": 41.86974379033834,
+        "unit": "%",
+        "delta": 10704000000.0
+      },
+      "qoq": {
+        "value": 28.787017967473894,
+        "unit": "%",
+        "delta": 8107000000.0
+      },
+      "view": "neutral",
+      "comparison_sources": [
+        "apple-FY2024Q3",
+        "apple-FY2025Q2"
+      ]
+    },
+    {
+      "key": "debt",
+      "label": {
+        "zh": "有息債務",
+        "en": "Interest-bearing debt"
+      },
+      "group": "balance",
+      "format": "money",
+      "fact": {
+        "value": 101698000000.0,
+        "unit": "USD",
+        "start": null,
+        "end": "2025-06-28",
+        "source_ids": [
+          "apple-FY2025Q3"
+        ],
+        "method": "sum of commercial paper and current/non-current term debt",
+        "page": 2
+      },
+      "yoy": {
+        "value": 0.38892837400299474,
+        "unit": "%",
+        "delta": 394000000.0
+      },
+      "qoq": {
+        "value": 3.5768846882447525,
+        "unit": "%",
+        "delta": 3512000000.0
+      },
+      "view": "neutral",
+      "comparison_sources": [
+        "apple-FY2024Q3",
+        "apple-FY2025Q2"
+      ]
+    },
+    {
+      "key": "assets",
+      "label": {
+        "zh": "總資產",
+        "en": "Total assets"
+      },
+      "group": "balance",
+      "format": "money",
+      "fact": {
+        "value": 331495000000.0,
+        "unit": "USD",
+        "start": null,
+        "end": "2025-06-28",
+        "source_ids": [
+          "apple-FY2025Q3"
+        ],
+        "method": "reported",
+        "page": 2,
+        "reported_label": "Total assets"
+      },
+      "yoy": {
+        "value": -0.03528219726668391,
+        "unit": "%",
+        "delta": -117000000.0
+      },
+      "qoq": {
+        "value": 0.07909839901216742,
+        "unit": "%",
+        "delta": 262000000.0
+      },
+      "view": "neutral",
+      "comparison_sources": [
+        "apple-FY2024Q3",
+        "apple-FY2025Q2"
+      ]
+    },
+    {
+      "key": "equity",
+      "label": {
+        "zh": "股東權益",
+        "en": "Shareholders equity"
+      },
+      "group": "balance",
+      "format": "money",
+      "fact": {
+        "value": 65830000000.0,
+        "unit": "USD",
+        "start": null,
+        "end": "2025-06-28",
+        "source_ids": [
+          "apple-FY2025Q3"
+        ],
+        "method": "reported",
+        "page": 2,
+        "reported_label": "Total shareholders’ equity"
+      },
+      "yoy": {
+        "value": -1.31618396594112,
+        "unit": "%",
+        "delta": -878000000.0
+      },
+      "qoq": {
+        "value": -1.4461943828971813,
+        "unit": "%",
+        "delta": -966000000.0
+      },
+      "view": "neutral",
+      "comparison_sources": [
+        "apple-FY2024Q3",
+        "apple-FY2025Q2"
+      ]
+    },
+    {
+      "key": "iphone",
+      "label": {
+        "zh": "iPhone 營收",
+        "en": "iPhone revenue"
+      },
+      "group": "business",
+      "format": "money",
+      "fact": {
+        "value": 44582000000.0,
+        "unit": "USD",
+        "start": "2025-03-30",
+        "end": "2025-06-28",
+        "source_ids": [
+          "apple-FY2025Q3"
+        ],
+        "method": "reported",
+        "reported_label": "iPhone",
+        "page": 1
+      },
+      "yoy": {
+        "value": 13.451750814332254,
+        "unit": "%",
+        "delta": 5286000000.0
+      },
+      "qoq": {
+        "value": -4.822698063662179,
+        "unit": "%",
+        "delta": -2259000000.0
+      },
+      "view": "up",
+      "comparison_sources": [
+        "apple-FY2025Q3",
+        "apple-FY2025Q2"
+      ]
+    },
+    {
+      "key": "mac",
+      "label": {
+        "zh": "Mac 營收",
+        "en": "Mac revenue"
+      },
+      "group": "business",
+      "format": "money",
+      "fact": {
+        "value": 8046000000.0,
+        "unit": "USD",
+        "start": "2025-03-30",
+        "end": "2025-06-28",
+        "source_ids": [
+          "apple-FY2025Q3"
+        ],
+        "method": "reported",
+        "reported_label": "Mac",
+        "page": 1
+      },
+      "yoy": {
+        "value": 14.795263232986166,
+        "unit": "%",
+        "delta": 1037000000.0
+      },
+      "qoq": {
+        "value": 1.2202792804126394,
+        "unit": "%",
+        "delta": 97000000.0
+      },
+      "view": "up",
+      "comparison_sources": [
+        "apple-FY2025Q3",
+        "apple-FY2025Q2"
+      ]
+    },
+    {
+      "key": "ipad",
+      "label": {
+        "zh": "iPad 營收",
+        "en": "iPad revenue"
+      },
+      "group": "business",
+      "format": "money",
+      "fact": {
+        "value": 6581000000.0,
+        "unit": "USD",
+        "start": "2025-03-30",
+        "end": "2025-06-28",
+        "source_ids": [
+          "apple-FY2025Q3"
+        ],
+        "method": "reported",
+        "reported_label": "iPad",
+        "page": 1
+      },
+      "yoy": {
+        "value": -8.112259145490086,
+        "unit": "%",
+        "delta": -581000000.0
+      },
+      "qoq": {
+        "value": 2.7960012496095032,
+        "unit": "%",
+        "delta": 179000000.0
+      },
+      "view": "down",
+      "comparison_sources": [
+        "apple-FY2025Q3",
+        "apple-FY2025Q2"
+      ]
+    },
+    {
+      "key": "wearables",
+      "label": {
+        "zh": "穿戴／家用／配件營收",
+        "en": "Wearables, home and accessories"
+      },
+      "group": "business",
+      "format": "money",
+      "fact": {
+        "value": 7404000000.0,
+        "unit": "USD",
+        "start": "2025-03-30",
+        "end": "2025-06-28",
+        "source_ids": [
+          "apple-FY2025Q3"
+        ],
+        "method": "reported",
+        "reported_label": "Wearables, Home and Accessories",
+        "page": 1
+      },
+      "yoy": {
+        "value": -8.558725453871807,
+        "unit": "%",
+        "delta": -693000000.0
+      },
+      "qoq": {
+        "value": -1.5687317202871531,
+        "unit": "%",
+        "delta": -118000000.0
+      },
+      "view": "down",
+      "comparison_sources": [
+        "apple-FY2025Q3",
+        "apple-FY2025Q2"
+      ]
+    },
+    {
+      "key": "services",
+      "label": {
+        "zh": "服務營收",
+        "en": "Services revenue"
+      },
+      "group": "business",
+      "format": "money",
+      "fact": {
+        "value": 27423000000.0,
+        "unit": "USD",
+        "start": "2025-03-30",
+        "end": "2025-06-28",
+        "source_ids": [
+          "apple-FY2025Q3"
+        ],
+        "method": "reported",
+        "reported_label": "Services",
+        "page": 1
+      },
+      "yoy": {
+        "value": 13.257341097757402,
+        "unit": "%",
+        "delta": 3210000000.0
+      },
+      "qoq": {
+        "value": 2.9198723963220097,
+        "unit": "%",
+        "delta": 778000000.0
+      },
+      "view": "up",
+      "comparison_sources": [
+        "apple-FY2025Q3",
+        "apple-FY2025Q2"
+      ]
+    },
+    {
+      "key": "greater_china",
+      "label": {
+        "zh": "大中華區營收",
+        "en": "Greater China revenue"
+      },
+      "group": "business",
+      "format": "money",
+      "fact": {
+        "value": 15369000000.0,
+        "unit": "USD",
+        "start": "2025-03-30",
+        "end": "2025-06-28",
+        "source_ids": [
+          "apple-FY2025Q3"
+        ],
+        "method": "reported",
+        "reported_label": "Greater China",
+        "page": 1
+      },
+      "yoy": {
+        "value": 4.352254209668649,
+        "unit": "%",
+        "delta": 641000000.0
+      },
+      "qoq": {
+        "value": -3.95575553055868,
+        "unit": "%",
+        "delta": -633000000.0
+      },
+      "view": "up",
+      "comparison_sources": [
+        "apple-FY2025Q3",
+        "apple-FY2025Q2"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://www.apple.com/newsroom/pdfs/fy2025-q3/FY25_Q3_Consolidated_Financial_Statements.pdf",
+      "retrieved_at": "2026-10-08T06:49:03.190558+00:00",
+      "saved_at": 1791442143.190593,
+      "sha256": "7c982ae6fed09ee53acab12afb1ad374b3fd6a5905c44bf0ef3130f8a8bd67fe",
+      "id": "apple-FY2025Q3",
+      "title": "Apple FY2025 Q3 financial statements",
+      "kind": "company_ir",
+      "supplemental_pages": 0
+    },
+    {
+      "url": "https://www.apple.com/newsroom/pdfs/fy2025-q2/FY25_Q2_Consolidated_Financial_Statements.pdf",
+      "retrieved_at": "2026-10-08T06:49:05.708113+00:00",
+      "saved_at": 1791442145.708138,
+      "sha256": "e333dd821d9ef827e82d8e0b696493a127c4ee171ea63aca3a80dc1dfea60e89",
+      "id": "apple-FY2025Q2",
+      "title": "Apple FY2025 Q2 financial statements",
+      "kind": "company_ir",
+      "supplemental_pages": 0
+    },
+    {
+      "url": "https://www.apple.com/newsroom/pdfs/fy2025-q1/FY25_Q1_Consolidated_Financial_Statements.pdf",
+      "retrieved_at": "2026-10-08T06:49:06.544382+00:00",
+      "saved_at": 1791442146.544404,
+      "sha256": "b45c21d81378d635103ac213cddf853599716b42b4df4646b2f5c07e5079c748",
+      "id": "apple-FY2025Q1",
+      "title": "Apple FY2025 Q1 financial statements",
+      "kind": "company_ir",
+      "supplemental_pages": 0
+    },
+    {
+      "url": "https://www.apple.com/newsroom/pdfs/fy2024-q3/FY24_Q3_Consolidated_Financial_Statements.pdf",
+      "retrieved_at": "2026-10-08T06:49:08.532067+00:00",
+      "saved_at": 1791442148.5321012,
+      "sha256": "e435ff39122eab86559349cc7795f91d81b2a0fda8e920e258a7803be8d4573b",
+      "id": "apple-FY2024Q3",
+      "title": "Apple FY2024 Q3 financial statements",
+      "kind": "company_ir",
+      "supplemental_pages": 0
+    }
+  ],
+  "warnings": [],
+  "interpretation": "Operating indicators reflect observed YoY direction; spending and balance-sheet changes require context. No buy/sell or consensus surprise classification."
+}

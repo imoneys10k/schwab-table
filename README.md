@@ -227,6 +227,15 @@ This project only generates table styling and does not provide investment advice
 
 <div align="center"><sub>⭐ If this saves you time, a star helps others find it.</sub></div>
 
-## Local quarterly earnings development
 
-This branch adds an HSBC-style quarterly earnings review skill. See [EARNINGS.md](EARNINGS.md) for source coverage, usage, reproducible examples, and validation. It is not part of the public v0.5.0 release.
+## Quarterly earnings research · HSBC layout
+
+v0.6.0 adds **quarterly-earnings-review**, installed beside the main skill with shared Python dependencies. Ask: “Review AAPL FY2025Q3 in an HSBC-style table.” It verifies fiscal dates and primary filings, computes single-quarter / YoY / QoQ values, and adds source-backed analyst commentary in Traditional Chinese and English.
+
+[Try the two-quarter demo](https://imoneys10k.github.io/schwab-table/earnings/) · [Usage and source coverage](EARNINGS.md) · [Skill](skills/quarterly-earnings-review/SKILL.md).
+
+```bash
+python3 quarterly_earnings.py AAPL --period FY2025Q3 -o out/aapl_q3
+```
+
+AAPL uses official Apple PDFs (live verified); other US-GAAP issuers use SEC Company Facts (access can be refused; the parser has fixed-fixture coverage). Other markets require verified official report imports via `--facts`. Missing data stays NA; annual or cumulative values are never relabelled as quarterly facts. No consensus beat/miss claim without evidence. See EARNINGS.md for source timestamps, offline examples, and analysis JSON.

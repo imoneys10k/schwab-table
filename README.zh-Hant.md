@@ -222,6 +222,15 @@ python3 csv_to_prices.py 0700.HK=tencent.csv --benchmark HSI=hsi.csv -o data/hk.
 
 <div align="center"><sub>⭐ 如果它幫你省了時間，點個 star 能讓更多人看到。</sub></div>
 
-## 本機季度財報開發版
 
-此分支新增 HSBC 季度財報研究 Skill；資料來源、指令、示例及驗證見 [EARNINGS.md](EARNINGS.md)。此功能尚未公開發布。
+## 季度財報研究 · HSBC 版式
+
+v0.6.0 新增 **quarterly-earnings-review**，安裝器會在主 Skill 同層註冊，共用 Python 依賴。可直接輸入：「幫我看看 FY2025Q3 的 AAPL 財報，用 HSBC 表。」核對公司財季與官方原件，計算單季／同比／環比，加入有來源支持的研究評論，預設繁體中文及英文 PNG／HTML。
+
+[兩個季度的線上示例](https://imoneys10k.github.io/schwab-table/earnings/) · [用法與來源範圍](EARNINGS.md) · [Skill](skills/quarterly-earnings-review/SKILL.md)。
+
+```bash
+python3 quarterly_earnings.py AAPL --period FY2025Q3 -o out/aapl_q3
+```
+
+AAPL 使用 Apple 官方 PDF，已即時驗證；其他 US-GAAP 公司使用 SEC Company Facts，可能遇到存取拒絕，解析已以固定資料驗證。其他市場可透過 `--facts` 匯入核實的官方財報。缺失保留 NA，全年與累計值不冒充單季，未取得一致預期時不宣稱超／低於預期。來源時間、離線示例及評論 JSON 見 EARNINGS.md。

@@ -37,6 +37,11 @@ die() { printf 'error: %s\n' "$*" >&2; exit 1; }
 # 0. Uninstall ----------------------------------------------------------------
 if [ "$UNINSTALL" -eq 1 ]; then
   if [ -f "$TARGET/SKILL.md" ]; then
+    if [ -f "$TARGET/install_earnings_skill.py" ]; then
+      CLEAN_PY="$TARGET/.venv/bin/python"
+      if [ ! -x "$CLEAN_PY" ]; then CLEAN_PY="$(command -v python3 || command -v python || true)"; fi
+      if [ -n "$CLEAN_PY" ]; then "$CLEAN_PY" "$TARGET/install_earnings_skill.py" --remove; fi
+    fi
     rm -rf "$TARGET"
     say "Removed $TARGET"
   else
@@ -103,7 +108,14 @@ else
         die "$REPORT_STYLE smoke test failed"
       fi
     done
-    say "Render OK (Schwab, Morgan, Blackstone, IBKR, chart)"
+    if ! "$VPY" "$TARGET/quarterly_earnings.py" AAPL --period FY2025Q3 \
+        --facts "$TARGET/examples/earnings/aapl_2025q3_facts.json" \
+        --analysis "$TARGET/examples/earnings/aapl_2025q3_analysis.json" -o "$SMOKE/earnings" >/dev/null 2>>"$SMOKE/err"; then
+      cat "$SMOKE/err" >&2
+      rm -rf "$SMOKE"
+      die "HSBC quarterly earnings smoke test failed"
+    fi
+    say "Render OK (Schwab, Morgan, Blackstone, IBKR, HSBC earnings, chart)"
   else
     cat "$SMOKE/err" >&2
     if [ "$(uname -s)" = "Linux" ]; then
@@ -117,6 +129,15 @@ fi
 
 if [ "$SKIP_DEPS" -eq 0 ] && [ "$(uname -s)" = "Linux" ] && command -v fc-list >/dev/null 2>&1 && [ -z "$(fc-list :lang=zh 2>/dev/null)" ]; then
   echo "hint: no Chinese font found, so the Chinese version would render as boxes. Install one, e.g. on Debian/Ubuntu: sudo apt install fonts-noto-cjk" >&2
+fi
+
+REGISTER_PY="${VPY:-}"
+if [ -z "$REGISTER_PY" ]; then REGISTER_PY="$(command -v python3 || command -v python || true)"; fi
+if [ -n "$REGISTER_PY" ] && [ -f "$TARGET/install_earnings_skill.py" ]; then
+  say "Registering quarterly-earnings-review beside the main skill"
+  "$REGISTER_PY" "$TARGET/install_earnings_skill.py"
+elif [ -f "$TARGET/install_earnings_skill.py" ]; then
+  echo "hint: register the earnings skill after installing Python: python3 $TARGET/install_earnings_skill.py" >&2
 fi
 
 say "Installed to $TARGET"

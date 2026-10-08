@@ -231,3 +231,9 @@ seven/nine-column report does not invent missing facts. See
 [template schemas, source samples and font substitutions](references/institutional-tables.md).
 New templates are calibrated for white paper; Schwab tables and charts retain
 light/dark modes. Examples use fictional companies and synthetic values.
+
+## Résultats trimestriels · Présentation HSBC
+
+La version v0.6.0 ajoute `quarterly-earnings-review`, enregistré à côté du skill principal avec le même environnement Python. Demandez « Analyse AAPL FY2025Q3 dans un tableau de style HSBC ». Le skill vérifie les périodes fiscales et les publications primaires, calcule les variations annuelles et trimestrielles et ajoute des commentaires sourcés, en chinois traditionnel et en anglais.
+
+[Démo de deux trimestres](https://imoneys10k.github.io/schwab-table/earnings/) · [Utilisation et couverture](EARNINGS.md). Les PDF officiels Apple ont été vérifiés en accès direct. Les autres sociétés US-GAAP utilisent SEC Company Facts, dont l'accès peut être refusé. Les autres marchés nécessitent un import officiel vérifié via `--facts`. Les données absentes restent NA ; les valeurs cumulées ne sont pas présentées comme trimestrielles.

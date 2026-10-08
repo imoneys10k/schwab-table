@@ -278,6 +278,7 @@ def sec_bundle(symbol,period,cik=None):
         elif previous:start=(dt.date.fromisoformat(previous['end'])+dt.timedelta(days=1)).isoformat()
         else:continue
         sid='sec-'+a['acc'];sources.append(dict(meta,id=sid,title=f'{data.get("entityName",symbol)} {key} filing',
+            data_url=url,
             published_at=a['filed'],url=f'https://www.sec.gov/Archives/edgar/data/{cik}/{a["acc"].replace("-","")}/{a["acc"]}-index.html',kind='regulator'))
         quarter={'start':start,'end':a['end'],'metrics':{}}
         for metric,tags in SEC_TAGS.items():

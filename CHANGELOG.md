@@ -2,6 +2,18 @@
 
 All notable changes. Versions follow the [releases](https://github.com/imoneys10k/schwab-table/releases) page.
 
+## 0.6.0 (2026-10-08)
+
+### Added
+- HSBC-style quarterly earnings review Skill: ticker + fiscal period to bilingual PNG/HTML, single-quarter values, YoY/QoQ comparisons, source-backed commentary and inspectable facts/audit ledgers.
+- Official Apple financial PDFs and SEC US-GAAP Company Facts adapters, with retrieval timestamps and 12-hour caches. Verified official report imports support other markets.
+- Reproducible AAPL FY2025Q3 / FY2025Q4 examples and an online quarter/language comparison page; Q4 distinguishes GAAP comparisons from the prior-year one-time tax adjustment.
+- Installers register the earnings Skill beside the existing Skill, share dependencies and smoke-test HSBC output. Existing unmanaged skills are preserved.
+- Tests for fiscal periods, cumulative cash-flow arithmetic, source evidence, PDF columns, missing data and installed Skill execution.
+
+### Validation and limits
+- 60 local tests pass; both Apple quarters were verified against official PDFs. SEC live access returned 403 in the development environment; its parser is covered by fixed known-answer tests. Global quarterly filings are not claimed as automatically covered.
+
 ## 0.5.0 (2026-10-08)
 
 ### Added
