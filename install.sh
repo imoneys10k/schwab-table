@@ -92,11 +92,18 @@ else
   "$VPY" -m playwright install chromium
 
   # 3. Smoke test ----------------------------------------------------------------
-  say "Smoke test: rendering an example table and an example chart"
+  say "Smoke test: rendering four table styles and an example chart"
   SMOKE="$(mktemp -d)"
   if "$VPY" "$TARGET/render_table.py" "$TARGET/examples/neural9_spec.json" "$SMOKE/table" >/dev/null 2>"$SMOKE/err" \
      && "$VPY" "$TARGET/render_chart.py" "$TARGET/examples/chart_lines_spec.json" "$SMOKE/chart" >/dev/null 2>>"$SMOKE/err"; then
-    say "Render OK"
+    for REPORT_STYLE in morgan blackstone ibkr; do
+      if ! "$VPY" "$TARGET/render_table.py" "$TARGET/examples/${REPORT_STYLE}_spec.json" "$SMOKE/$REPORT_STYLE" >/dev/null 2>>"$SMOKE/err"; then
+        cat "$SMOKE/err" >&2
+        rm -rf "$SMOKE"
+        die "$REPORT_STYLE smoke test failed"
+      fi
+    done
+    say "Render OK (Schwab, Morgan, Blackstone, IBKR, chart)"
   else
     cat "$SMOKE/err" >&2
     if [ "$(uname -s)" = "Linux" ]; then
