@@ -65,7 +65,7 @@ class InstitutionalTables(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'column_groups'):build_html(s,'en')
 
     def test_existing_schwab_spec_and_dark_theme_still_work(self):
-        s=json.loads((Path(__file__).resolve().parent.parent/'examples/watchlist_spec.json').read_text())
+        s=json.loads((Path(__file__).resolve().parent.parent/'examples/watchlist_spec.json').read_text(encoding='utf-8'))
         html=build_html(s,'zh','dark')
         self.assertTrue('zh-Hant' in html and '收盤價' in html)
 
