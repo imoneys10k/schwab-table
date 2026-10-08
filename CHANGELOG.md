@@ -3,6 +3,21 @@
 All notable changes. Versions follow the [releases](https://github.com/imoneys10k/schwab-table/releases) page.
 
 
+
+## 0.6.2 (2026-10-08)
+
+### Changed
+- README (English, Traditional Chinese, Japanese, French) rewritten around what the project is now: two skills, four table styles, price charts with market routing, quarterly earnings review, data and honesty rules, complete file list, tests and evals. The v0.5 / v0.6 sections that had been appended below the license are folded into the page, and the gallery and flow chart cover every feature.
+- Website rebuilt from the same content: highlights, a ten-image gallery, a quarterly-earnings section linking the demo, a data-sources table, install tabs and prompt in four languages.
+- Banner and social card mention quarterly earnings and Traditional Chinese.
+- CONTRIBUTING: sources must be named (Yahoo only when labelled aggregated) instead of the older "authoritative data only".
+
+### Added
+- `tools/build_docs.py`, `tools/docs_content.py`, `tools/site_template.html`: one content table generates the four READMEs and the website. `tests/test_docs.py` fails if they are out of date, if a link, image or anchor is dead, or if a language is missing text.
+
+### Fixed
+- The `--ref` row of the install options table had lost a full stop ("pin a version Run the installer ...").
+
 ## 0.6.1 (2026-10-08)
 
 ### Fixed

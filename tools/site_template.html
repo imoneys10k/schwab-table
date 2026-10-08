@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>schwab-table</title>
+<meta name="description" content="Institutional-style tables, price charts and HSBC-style quarterly earnings reviews for AI agents. English and Traditional Chinese, PNG + HTML.">
+<meta property="og:title" content="schwab-table">
+<meta property="og:description" content="Research-desk tables, price charts and quarterly earnings reviews for your AI agent.">
+<meta property="og:image" content="https://imoneys10k.github.io/schwab-table/img/social-preview.png">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+@font-face{font-family:'Inter';font-style:normal;font-weight:100 900;src:url(fonts/inter-latin-wght-normal.woff2) format('woff2')}
+:root{--bg:#F6F9FB;--surface:#fff;--ink:#14213D;--ink2:#4A5A74;--line:#DDE6EC;--accent:#2a78d6;--band:#ACDCEC;--navy:#1B2A4A;--shadow:0 10px 30px rgba(27,42,74,.10)}
+@media (prefers-color-scheme:dark){:root{--bg:#0C1424;--surface:#131E34;--ink:#EAF1F8;--ink2:#9FB2CC;--line:#23324D;--accent:#6da7ec;--shadow:0 10px 30px rgba(0,0,0,.35)}}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Inter','Helvetica Neue',Arial,'PingFang TC','Noto Sans CJK TC','Microsoft JhengHei','Hiragino Sans','Noto Sans CJK JP',sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+code{font:0.92em ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:rgba(127,150,180,.16);padding:1px 5px;border-radius:5px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+nav{position:absolute;top:0;left:0;right:0;z-index:5}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:68px;gap:12px}
+.brand{color:#fff;font-weight:800;font-size:19px;letter-spacing:-.02em}.brand b{color:var(--band)}
+.nav-r{display:flex;align-items:center;gap:14px}
+.langs{display:flex;gap:2px;background:rgba(255,255,255,.10);border-radius:999px;padding:3px}
+.langs button{border:0;background:transparent;color:#C9D8EA;font:600 13px inherit;font-family:inherit;padding:6px 12px;border-radius:999px;cursor:pointer}
+.langs button.on{background:#fff;color:var(--navy)}
+.gh{color:#fff;font-weight:600;font-size:14px;padding:7px 14px;border:1px solid rgba(255,255,255,.35);border-radius:999px}
+.hero{position:relative;overflow:hidden;color:#fff;padding:132px 0 96px;background:radial-gradient(800px 460px at 85% 10%,rgba(172,220,236,.30),transparent 60%),radial-gradient(640px 460px at 0% 100%,rgba(42,120,214,.34),transparent 60%),linear-gradient(135deg,#0F1B33 0%,#1B2A4A 50%,#235283 100%)}
+.hero:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:44px 44px;-webkit-mask-image:linear-gradient(90deg,#000,transparent 75%);mask-image:linear-gradient(90deg,#000,transparent 75%)}
+.hero .wrap{position:relative;display:grid;grid-template-columns:1.05fr 1fr;gap:40px;align-items:center}
+.pill{display:inline-block;font-size:12.5px;font-weight:700;letter-spacing:.1em;padding:6px 14px;border:1px solid rgba(172,220,236,.55);border-radius:999px;color:var(--band);background:rgba(172,220,236,.10)}
+h1{font-size:clamp(34px,5vw,60px);line-height:1.08;letter-spacing:-.03em;font-weight:800;margin:20px 0 18px}
+h1 span{color:var(--band)}
+.sub{font-size:18px;color:#C7D6E9;max-width:540px;margin:0 0 30px}
+.cta{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-block;font-weight:700;font-size:15.5px;padding:13px 22px;border-radius:12px}.btn:hover{text-decoration:none;filter:brightness(1.06)}
+.btn.p{background:var(--band);color:var(--navy)}.btn.s{background:rgba(255,255,255,.10);color:#fff;border:1px solid rgba(255,255,255,.28)}
+.stack{position:relative;height:380px}
+.stack img{position:absolute;width:88%;border-radius:10px;background:#fff;box-shadow:0 26px 60px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.12)}
+.stack .a{left:0;top:0;transform:rotate(-3.5deg)}.stack .b{right:-4%;top:130px;width:84%;transform:rotate(2.5deg)}
+section{padding:72px 0}
+h2{font-size:clamp(26px,3.4vw,38px);letter-spacing:-.025em;margin:0 0 28px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:var(--shadow)}
+.card .e{font-size:28px}.card h3{margin:10px 0 6px;font-size:18px}.card p{margin:0;color:var(--ink2);font-size:15px}
+.gal{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+.gal figure{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px;box-shadow:var(--shadow)}
+.gal img{display:block;width:100%;border-radius:8px;background:#fff}
+.gal figcaption{padding:10px 4px 2px;font-size:14px;color:var(--ink2)}.gal figcaption b{color:var(--ink)}
+.note{color:var(--ink2);font-size:13.5px;margin-top:16px}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+.chip{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:14px;max-width:340px}.chip b{display:block}.chip span{color:var(--ink2);font-size:13px}
+h3.sec{margin:30px 0 4px;font-size:17px;color:var(--ink2);font-weight:600}
+.earn{display:grid;grid-template-columns:1.1fr .9fr;gap:30px;align-items:start}
+.earn p{margin:0 0 14px;color:var(--ink2)}.earn ul{margin:0 0 18px;padding-left:20px;color:var(--ink2)}.earn li{margin:0 0 9px}
+.earn .box2{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px;box-shadow:var(--shadow)}.earn .box2 img{display:block;width:100%;border-radius:8px;background:#fff}
+table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:14.5px}
+th{background:var(--band);color:var(--navy);text-align:left;padding:10px 14px;font-weight:700}
+td{padding:11px 14px;border-top:1px solid var(--line);vertical-align:top}td:first-child{white-space:normal}
+ul.rules{margin:18px 0 0;padding-left:20px;color:var(--ink2)}ul.rules li{margin:0 0 8px}
+.inst{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.box{background:#0F1B33;color:#E6EEF8;border-radius:16px;padding:18px 18px 20px;box-shadow:var(--shadow)}
+.tabs{display:flex;gap:6px;margin-bottom:12px}
+.tabs button{background:transparent;border:1px solid rgba(255,255,255,.2);color:#B7C7DD;font:600 13px inherit;font-family:inherit;border-radius:8px;padding:6px 12px;cursor:pointer}
+.tabs button.on{background:var(--band);color:var(--navy);border-color:var(--band)}
+pre{margin:0;white-space:pre-wrap;word-break:break-all;font:13.5px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.cp{margin-top:14px;background:rgba(255,255,255,.12);color:#fff;border:0;border-radius:8px;padding:8px 14px;font:600 13px inherit;font-family:inherit;cursor:pointer}
+.box h3{margin:0 0 12px;font-size:15px;color:var(--band)}
+footer{padding:34px 0 50px;color:var(--ink2);font-size:14px;border-top:1px solid var(--line)}
+footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+@media (max-width:860px){.hero .wrap,.earn{grid-template-columns:1fr}.stack{height:300px}.grid3{grid-template-columns:1fr 1fr}.inst,.gal{grid-template-columns:1fr}nav .gh{display:none}}
+@media (max-width:560px){.grid3{grid-template-columns:1fr}.hero{padding-top:110px}.langs button{padding:6px 9px}}
+</style>
+</head>
+<body>
+<nav><div class="wrap"><a class="brand" href="#">schwab-<b>table</b></a>
+<div class="nav-r"><div class="langs" id="langs"></div><a class="gh" href="https://github.com/imoneys10k/schwab-table">GitHub</a></div></div></nav>
+
+<header class="hero"><div class="wrap">
+<div><span class="pill">CLAUDE SKILLS · MIT</span>
+<h1><span id="ha"></span><br><span id="hb" style="color:#fff"></span></h1>
+<p class="sub" id="sub"></p>
+<div class="cta"><a class="btn p" href="#install" id="cta1"></a><a class="btn s" href="earnings/" id="cta3"></a><a class="btn s" href="https://github.com/imoneys10k/schwab-table" id="cta2"></a></div></div>
+<div class="stack"><img class="a" src="img/neural9_en.png" alt="Ranking table"><img class="b" src="img/chart_lines_en.png" alt="Line chart"></div>
+</div></header>
+
+<section><div class="wrap"><h2 id="t_features"></h2><div class="grid3" id="cards"></div></div></section>
+
+<section style="padding-top:0"><div class="wrap"><h2 id="t_gallery"></h2><div class="gal" id="gal"></div><p class="note" id="gnote"></p>
+<h3 class="sec" id="t_modes"></h3><div class="chips" id="chips"></div></div></section>
+
+<section style="padding-top:0"><div class="wrap"><h2 id="t_earn"></h2>
+<div class="earn"><div><p id="earn_intro"></p><ul id="earn_points"></ul><a class="btn p" href="earnings/" id="earn_btn"></a> <span class="note" id="earn_doc" style="margin-left:10px"></span></div>
+<div class="box2"><img src="img/aapl_2025q4_zh.png" alt="HSBC-style quarterly earnings table" loading="lazy"></div></div></div></section>
+
+<section style="padding-top:0"><div class="wrap"><h2 id="t_data"></h2><div id="route"></div><ul class="rules" id="rules"></ul></div></section>
+
+<section id="install" style="padding-top:20px"><div class="wrap"><h2 id="t_install"></h2>
+<div class="inst">
+<div class="box"><div class="tabs"><button id="tab_unix" class="on"></button><button id="tab_win"></button></div><pre id="cmd"></pre><button class="cp" id="cp1"></button></div>
+<div class="box"><h3 id="or_agent"></h3><pre id="prompt"></pre><button class="cp" id="cp2"></button></div>
+</div></div></section>
+
+<footer><div class="wrap"><span id="foot"></span><span><span id="docs_label"></span>: <!--DOCS_LINKS--></span></div></footer>
+
+<script>
+var D = /*DATA*/;
+var IMGS = /*IMGS*/;
+var CMDS = {
+  unix: "curl -fsSL https://raw.githubusercontent.com/imoneys10k/schwab-table/main/install.sh | sh",
+  win: "irm https://raw.githubusercontent.com/imoneys10k/schwab-table/main/install.ps1 | iex"
+};
+var NAMES = {en: "EN", zh: "繁體中文", ja: "日本語", fr: "FR"};
+var HTML_LANG = {en: "en", zh: "zh-Hant", ja: "ja", fr: "fr"};
+var lang = "en", tab = "unix";
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+function pick(){
+  var saved = null; try { saved = localStorage.getItem("lang"); } catch(e) {}
+  if (saved && D[saved]) return saved;
+  var n = (navigator.language || "en").toLowerCase();
+  return n.indexOf("zh") === 0 ? "zh" : n.indexOf("ja") === 0 ? "ja" : n.indexOf("fr") === 0 ? "fr" : "en";
+}
+function render(){
+  var d = D[lang];
+  document.documentElement.lang = HTML_LANG[lang];
+  $("ha").textContent = d.hero_a; $("hb").textContent = d.hero_b; $("sub").textContent = d.sub;
+  $("cta1").textContent = d.cta1; $("cta2").textContent = d.cta2; $("cta3").textContent = d.cta3;
+  $("t_features").textContent = d.t_features; $("t_gallery").textContent = d.t_gallery; $("t_install").textContent = d.t_install;
+  $("cards").innerHTML = d.cards.map(function(c){return '<div class="card"><div class="e">'+c[0]+'</div><h3>'+esc(c[1])+'</h3><p>'+esc(c[2])+'</p></div>'}).join("");
+  $("gal").innerHTML = IMGS.map(function(n,i){return '<figure><img src="img/'+n+'.png" alt="'+esc(d.gallery[i][0])+'" loading="lazy"><figcaption><b>'+esc(d.gallery[i][0])+'</b> · '+esc(d.gallery[i][1])+'</figcaption></figure>'}).join("");
+  $("gnote").textContent = d.gallery_note;
+  $("t_modes").textContent = d.t_modes;
+  $("chips").innerHTML = d.chips.map(function(m){return '<div class="chip"><b>'+esc(m[0])+'</b><span>'+esc(m[1])+'</span></div>'}).join("");
+  $("t_earn").textContent = d.t_earn; $("earn_intro").innerHTML = d.earn_intro;
+  $("earn_points").innerHTML = d.earn_points.map(function(p){return '<li>'+p+'</li>'}).join("");
+  $("earn_btn").textContent = d.earn_btn; $("earn_doc").innerHTML = d.earn_doc;
+  $("t_data").textContent = d.t_data;
+  $("route").innerHTML = '<table><thead><tr>'+d.route_head.map(function(h){return '<th>'+esc(h)+'</th>'}).join("")+'</tr></thead><tbody>'+d.route_rows.map(function(r){return '<tr>'+r.map(function(x){return '<td>'+x+'</td>'}).join("")+'</tr>'}).join("")+'</tbody></table>';
+  $("rules").innerHTML = d.rules.map(function(r){return '<li>'+r+'</li>'}).join("");
+  $("tab_unix").textContent = d.tab_unix; $("tab_win").textContent = d.tab_win;
+  $("cmd").textContent = CMDS[tab]; $("or_agent").textContent = d.or_agent; $("prompt").textContent = d.prompt;
+  $("cp1").textContent = d.copy; $("cp2").textContent = d.copy;
+  $("foot").textContent = d.foot; $("docs_label").textContent = d.docs_label;
+  Array.prototype.forEach.call($("langs").children, function(b){ b.className = b.getAttribute("data-l") === lang ? "on" : ""; });
+  $("tab_unix").className = tab === "unix" ? "on" : ""; $("tab_win").className = tab === "win" ? "on" : "";
+}
+$("langs").innerHTML = Object.keys(NAMES).map(function(k){return '<button data-l="'+k+'">'+NAMES[k]+'</button>'}).join("");
+$("langs").addEventListener("click", function(e){ var l = e.target.getAttribute("data-l"); if (l) { lang = l; try { localStorage.setItem("lang", l); } catch(x) {} render(); } });
+$("tab_unix").onclick = function(){ tab = "unix"; render(); };
+$("tab_win").onclick = function(){ tab = "win"; render(); };
+function copy(text, btn){
+  var done = function(){ btn.textContent = D[lang].copied; setTimeout(function(){ btn.textContent = D[lang].copy; }, 1400); };
+  try { navigator.clipboard.writeText(text).then(done, function(){}); } catch(e) {}
+}
+$("cp1").onclick = function(){ copy(CMDS[tab], this); };
+$("cp2").onclick = function(){ copy(D[lang].prompt, this); };
+lang = pick(); render();
+</script>
+</body>
+</html>
