@@ -1,0 +1,26 @@
+{
+  "source_ids": [
+    "apple-FY2025Q4",
+    "apple-FY2025Q3",
+    "apple-FY2025Q2",
+    "apple-FY2024Q4"
+  ],
+  "overview": {
+    "zh": "營收與現金流同比成長，但淨利及EPS的高增幅受到去年一次性稅項影響，不能全部視為營運改善。公司附錄提供去年GAAP與非GAAP調節；本表保留GAAP比較，將基期因素另作解釋。",
+    "en": "Revenue and cash flow grew YoY, while large net-income and EPS growth reflects a prior-year one-time tax charge. The appendix reconciles prior GAAP and non-GAAP results; this table retains GAAP comparisons and explains the base effect separately."
+  },
+  "comments": {
+    "eps": {
+      "zh": "去年同期GAAP EPS為0.97，附錄調整後為1.64；不以非GAAP值偷偷替換同比基期。",
+      "en": "Prior GAAP EPS was 0.97 versus 1.64 adjusted in the appendix; the GAAP comparison base is not silently replaced."
+    },
+    "net_income": {
+      "zh": "去年同期一次性稅項10,246百萬USD壓低GAAP基期，高同比增幅需考慮此因素。",
+      "en": "A prior USD 10,246m one-time tax charge depressed the GAAP base; not all headline growth is operational."
+    },
+    "cfo": {
+      "zh": "單季由全年現金流減九個月值計算，不以全年數字冒充本季。",
+      "en": "Single-quarter cash flow is full year minus nine months, not the annual amount."
+    }
+  }
+}

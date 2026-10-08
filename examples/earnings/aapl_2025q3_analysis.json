@@ -1,0 +1,46 @@
+{
+  "source_ids": [
+    "apple-FY2025Q3",
+    "apple-FY2025Q2",
+    "apple-FY2025Q1",
+    "apple-FY2024Q3"
+  ],
+  "overview": {
+    "zh": "營收與盈利同比成長，但現金流表現較弱。收入增長主要來自 iPhone、Mac 與服務；iPad及穿戴業務走弱。自由現金流同比下降8.62%，需將盈利增長與資本投入、現金轉換分開解讀。",
+    "en": "Revenue and earnings grew YoY, while cash generation was weaker. iPhone, Mac and Services led growth; iPad and Wearables declined. FCF fell 8.62% YoY: assess earnings alongside investment and cash conversion."
+  },
+  "comments": {
+    "revenue": {
+      "zh": "本季同比成長，環比回落不直接等於需求轉弱，需考慮產品發布與季節性。",
+      "en": "Positive YoY growth; the sequential decline alone does not establish weaker demand given release cycles and seasonality."
+    },
+    "eps": {
+      "zh": "EPS增幅高於淨利增幅，需結合稀釋加權股數變化；不能將差額全視為營運改善。",
+      "en": "EPS grew faster than net income; inspect diluted share-count changes rather than attributing the difference entirely to operations."
+    },
+    "cfo": {
+      "zh": "與淨利增長不同步；需核對營運資金與現金稅支出，不能只看EPS。",
+      "en": "Cash flow did not follow net income growth; examine working capital and cash taxes, not EPS alone."
+    },
+    "fcf": {
+      "zh": "同比減少2,302百萬USD，由營運現金流減少991及資本支出增加1,311共同造成。",
+      "en": "The USD 2,302m YoY decline equals CFO decreasing 991m plus capital expenditure increasing 1,311m."
+    },
+    "capex": {
+      "zh": "更高投入拉低本期自由現金流，長期回報與必要性需另核對。",
+      "en": "Investment reduced current FCF; its necessity and longer-term returns require separate evidence."
+    },
+    "debt": {
+      "zh": "應連同可交易證券與到期結構解讀，現金欄不等於總流動性。",
+      "en": "Read alongside marketable securities and maturities; cash here is not total liquidity."
+    },
+    "services": {
+      "zh": "服務收入同比增長13.26%；收入增長不能單獨證明付費用戶增長。",
+      "en": "Services revenue rose 13.26%; revenue alone does not establish growth in paying users."
+    },
+    "greater_china": {
+      "zh": "同比回升但環比下降；價格、產品組合與渠道因素需進一步核對。",
+      "en": "Higher YoY but lower sequentially; pricing, product mix and channel factors need further evidence."
+    }
+  }
+}

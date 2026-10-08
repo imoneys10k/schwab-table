@@ -1,0 +1,4 @@
+interface:
+  display_name: "Quarterly Earnings Review"
+  short_description: "Quarterly filings in an HSBC-style financial table"
+  default_prompt: "Review the requested stock and fiscal quarter using primary statements; produce a Traditional Chinese HSBC-style financial table with source-backed conclusions."

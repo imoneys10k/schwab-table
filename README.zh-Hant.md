@@ -221,3 +221,7 @@ python3 csv_to_prices.py 0700.HK=tencent.csv --benchmark HSI=hsi.csv -o data/hk.
 [MIT](LICENSE)
 
 <div align="center"><sub>⭐ 如果它幫你省了時間，點個 star 能讓更多人看到。</sub></div>
+
+## 本機季度財報開發版
+
+此分支新增 HSBC 季度財報研究 Skill；資料來源、指令、示例及驗證見 [EARNINGS.md](EARNINGS.md)。此功能尚未公開發布。

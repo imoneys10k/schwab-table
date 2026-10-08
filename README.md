@@ -226,3 +226,7 @@ This project only generates table styling and does not provide investment advice
 [MIT](LICENSE)
 
 <div align="center"><sub>⭐ If this saves you time, a star helps others find it.</sub></div>
+
+## Local quarterly earnings development
+
+This branch adds an HSBC-style quarterly earnings review skill. See [EARNINGS.md](EARNINGS.md) for source coverage, usage, reproducible examples, and validation. It is not part of the public v0.5.0 release.
