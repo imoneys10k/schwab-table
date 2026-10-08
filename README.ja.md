@@ -4,7 +4,7 @@
 
 **AI エージェントのための、リサーチレポート風の表と推移チャート。**
 
-[English](README.md) · [简体中文](README.zh-CN.md) · **日本語** · [Français](README.fr.md)
+[English](README.md) · [繁體中文](README.zh-Hant.md) · **日本語** · [Français](README.fr.md)
 
 <p><a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/License-MIT-2a78d6?style=flat-square"></a> <a href="https://github.com/imoneys10k/schwab-table/actions/workflows/install-test.yml"><img alt="install test" src="https://img.shields.io/github/actions/workflow/status/imoneys10k/schwab-table/install-test.yml?branch=main&style=flat-square&label=install%20test"></a> <a href="https://github.com/imoneys10k/schwab-table/releases"><img alt="release" src="https://img.shields.io/github/v/release/imoneys10k/schwab-table?style=flat-square&color=1B2A4A"></a> <a href="https://github.com/imoneys10k/schwab-table/stargazers"><img alt="stars" src="https://img.shields.io/github/stars/imoneys10k/schwab-table?style=flat-square&color=eda100"></a> <a href="https://github.com/imoneys10k/schwab-table/actions/workflows/tests.yml"><img alt="tests" src="https://img.shields.io/github/actions/workflow/status/imoneys10k/schwab-table/tests.yml?branch=main&style=flat-square&label=tests"></a> <img alt="Python 3.9+" src="https://img.shields.io/badge/Python-3.9%2B-1baf7a?style=flat-square"> <img alt="macOS, Linux, Windows" src="https://img.shields.io/badge/macOS%20%C2%B7%20Linux%20%C2%B7%20Windows-supported-ACDCEC?style=flat-square&labelColor=1B2A4A"> <img alt="Claude Skill" src="https://img.shields.io/badge/Claude-Skill-eb6834?style=flat-square"></p>
 
@@ -184,7 +184,7 @@ python3 csv_to_prices.py 0700.HK=tencent.csv --benchmark HSI=hsi.csv -o data/hk.
 
 `fetch_prices.py` は応答を 12 時間キャッシュします（`--refresh` で無視）。ネットワークに失敗した場合は、警告つきで直前のキャッシュを使います。コードが曖昧なときは `index:COMP`、`etf:SPY` で資産クラスを指定できます。両方のレンダラーが `--theme dark` と `--pdf` に対応しています。
 
-フォント：Inter（リポジトリの `fonts/` に同梱、SIL Open Font License）が英数字用にすべての HTML に埋め込まれるため、どのマシンでも同じ見た目になります。中国語はシステムの中国語フォント（macOS は PingFang SC、Windows は Microsoft YaHei）を使います。最小構成の Linux サーバーでは、例えば `sudo apt install fonts-noto-cjk` で入れてください。ないと中国語版が四角で表示されます。
+フォント：Inter、Source Sans 3、Droid Sansを同梱してラテン文字に埋め込みます。原本との字形の違いと繁体字フォントのフォールバックは[テンプレートガイド](references/institutional-tables.md)に記載しています。Linuxでは `fonts-noto-cjk` を利用できます。PDFから抽出した専用フォントやmacOSのフォントファイルは配布しません。
 
 </details>
 
@@ -197,3 +197,37 @@ python3 csv_to_prices.py 0700.HK=tencent.csv --benchmark HSI=hsi.csv -o data/hk.
 [MIT](LICENSE)
 
 <div align="center"><sub>⭐ 役に立ったら、スターをもらえると他の人にも見つけてもらえます。</sub></div>
+
+
+## 新しいレポート形式
+
+Schwab（既定）、Morgan、Blackstone、IBKR の4形式。中国語出力は繁体字です。
+
+## Institutional report templates
+
+Four report styles are available: Schwab (default), Morgan-style return/risk matrix,
+Blackstone-style grouped performance and IBKR-style holdings/exposure. All Chinese
+output now uses **Traditional Chinese**, including charts; existing `zh` specs
+and `_zh` filenames still work.
+
+| Style | Example | Purpose |
+| --- | --- | --- |
+| `schwab` | [Watchlist](examples/watchlist_zh.png) | Existing ranking, watchlist and P/L tables |
+| `morgan` | [Matrix](examples/morgan_zh.png) | Two periods × return, volatility and drawdown |
+| `blackstone` | [Grouped returns](examples/blackstone_zh.png) | Industry/strategy groups, two return periods |
+| `ibkr` | [Holdings](examples/ibkr_zh.png) | Brokerage fields, market values, weights and supplied exposure |
+
+```bash
+python3 render_table.py examples/morgan_spec.json out/matrix
+python3 render_table.py examples/blackstone_spec.json out/grouped
+python3 render_table.py examples/ibkr_spec.json out/holdings
+# Prepare a matrix from the existing free daily-price data:
+python3 prices_to_table.py data/prices.json data/matrix.json --style morgan
+python3 render_table.py data/matrix.json out/matrix
+```
+
+Templates have explicit column schemas; passing a five-column watchlist to a
+seven/nine-column report does not invent missing facts. See
+[template schemas, source samples and font substitutions](references/institutional-tables.md).
+New templates are calibrated for white paper; Schwab tables and charts retain
+light/dark modes. Examples use fictional companies and synthetic values.

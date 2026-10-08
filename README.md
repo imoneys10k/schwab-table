@@ -4,7 +4,7 @@
 
 **Research-desk tables and price charts for your AI agent.**
 
-**English** · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [Français](README.fr.md)
+**English** · [繁體中文](README.zh-Hant.md) · [日本語](README.ja.md) · [Français](README.fr.md)
 
 <p><a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/License-MIT-2a78d6?style=flat-square"></a> <a href="https://github.com/imoneys10k/schwab-table/actions/workflows/install-test.yml"><img alt="install test" src="https://img.shields.io/github/actions/workflow/status/imoneys10k/schwab-table/install-test.yml?branch=main&style=flat-square&label=install%20test"></a> <a href="https://github.com/imoneys10k/schwab-table/releases"><img alt="release" src="https://img.shields.io/github/v/release/imoneys10k/schwab-table?style=flat-square&color=1B2A4A"></a> <a href="https://github.com/imoneys10k/schwab-table/stargazers"><img alt="stars" src="https://img.shields.io/github/stars/imoneys10k/schwab-table?style=flat-square&color=eda100"></a> <a href="https://github.com/imoneys10k/schwab-table/actions/workflows/tests.yml"><img alt="tests" src="https://img.shields.io/github/actions/workflow/status/imoneys10k/schwab-table/tests.yml?branch=main&style=flat-square&label=tests"></a> <img alt="Python 3.9+" src="https://img.shields.io/badge/Python-3.9%2B-1baf7a?style=flat-square"> <img alt="macOS, Linux, Windows" src="https://img.shields.io/badge/macOS%20%C2%B7%20Linux%20%C2%B7%20Windows-supported-ACDCEC?style=flat-square&labelColor=1B2A4A"> <img alt="Claude Skill" src="https://img.shields.io/badge/Claude-Skill-eb6834?style=flat-square"></p>
 
@@ -19,7 +19,7 @@ A Claude Skill that turns a stock list, a brokerage holdings screenshot, or read
 <table>
 <tr><td width="50%" valign="top"><h3>🎯 Research-desk look</h3><p>Light-blue title band, thin grey rules and small-print footnotes, like a broker research note.</p></td><td width="50%" valign="top"><h3>📊 Tables and charts</h3><p>Ranking, holdings and watchlist tables, plus line charts and small multiples with drawdown and log scale.</p></td></tr>
 <tr><td width="50%" valign="top"><h3>🌏 Bilingual by default</h3><p>Every output in Chinese and English: 2x PNG and self-contained HTML.</p></td><td width="50%" valign="top"><h3>🔒 Explicit data sources</h3><p>Exchange closes plus clearly labelled Yahoo global data. Missing data is marked NA, never made up.</p></td></tr>
-<tr><td width="50%" valign="top"><h3>🤖 One-line agent install</h3><p>Paste a prompt into Claude Code or Codex. Works on macOS, Linux and Windows.</p></td><td width="50%" valign="top"><h3>🔤 Same fonts everywhere</h3><p>Inter is bundled and embedded in every HTML file, so output looks the same on every machine.</p></td></tr>
+<tr><td width="50%" valign="top"><h3>🤖 One-line agent install</h3><p>Paste a prompt into Claude Code or Codex. Works on macOS, Linux and Windows.</p></td><td width="50%" valign="top"><h3>🔤 Embedded report fonts</h3><p>Inter, Source Sans 3 and Droid Sans are bundled and embedded, for stable Latin text; source-font substitutions are documented.</p></td></tr>
 </table>
 
 ## 🎨 Gallery
@@ -43,6 +43,35 @@ flowchart LR
   classDef n fill:#ACDCEC,stroke:#1B2A4A,color:#1B2A4A,stroke-width:1px;
   class A,B,C,D,E n;
 ```
+
+## Institutional report templates
+
+Four report styles are available: Schwab (default), Morgan-style return/risk matrix,
+Blackstone-style grouped performance and IBKR-style holdings/exposure. All Chinese
+output now uses **Traditional Chinese**, including charts; existing `zh` specs
+and `_zh` filenames still work.
+
+| Style | Example | Purpose |
+| --- | --- | --- |
+| `schwab` | [Watchlist](examples/watchlist_zh.png) | Existing ranking, watchlist and P/L tables |
+| `morgan` | [Matrix](examples/morgan_zh.png) | Two periods × return, volatility and drawdown |
+| `blackstone` | [Grouped returns](examples/blackstone_zh.png) | Industry/strategy groups, two return periods |
+| `ibkr` | [Holdings](examples/ibkr_zh.png) | Brokerage fields, market values, weights and supplied exposure |
+
+```bash
+python3 render_table.py examples/morgan_spec.json out/matrix
+python3 render_table.py examples/blackstone_spec.json out/grouped
+python3 render_table.py examples/ibkr_spec.json out/holdings
+# Prepare a matrix from the existing free daily-price data:
+python3 prices_to_table.py data/prices.json data/matrix.json --style morgan
+python3 render_table.py data/matrix.json out/matrix
+```
+
+Templates have explicit column schemas; passing a five-column watchlist to a
+seven/nine-column report does not invent missing facts. See
+[template schemas, source samples and font substitutions](references/institutional-tables.md).
+New templates are calibrated for white paper; Schwab tables and charts retain
+light/dark modes. Examples use fictional companies and synthetic values.
 
 ## 🚀 Install
 
@@ -184,7 +213,7 @@ python3 csv_to_prices.py 0700.HK=tencent.csv --benchmark HSI=hsi.csv -o data/hk.
 
 `fetch_prices.py` caches responses for 12 hours (`--refresh` bypasses the cache) and falls back to the last cache if the network fails, with a warning. `index:COMP` / `etf:SPY` force the asset class when a code is ambiguous. Both renderers also take `--theme dark` and `--pdf`.
 
-Fonts: Inter (bundled in `fonts/`, SIL Open Font License) is embedded in every HTML file for Latin text and numbers, so output looks the same on every machine. Chinese text uses the system CJK font (PingFang SC on macOS, Microsoft YaHei on Windows). On a minimal Linux server install one, e.g. `sudo apt install fonts-noto-cjk`; otherwise the Chinese version renders as boxes.
+Fonts: Inter, Source Sans 3 and Droid Sans are bundled and embedded for Latin text. Source-font substitutions and system Traditional Chinese fallbacks are documented in [the template guide](references/institutional-tables.md). Install `fonts-noto-cjk` on a minimal Linux system. Original proprietary PDF fonts and macOS font files are not distributed.
 
 </details>
 

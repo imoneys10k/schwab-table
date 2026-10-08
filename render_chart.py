@@ -31,8 +31,9 @@ from pathlib import Path
 
 from fonts import font_face_css
 from render_common import THEMES, render_files
+from localization import traditional_html
 
-FONT = ('"Inter","Helvetica Neue",Helvetica,Arial,"Noto Sans CJK SC","Source Han Sans SC","PingFang SC","Microsoft YaHei",sans-serif')
+FONT = ('"Inter","Helvetica Neue",Helvetica,Arial,"Noto Sans CJK TC","Source Han Sans TC","PingFang TC","Microsoft JhengHei",sans-serif')
 MAX_SYMBOLS = 9
 MAX_LINES = 5
 
@@ -79,7 +80,7 @@ S = {
         "basis_total": "回报为由用户提供的复权收盘价计算的总回报（股息再投资）。",
         "bench_etf": "{b}：交易所交易基金，此处仅用作其对应指数的替代，并非指数本身，也无法完全复制指数。",
         "bench_idx": "指数不受管理，不产生管理费及其他费用，且不可直接投资。",
-        "months": ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"], "lang": "zh-CN",
+        "months": ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"], "lang": "zh-Hant",
         "tip_d": "{y}/{m}/{d}",
     },
 }
@@ -578,8 +579,9 @@ def build_html(spec, d, series, benches, base, end, start, lang, theme="light"):
     body = layout_lines(c) if mode == "lines" else layout_multiples(c)
     data = json.dumps(c.hov, separators=(",", ":")).replace("</", "<\\/")
     js = HOVER_JS.replace("__DATA__", data).replace("__MONTHS__", json.dumps(c.L["months"], ensure_ascii=False)).replace("__FMT__", json.dumps(c.L["tip_d"]))
-    return (f'<!doctype html><html lang="{c.L["lang"]}"><head><meta charset="utf-8"><title>Price performance</title><style>{c.css()}</style></head>'
+    html = (f'<!doctype html><html lang="{c.L["lang"]}"><head><meta charset="utf-8"><title>Price performance</title><style>{c.css()}</style></head>'
             f'<body><div id="wrap"><div class="box">{title_block(c)}{body}</div><div class="foot">{footnote(c)}</div><div id="tip"></div></div><script>{js}</script></body></html>')
+    return traditional_html(html) if lang == "zh" else html
 
 
 def main():

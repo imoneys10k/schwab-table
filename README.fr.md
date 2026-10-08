@@ -4,7 +4,7 @@
 
 **Tableaux et graphiques de cours façon étude, pour votre agent IA.**
 
-[English](README.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · **Français**
+[English](README.md) · [繁體中文](README.zh-Hant.md) · [日本語](README.ja.md) · **Français**
 
 <p><a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/License-MIT-2a78d6?style=flat-square"></a> <a href="https://github.com/imoneys10k/schwab-table/actions/workflows/install-test.yml"><img alt="install test" src="https://img.shields.io/github/actions/workflow/status/imoneys10k/schwab-table/install-test.yml?branch=main&style=flat-square&label=install%20test"></a> <a href="https://github.com/imoneys10k/schwab-table/releases"><img alt="release" src="https://img.shields.io/github/v/release/imoneys10k/schwab-table?style=flat-square&color=1B2A4A"></a> <a href="https://github.com/imoneys10k/schwab-table/stargazers"><img alt="stars" src="https://img.shields.io/github/stars/imoneys10k/schwab-table?style=flat-square&color=eda100"></a> <a href="https://github.com/imoneys10k/schwab-table/actions/workflows/tests.yml"><img alt="tests" src="https://img.shields.io/github/actions/workflow/status/imoneys10k/schwab-table/tests.yml?branch=main&style=flat-square&label=tests"></a> <img alt="Python 3.9+" src="https://img.shields.io/badge/Python-3.9%2B-1baf7a?style=flat-square"> <img alt="macOS, Linux, Windows" src="https://img.shields.io/badge/macOS%20%C2%B7%20Linux%20%C2%B7%20Windows-supported-ACDCEC?style=flat-square&labelColor=1B2A4A"> <img alt="Claude Skill" src="https://img.shields.io/badge/Claude-Skill-eb6834?style=flat-square"></p>
 
@@ -184,7 +184,7 @@ python3 csv_to_prices.py 0700.HK=tencent.csv --benchmark HSI=hsi.csv -o data/hk.
 
 `fetch_prices.py` met les réponses en cache 12 heures (`--refresh` l'ignore) et, en cas d'échec réseau, reprend le dernier cache avec un avertissement. `index:COMP` / `etf:SPY` forcent la classe d'actif quand un code est ambigu. Les deux moteurs acceptent aussi `--theme dark` et `--pdf`.
 
-Polices : Inter (fournie dans `fonts/`, licence SIL Open Font) est intégrée à chaque fichier HTML pour les caractères latins et les chiffres, donc le rendu est identique sur toutes les machines. Le chinois utilise la police CJK du système (PingFang SC sous macOS, Microsoft YaHei sous Windows). Sur un serveur Linux minimal, installez-en une, par exemple `sudo apt install fonts-noto-cjk` ; sinon la version chinoise s'affiche en carrés.
+Polices : Inter, Source Sans 3 et Droid Sans sont embarquées pour le texte latin. Les substitutions et les polices système pour le chinois traditionnel sont documentées dans [le guide](references/institutional-tables.md). Sur Linux minimal, installez `fonts-noto-cjk`. Les polices propriétaires extraites des PDF ou de macOS ne sont pas distribuées.
 
 </details>
 
@@ -197,3 +197,37 @@ Ce projet ne produit que la mise en forme de tableaux et ne fournit aucun consei
 [MIT](LICENSE)
 
 <div align="center"><sub>⭐ Si cela vous fait gagner du temps, une étoile aide d'autres personnes à le trouver.</sub></div>
+
+
+## Modèles de rapports
+
+Quatre modèles : Schwab (par défaut), Morgan, Blackstone et IBKR. La sortie chinoise utilise les caractères traditionnels.
+
+## Institutional report templates
+
+Four report styles are available: Schwab (default), Morgan-style return/risk matrix,
+Blackstone-style grouped performance and IBKR-style holdings/exposure. All Chinese
+output now uses **Traditional Chinese**, including charts; existing `zh` specs
+and `_zh` filenames still work.
+
+| Style | Example | Purpose |
+| --- | --- | --- |
+| `schwab` | [Watchlist](examples/watchlist_zh.png) | Existing ranking, watchlist and P/L tables |
+| `morgan` | [Matrix](examples/morgan_zh.png) | Two periods × return, volatility and drawdown |
+| `blackstone` | [Grouped returns](examples/blackstone_zh.png) | Industry/strategy groups, two return periods |
+| `ibkr` | [Holdings](examples/ibkr_zh.png) | Brokerage fields, market values, weights and supplied exposure |
+
+```bash
+python3 render_table.py examples/morgan_spec.json out/matrix
+python3 render_table.py examples/blackstone_spec.json out/grouped
+python3 render_table.py examples/ibkr_spec.json out/holdings
+# Prepare a matrix from the existing free daily-price data:
+python3 prices_to_table.py data/prices.json data/matrix.json --style morgan
+python3 render_table.py data/matrix.json out/matrix
+```
+
+Templates have explicit column schemas; passing a five-column watchlist to a
+seven/nine-column report does not invent missing facts. See
+[template schemas, source samples and font substitutions](references/institutional-tables.md).
+New templates are calibrated for white paper; Schwab tables and charts retain
+light/dark modes. Examples use fictional companies and synthetic values.

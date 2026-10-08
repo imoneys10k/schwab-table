@@ -27,9 +27,11 @@ from pathlib import Path
 
 from fonts import font_face_css
 from render_common import THEMES, render_files
+from institutional_tables import STYLES, build_html as institutional_html
+from localization import traditional_html
 
 FONT_STACK = ('"Inter", "Helvetica Neue", Helvetica, Arial, '
-              '"Noto Sans CJK SC", "Source Han Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif')
+              '"Noto Sans CJK TC", "Source Han Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif')
 
 
 def fmt(v, kind):
@@ -41,7 +43,12 @@ def fmt(v, kind):
     return f'<span class="sgn">-</span>{t}' if v < 0 else t
 
 
-def build_html(spec, lang, theme="light"):
+def build_html(spec, lang, theme="light", style=None):
+    style = style or spec.get("style", "schwab")
+    if style not in STYLES:
+        raise ValueError(f"unknown table style: {style}")
+    if style != "schwab":
+        return institutional_html(spec, lang, style, theme)
     L = spec["langs"][lang]
     T = THEMES[theme]
     rows = sorted(spec["rows"], key=lambda r: r["cells"][0], reverse=True)
@@ -54,7 +61,7 @@ def build_html(spec, lang, theme="light"):
         body.append(f'<tr class="{"bench" if r.get("bench") else ""}"><td class="name">{name}</td>{cells}</tr>')
     h1 = "".join(f"<th>{t}</th>" for t in L["h1"])
     h2 = "".join(f"<th>{t}</th>" for t in L["h2"])
-    return f"""<!doctype html><html lang="{'zh-CN' if lang == 'zh' else 'en'}"><head><meta charset="utf-8">
+    html = f"""<!doctype html><html lang="{'zh-Hant' if lang == 'zh' else 'en'}"><head><meta charset="utf-8">
 <title>{L['title']}</title><style>
 {font_face_css()}
 body {{ margin:0; background:{T['bg']}; font-family:{FONT_STACK}; -webkit-font-smoothing:antialiased; }}
@@ -87,6 +94,7 @@ tbody tr.bench td {{ color:{T['ink']}; font-weight:600; }}
 </tbody></table>
 <div class="foot">{L['foot']}</div>
 </div></body></html>"""
+    return traditional_html(html) if lang == "zh" else html
 
 
 def load_spec(spec_path):
@@ -117,6 +125,7 @@ def main():
     ap.add_argument("--no-png", action="store_true", help="write HTML only")
     ap.add_argument("--pdf", action="store_true", help="also write a vector PDF")
     ap.add_argument("--theme", choices=sorted(THEMES), default="light", help="light (default) or dark")
+    ap.add_argument("--style", choices=STYLES, help="report template (default: spec.style, or schwab)")
     ap.add_argument("--scale", type=float, default=2, help="PNG pixel density (default 2; use 3 for print)")
     args = ap.parse_args()
 
@@ -124,7 +133,10 @@ def main():
     langs = pick_langs(spec, [l.strip() for l in args.langs.split(",")] if args.langs else None)
     Path(args.prefix).parent.mkdir(parents=True, exist_ok=True)
 
-    htmls = {lang: build_html(spec, lang, args.theme) for lang in langs}
+    try:
+        htmls = {lang: build_html(spec, lang, args.theme, args.style) for lang in langs}
+    except (ValueError, RuntimeError) as exc:
+        sys.exit(f"error: {exc}")
     for lang, html in htmls.items():
         Path(f"{args.prefix}_{lang}.html").write_text(html, encoding="utf-8")
         print(f"wrote {args.prefix}_{lang}.html")

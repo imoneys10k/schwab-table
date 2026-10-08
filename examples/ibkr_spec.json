@@ -1,0 +1,386 @@
+{
+  "style": "ibkr",
+  "as_of": {
+    "en": "As of: 7 October 2026",
+    "zh": "截至：2026年10月7日"
+  },
+  "columns": [
+    {
+      "key": "ticker",
+      "label": {
+        "en": "Symbol",
+        "zh": "代碼"
+      },
+      "format": "text",
+      "width": 12
+    },
+    {
+      "key": "name",
+      "label": {
+        "en": "Description",
+        "zh": "證券名稱"
+      },
+      "format": "text",
+      "width": 23
+    },
+    {
+      "key": "sector",
+      "label": {
+        "en": "Sector",
+        "zh": "行業"
+      },
+      "format": "text",
+      "width": 8
+    },
+    {
+      "key": "long",
+      "label": {
+        "en": "Long Value",
+        "zh": "多頭市值"
+      },
+      "format": "money",
+      "width": 9
+    },
+    {
+      "key": "short",
+      "label": {
+        "en": "Short Value",
+        "zh": "空頭市值"
+      },
+      "format": "money",
+      "width": 9
+    },
+    {
+      "key": "net",
+      "label": {
+        "en": "Net Value",
+        "zh": "淨市值"
+      },
+      "format": "money",
+      "width": 9
+    },
+    {
+      "key": "long_weight",
+      "label": {
+        "en": "Long Weight %",
+        "zh": "多頭權重 %"
+      },
+      "format": "pct",
+      "width": 10
+    },
+    {
+      "key": "short_weight",
+      "label": {
+        "en": "Short Weight %",
+        "zh": "空頭權重 %"
+      },
+      "format": "pct",
+      "width": 10
+    },
+    {
+      "key": "net_weight",
+      "label": {
+        "en": "Net Weight %",
+        "zh": "淨權重 %"
+      },
+      "format": "pct",
+      "width": 10
+    }
+  ],
+  "rows": [
+    {
+      "ticker": "ACRB",
+      "name": {
+        "en": "ACME ROBOTICS",
+        "zh": "極客機器人"
+      },
+      "sector": {
+        "en": "TECHNOLOGY",
+        "zh": "科技"
+      },
+      "values": {
+        "long": 29152.5,
+        "short": 0.0,
+        "net": 29152.5,
+        "long_weight": 11.066872724415223,
+        "short_weight": -0.0,
+        "net_weight": 11.202620150767032
+      }
+    },
+    {
+      "ticker": "HOOL",
+      "name": {
+        "en": "HOOLI CLOUD",
+        "zh": "呼哩雲"
+      },
+      "sector": {
+        "en": "TECHNOLOGY",
+        "zh": "科技"
+      },
+      "values": {
+        "long": 21683.5,
+        "short": 0.0,
+        "net": 21683.5,
+        "long_weight": 8.231490771627046,
+        "short_weight": -0.0,
+        "net_weight": 8.33245910433606
+      }
+    },
+    {
+      "ticker": "CYDN",
+      "name": {
+        "en": "CYBERDYNE SYSTEMS",
+        "zh": "賽博系統"
+      },
+      "sector": {
+        "en": "TECHNOLOGY",
+        "zh": "科技"
+      },
+      "values": {
+        "long": 16017.0,
+        "short": 0.0,
+        "net": 16017.0,
+        "long_weight": 6.080373910537985,
+        "short_weight": -0.0,
+        "net_weight": 6.154956417282756
+      }
+    },
+    {
+      "ticker": "INSY",
+      "name": {
+        "en": "INITECH SYSTEMS",
+        "zh": "因尼科技"
+      },
+      "sector": {
+        "en": "TECHNOLOGY",
+        "zh": "科技"
+      },
+      "values": {
+        "long": 0.0,
+        "short": -3192.0,
+        "net": -3192.0,
+        "long_weight": 0.0,
+        "short_weight": 100.0,
+        "net_weight": -1.2266105315581295
+      }
+    },
+    {
+      "ticker": "STRK",
+      "name": {
+        "en": "STARK AEROSPACE",
+        "zh": "星銳航天"
+      },
+      "sector": {
+        "en": "INDUSTRIALS",
+        "zh": "工業"
+      },
+      "values": {
+        "long": 71944.0,
+        "short": 0.0,
+        "net": 71944.0,
+        "long_weight": 27.31138294435567,
+        "short_weight": -0.0,
+        "net_weight": 27.646387243865313
+      }
+    },
+    {
+      "ticker": "MDSY",
+      "name": {
+        "en": "MERIDIAN INDUSTRIAL",
+        "zh": "經緯工業"
+      },
+      "sector": {
+        "en": "INDUSTRIALS",
+        "zh": "工業"
+      },
+      "values": {
+        "long": 19162.5,
+        "short": 0.0,
+        "net": 19162.5,
+        "long_weight": 7.274468693306122,
+        "short_weight": -0.0,
+        "net_weight": 7.363698092413112
+      }
+    },
+    {
+      "ticker": "STLG",
+      "name": {
+        "en": "STRIDE LOGISTICS",
+        "zh": "遠行物流"
+      },
+      "sector": {
+        "en": "INDUSTRIALS",
+        "zh": "工業"
+      },
+      "values": {
+        "long": 11388.6,
+        "short": 0.0,
+        "net": 11388.6,
+        "long_weight": 4.3233405954643755,
+        "short_weight": -0.0,
+        "net_weight": 4.37637114652347
+      }
+    },
+    {
+      "ticker": "NVAT",
+      "name": {
+        "en": "NOVA AUTOMATION",
+        "zh": "新星自動化"
+      },
+      "sector": {
+        "en": "INDUSTRIALS",
+        "zh": "工業"
+      },
+      "values": {
+        "long": 8337.5,
+        "short": 0.0,
+        "net": 8337.5,
+        "long_weight": 3.165081942880093,
+        "short_weight": -0.0,
+        "net_weight": 3.203905171323905
+      }
+    },
+    {
+      "ticker": "RVFN",
+      "name": {
+        "en": "RIVERSTONE FINANCIAL",
+        "zh": "磐石金融"
+      },
+      "sector": {
+        "en": "FINANCIALS",
+        "zh": "金融"
+      },
+      "values": {
+        "long": 19815.2,
+        "short": 0.0,
+        "net": 19815.2,
+        "long_weight": 7.5222466824057115,
+        "short_weight": -0.0,
+        "net_weight": 7.614515352421883
+      }
+    },
+    {
+      "ticker": "SMAS",
+      "name": {
+        "en": "SUMMIT ASSURANCE",
+        "zh": "峰頂保險"
+      },
+      "sector": {
+        "en": "FINANCIALS",
+        "zh": "金融"
+      },
+      "values": {
+        "long": 34782.0,
+        "short": 0.0,
+        "net": 34782.0,
+        "long_weight": 13.203943644648323,
+        "short_weight": -0.0,
+        "net_weight": 13.36590460797458
+      }
+    },
+    {
+      "ticker": "OAKB",
+      "name": {
+        "en": "OAK BANCORP",
+        "zh": "橡樹銀行"
+      },
+      "sector": {
+        "en": "FINANCIALS",
+        "zh": "金融"
+      },
+      "values": {
+        "long": 11602.5,
+        "short": 0.0,
+        "net": 11602.5,
+        "long_weight": 4.404541318412747,
+        "short_weight": -0.0,
+        "net_weight": 4.458567886091227
+      }
+    },
+    {
+      "ticker": "HBCA",
+      "name": {
+        "en": "HARBOR CAPITAL",
+        "zh": "海港資本"
+      },
+      "sector": {
+        "en": "FINANCIALS",
+        "zh": "金融"
+      },
+      "values": {
+        "long": 19536.0,
+        "short": 0.0,
+        "net": 19536.0,
+        "long_weight": 7.416256771946686,
+        "short_weight": -0.0,
+        "net_weight": 7.507225358558777
+      }
+    }
+  ],
+  "langs": {
+    "en": {
+      "title": "Concentration",
+      "section": "Holdings",
+      "exposure_title": "Exposure",
+      "foot": "Source: synthetic sample data, as of 7 October 2026. All companies, symbols, returns, risk metrics and holdings are fictional. Returns exclude dividends; values are USD. Missing values are NA. Not a report issued by the referenced institution. <b>Past performance is no guarantee of future results.</b> Long and short weights use their respective gross totals; net weight uses net value. Weights are position values, not derivative look-through exposure."
+    },
+    "zh": {
+      "title": "集中度",
+      "section": "持倉明細",
+      "exposure_title": "敞口",
+      "foot": "資料來源：合成示例數據，截至2026年10月7日。公司、代碼、回報、風險指標及持倉均為虛構；回報不含股息，市值以美元表示，缺失值填NA。本表並非相關機構出具的研究報告。<b>過往業績不代表未來表現。</b>多頭與空頭權重分別以各自總市值計算；淨權重以淨市值計算。權重為部位市值，並非衍生品穿透敞口。"
+    }
+  },
+  "exposure": [
+    {
+      "columns": [
+        {
+          "key": "name",
+          "label": {
+            "en": "Exposure",
+            "zh": "敞口"
+          },
+          "width": 50
+        },
+        {
+          "key": "value",
+          "label": {
+            "en": "Value (USD)",
+            "zh": "市值（USD）"
+          },
+          "format": "money",
+          "width": 50
+        }
+      ],
+      "rows": [
+        {
+          "name": {
+            "en": "Long",
+            "zh": "多頭"
+          },
+          "values": {
+            "value": 263421.30000000005
+          }
+        },
+        {
+          "name": {
+            "en": "Short",
+            "zh": "空頭"
+          },
+          "values": {
+            "value": -3192.0
+          }
+        },
+        {
+          "name": {
+            "en": "Net",
+            "zh": "淨敞口"
+          },
+          "values": {
+            "value": 260229.30000000005
+          }
+        }
+      ]
+    }
+  ]
+}

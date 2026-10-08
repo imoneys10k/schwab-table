@@ -19,6 +19,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
+      - name: Traditional Chinese conversion
+        run: python -m pip install "opencc-python-reimplemented>=0.1.7"
       - name: Unit tests (calculations, parsers, CSV import, HTML rendering)
         run: python -m unittest discover -s tests -v
 
@@ -26,10 +28,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      - name: Traditional Chinese conversion
+        run: python3 -m pip install "opencc-python-reimplemented>=0.1.7"
       - name: Regenerate HTML examples and check they match the repo
         run: |
           python3 examples/make_sample_prices.py
           for m in neural9 holdings watchlist; do python3 render_table.py examples/${m}_spec.json examples/$m --no-png >/dev/null; done
+          for m in morgan blackstone ibkr; do python3 render_table.py examples/${m}_spec.json examples/$m --no-png >/dev/null; done
           for m in chart_lines chart_multiples; do python3 render_chart.py examples/${m}_spec.json examples/$m --no-png >/dev/null; done
           git diff --exit-code -- 'examples/*.html' examples/sample_prices.json
 
@@ -39,6 +44,8 @@ jobs:
     continue-on-error: true
     steps:
       - uses: actions/checkout@v5
+      - name: Traditional Chinese conversion
+        run: python3 -m pip install "opencc-python-reimplemented>=0.1.7"
       - name: Fetch real prices and sanity-check them
         run: |
           python3 fetch_prices.py AAPL --benchmark SPY,COMP -o "$RUNNER_TEMP/p.json"

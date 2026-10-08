@@ -1,0 +1,285 @@
+{
+  "style": "blackstone",
+  "columns": [
+    {
+      "key": "name",
+      "label": {
+        "en": "",
+        "zh": ""
+      },
+      "width": 52
+    },
+    {
+      "key": "ytd_return",
+      "label": {
+        "en": "YTD",
+        "zh": "年初至今"
+      },
+      "format": "pct",
+      "width": 24
+    },
+    {
+      "key": "year_return",
+      "label": {
+        "en": "Trailing 1Y",
+        "zh": "近一年"
+      },
+      "format": "pct",
+      "width": 24
+    }
+  ],
+  "rows": [
+    {
+      "ticker": "ACRB",
+      "name": {
+        "en": "Acme Robotics",
+        "zh": "極客機器人"
+      },
+      "group": {
+        "en": "TECHNOLOGY",
+        "zh": "科技"
+      },
+      "level": 2,
+      "values": {
+        "ytd_return": 88.4,
+        "ytd_vol": 22.0,
+        "ytd_drawdown": -12.0,
+        "year_return": 143.2,
+        "year_vol": 26.0,
+        "year_drawdown": -18.0
+      }
+    },
+    {
+      "ticker": "HOOL",
+      "name": {
+        "en": "Hooli Cloud",
+        "zh": "呼哩雲"
+      },
+      "group": {
+        "en": "TECHNOLOGY",
+        "zh": "科技"
+      },
+      "level": 2,
+      "values": {
+        "ytd_return": 22.3,
+        "ytd_vol": 23.7,
+        "ytd_drawdown": -13.1,
+        "year_return": 35.0,
+        "year_vol": 27.8,
+        "year_drawdown": -19.2
+      }
+    },
+    {
+      "ticker": "CYDN",
+      "name": {
+        "en": "Cyberdyne Systems",
+        "zh": "賽博系統"
+      },
+      "group": {
+        "en": "TECHNOLOGY",
+        "zh": "科技"
+      },
+      "level": 2,
+      "values": {
+        "ytd_return": 14.5,
+        "ytd_vol": 25.4,
+        "ytd_drawdown": -14.2,
+        "year_return": 21.6,
+        "year_vol": 29.6,
+        "year_drawdown": -20.4
+      }
+    },
+    {
+      "ticker": "INSY",
+      "name": {
+        "en": "Initech Systems",
+        "zh": "因尼科技"
+      },
+      "group": {
+        "en": "TECHNOLOGY",
+        "zh": "科技"
+      },
+      "level": 2,
+      "values": {
+        "ytd_return": -5.2,
+        "ytd_vol": 27.1,
+        "ytd_drawdown": -15.3,
+        "year_return": -11.6,
+        "year_vol": 31.4,
+        "year_drawdown": -21.6
+      }
+    },
+    {
+      "ticker": "STRK",
+      "name": {
+        "en": "Stark Aerospace",
+        "zh": "星銳航天"
+      },
+      "group": {
+        "en": "INDUSTRIALS",
+        "zh": "工業"
+      },
+      "level": 2,
+      "values": {
+        "ytd_return": 41.7,
+        "ytd_vol": 28.8,
+        "ytd_drawdown": -16.4,
+        "year_return": 62.9,
+        "year_vol": 33.2,
+        "year_drawdown": -22.8
+      }
+    },
+    {
+      "ticker": "MDSY",
+      "name": {
+        "en": "Meridian Industrial",
+        "zh": "經緯工業"
+      },
+      "group": {
+        "en": "INDUSTRIALS",
+        "zh": "工業"
+      },
+      "level": 2,
+      "values": {
+        "ytd_return": 19.8,
+        "ytd_vol": 30.5,
+        "ytd_drawdown": -17.5,
+        "year_return": 27.4,
+        "year_vol": 35.0,
+        "year_drawdown": -24.0
+      }
+    },
+    {
+      "ticker": "STLG",
+      "name": {
+        "en": "Stride Logistics",
+        "zh": "遠行物流"
+      },
+      "group": {
+        "en": "INDUSTRIALS",
+        "zh": "工業"
+      },
+      "level": 2,
+      "values": {
+        "ytd_return": 6.9,
+        "ytd_vol": 32.2,
+        "ytd_drawdown": -18.6,
+        "year_return": 12.8,
+        "year_vol": 36.8,
+        "year_drawdown": -25.2
+      }
+    },
+    {
+      "ticker": "NVAT",
+      "name": {
+        "en": "Nova Automation",
+        "zh": "新星自動化"
+      },
+      "group": {
+        "en": "INDUSTRIALS",
+        "zh": "工業"
+      },
+      "level": 2,
+      "values": {
+        "ytd_return": -8.7,
+        "ytd_vol": 33.9,
+        "ytd_drawdown": -19.7,
+        "year_return": -4.8,
+        "year_vol": 38.6,
+        "year_drawdown": -26.4
+      }
+    },
+    {
+      "ticker": "RVFN",
+      "name": {
+        "en": "Riverstone Financial",
+        "zh": "磐石金融"
+      },
+      "group": {
+        "en": "FINANCIALS",
+        "zh": "金融"
+      },
+      "level": 2,
+      "values": {
+        "ytd_return": 12.2,
+        "ytd_vol": 35.6,
+        "ytd_drawdown": -20.8,
+        "year_return": 18.5,
+        "year_vol": 40.4,
+        "year_drawdown": -27.6
+      }
+    },
+    {
+      "ticker": "SMAS",
+      "name": {
+        "en": "Summit Assurance",
+        "zh": "峰頂保險"
+      },
+      "group": {
+        "en": "FINANCIALS",
+        "zh": "金融"
+      },
+      "level": 2,
+      "values": {
+        "ytd_return": 9.5,
+        "ytd_vol": 37.3,
+        "ytd_drawdown": -21.9,
+        "year_return": 16.2,
+        "year_vol": 42.2,
+        "year_drawdown": -28.8
+      }
+    },
+    {
+      "ticker": "OAKB",
+      "name": {
+        "en": "Oak Bancorp",
+        "zh": "橡樹銀行"
+      },
+      "group": {
+        "en": "FINANCIALS",
+        "zh": "金融"
+      },
+      "level": 2,
+      "values": {
+        "ytd_return": 4.7,
+        "ytd_vol": 39.0,
+        "ytd_drawdown": -23.0,
+        "year_return": 6.8,
+        "year_vol": 44.0,
+        "year_drawdown": -30.0
+      }
+    },
+    {
+      "ticker": "HBCA",
+      "name": {
+        "en": "Harbor Capital",
+        "zh": "海港資本"
+      },
+      "group": {
+        "en": "FINANCIALS",
+        "zh": "金融"
+      },
+      "level": 2,
+      "values": {
+        "ytd_return": -3.6,
+        "ytd_vol": 40.7,
+        "ytd_drawdown": -24.1,
+        "year_return": -7.9,
+        "year_vol": 45.8,
+        "year_drawdown": -31.2
+      }
+    }
+  ],
+  "langs": {
+    "en": {
+      "title": "Investment Performance",
+      "subtitle": "(price appreciation / excluding dividends)",
+      "foot": "Source: synthetic sample data, as of 7 October 2026. All companies, symbols, returns, risk metrics and holdings are fictional. Returns exclude dividends; values are USD. Missing values are NA. Not a report issued by the referenced institution. <b>Past performance is no guarantee of future results.</b>"
+    },
+    "zh": {
+      "title": "投資業績",
+      "subtitle": "（價格變動／不含股息）",
+      "foot": "資料來源：合成示例數據，截至2026年10月7日。公司、代碼、回報、風險指標及持倉均為虛構；回報不含股息，市值以美元表示，缺失值填NA。本表並非相關機構出具的研究報告。<b>過往業績不代表未來表現。</b>"
+    }
+  }
+}

@@ -6,9 +6,17 @@ from pathlib import Path
 _FONT = Path(__file__).resolve().parent / "fonts" / "inter-latin-wght-normal.woff2"
 
 
-def font_face_css():
-    if not _FONT.exists():
+def font_face_css(style="schwab"):
+    registry = {
+        "schwab": ("Inter", _FONT, "woff2", "100 900"),
+        "morgan": ("Source Sans 3", _FONT.parent / "SourceSans3VF-Upright.ttf", "truetype", "200 900"),
+        "blackstone": ("Source Sans 3", _FONT.parent / "SourceSans3VF-Upright.ttf", "truetype", "200 900"),
+        "ibkr": ("Droid Sans", _FONT.parent / "DroidSans.ttf", "truetype", "400"),
+    }
+    family, path, fmt, weight = registry[style]
+    if not path.exists():
         return ""
-    b64 = base64.b64encode(_FONT.read_bytes()).decode("ascii")
-    return ("@font-face{font-family:'Inter';font-style:normal;font-weight:100 900;"
-            f"src:url(data:font/woff2;base64,{b64}) format('woff2');}}")
+    b64 = base64.b64encode(path.read_bytes()).decode("ascii")
+    mime = "woff2" if fmt == "woff2" else "ttf"
+    return (f"@font-face{{font-family:'{family}';font-style:normal;font-weight:{weight};"
+            f"src:url(data:font/{mime};base64,{b64}) format('{fmt}');}}")

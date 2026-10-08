@@ -139,7 +139,7 @@ Ready-made "YTD %" figures on web pages mostly come from aggregators and are not
 | Element | Value |
 |---|---|
 | Latin/number font | `Inter`, falling back to `Helvetica Neue`, Helvetica, Arial |
-| Chinese font | `Noto Sans CJK SC` / `Source Han Sans SC`, falling back to `PingFang SC`, `Microsoft YaHei` |
+| Chinese font | `Noto Sans CJK TC` / `Source Han Sans TC`, falling back to `PingFang TC`, `Microsoft JhengHei` |
 | Number columns | `font-feature-settings: "tnum" 1` (tabular figures); wrap the minus sign separately in `"tnum" 0` to avoid `- 8.56` |
 | Title/header background | `#ACDCEC` |
 | Title/header text | `#1B2A4A`; title 15px / 700, header 13.5px / 600, line height 1.25 |
@@ -261,3 +261,8 @@ Everything except `data` is optional. Without `start` / `end` the data file's ra
 - [ ] When an ETF is the benchmark the footnote says it is a proxy; when a log scale is used the subtitle says so
 - [ ] Summary table sorted by return descending, benchmark row bold, numbers consistent with the line-end labels
 - [ ] A-share unadjusted-price risks and local currencies are disclosed; Yahoo is not called official; total-return charts use user-supplied dividend-adjusted closes
+
+
+## Institutional templates and Traditional Chinese
+
+Chinese output defaults to Traditional Chinese, including charts; `zh` input keys remain compatible. When the user requests Morgan, Blackstone or IBKR, read [references/institutional-tables.md](references/institutional-tables.md) and prepare the appropriate column schema. Schwab remains the default. Do not infer account weights or holdings from daily prices.

@@ -112,8 +112,8 @@ class GlobalPrices(unittest.TestCase):
         self.assertNotIn("price ($)", en)
         self.assertNotIn("computed from official closing prices", en)
         self.assertIn("Last close by symbol", en)
-        self.assertIn("未复权", zh)
-        self.assertIn("聚合日收盘价", zh)
+        self.assertTrue("未復權" in zh)
+        self.assertTrue("聚合日收盤價" in zh)
 
 
 if __name__ == "__main__":

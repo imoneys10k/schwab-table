@@ -238,7 +238,7 @@ class EndToEnd(unittest.TestCase):
         spec = json.loads((ROOT / "examples" / "chart_multiples_spec.json").read_text(encoding="utf-8"))
         d, series, benches, base, end, start, w = self.load(spec)
         html = rc.build_html(spec, d, series, benches, base, end, start, "zh", "dark")
-        self.assertIn("对数刻度", html)                                  # WAYN's +241% triggers the automatic log scale
+        self.assertTrue("對數刻度" in html)                             # WAYN's +241% triggers the automatic log scale
         self.assertIn(rc.THEMES["dark"]["bg"], html)
         self.assertEqual(html.count('class="hov"'), len(series))
 
