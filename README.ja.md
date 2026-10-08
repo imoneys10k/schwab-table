@@ -84,7 +84,7 @@ irm https://raw.githubusercontent.com/imoneys10k/schwab-table/main/install.ps1 |
 | オプション（macOS / Linux） | オプション（Windows） | 内容 |
 |---|---|---|
 | `--dir PATH` | `-Dir PATH` | 別の場所にインストール（他のエージェントの skills フォルダなど）。環境変数 `CLAUDE_SKILLS_DIR` で既定のルートを変更できます |
-| `--ref TAG` | `-Ref TAG` | `main` の代わりにタグまたはブランチをインストール（例：`v0.4.0`）。バージョン固定に使います |
+| `--ref TAG` | `-Ref TAG` | `main` の代わりにタグまたはブランチをインストール（例：`v0.4.0`）。バージョン固定に使います。付けずにもう一度実行すると `main` に戻ります |
 | `--skip-deps` | `-SkipDeps` | Python / Playwright / Chromium をスキップ（ファイルの取得のみ） |
 | `--uninstall` | `-Uninstall` | インストール済みのスキルフォルダを削除 |
 

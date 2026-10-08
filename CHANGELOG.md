@@ -2,6 +2,24 @@
 
 All notable changes. Versions follow the [releases](https://github.com/imoneys10k/schwab-table/releases) page.
 
+
+## 0.6.1 (2026-10-08)
+
+### Fixed
+- `BRK.B`, `BF.B` and other US share-class tickers: dotted symbols were all sent to Yahoo, which spells them `BRK-B` and returned 404. One-letter class suffixes now go to Nasdaq (which serves them); exchange suffixes (`.HK`, `.T`, `.SS`, ...) still use their own adapters.
+- Re-running `install.sh` / `install.ps1` without `--ref` after pinning with `--ref` reported "Already up to date" and stayed on the old tag. It now moves back to `main`.
+- `--uninstall` only checked that `SKILL.md` existed. It now requires the folder to be this skill (`name: schwab-performance-table`).
+- A price cache saved before the day's close was published could be reused for up to 12 hours and miss that close. A cache is now reused only if it already has the newest expected close (US market clock, no tz database needed).
+- `INDEX_SYMBOLS` no longer lists `SPX`, `RUT` and `DJIA` (the API returns "Symbol not exists" for them).
+- More than two benchmarks were drawn with identical styling; the chart now keeps the first two and warns.
+
+### Changed
+- Docs: the mode C `--start` example no longer hard-codes a date; `evals/RESULTS.md` no longer claims more than was checked.
+- Removed an unused parameter in the hover code and the theme identity check in the CSS (`ptitle` is now a theme key).
+
+### Tests
+- `tests/test_fetch_reliability.py` (symbol routing, retries, cache freshness around DST, benchmark limit); CI also checks that a pinned install can be updated and that a foreign folder is not uninstalled.
+
 ## 0.6.0 (2026-10-08)
 
 ### Added

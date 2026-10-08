@@ -35,6 +35,18 @@ jobs:
           sh ./install.sh --dir "$D" --uninstall
           test ! -e "$D"
 
+      - name: Update a pinned install; refuse to uninstall a folder that is not this skill
+        run: |
+          D="$RUNNER_TEMP/skill-upd/schwab-performance-table"
+          sh ./install.sh --dir "$D" --ref v0.3.0 --skip-deps
+          test ! -f "$D/csv_to_prices.py"            # v0.3.0 predates this file
+          sh ./install.sh --dir "$D" --skip-deps      # no --ref: must move to main, not stay on the tag
+          test -f "$D/csv_to_prices.py"
+          sh ./install.sh --dir "$D" --skip-deps      # a normal update on the branch still works
+          F="$RUNNER_TEMP/foreign"; mkdir -p "$F"; printf -- '---\nname: other\n---\n' > "$F/SKILL.md"
+          if sh ./install.sh --dir "$F" --uninstall; then echo "uninstall should have refused"; exit 1; fi
+          test -f "$F/SKILL.md"
+
   windows:
     runs-on: windows-latest
     steps:
@@ -57,3 +69,18 @@ jobs:
           if (-not (Test-Path "$d\SKILL.md")) { throw "pinned install failed" }
           .\install.ps1 -Dir $d -Uninstall
           if (Test-Path $d) { throw "uninstall failed" }
+      - name: Update a pinned install; refuse to uninstall a folder that is not this skill
+        shell: pwsh
+        run: |
+          $d = "$env:RUNNER_TEMP\skill-upd\schwab-performance-table"
+          .\install.ps1 -Dir $d -Ref v0.3.0 -SkipDeps
+          if (Test-Path "$d\csv_to_prices.py") { throw "v0.3.0 should not have csv_to_prices.py" }
+          .\install.ps1 -Dir $d -SkipDeps
+          if (-not (Test-Path "$d\csv_to_prices.py")) { throw "update from a pinned install did not move to main" }
+          .\install.ps1 -Dir $d -SkipDeps
+          $f = "$env:RUNNER_TEMP\foreign"; New-Item -ItemType Directory -Force -Path $f | Out-Null
+          Set-Content -Path "$f\SKILL.md" -Value "---`nname: other`n---"
+          $refused = $false
+          try { .\install.ps1 -Dir $f -Uninstall } catch { $refused = $true }
+          if (-not $refused) { throw "uninstall should have refused" }
+          if (-not (Test-Path "$f\SKILL.md")) { throw "foreign folder was deleted" }

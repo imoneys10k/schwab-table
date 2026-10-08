@@ -8,7 +8,7 @@ To pass options, save the script and run it:
   -Dir        install into <path> (default: $env:CLAUDE_SKILLS_DIR or ~\.claude\skills, + \schwab-performance-table)
   -Ref        install a tag or branch instead of main, e.g. -Ref v0.4.0 (pin a version)
   -SkipDeps   do not create the Python venv / install Playwright + Chromium
-  -Uninstall  delete the installed skill folder (only if it contains SKILL.md)
+  -Uninstall  delete the installed skill folder (only if its SKILL.md is named schwab-performance-table)
 Re-running updates an existing install.
 #>
 param(
@@ -36,9 +36,17 @@ function Invoke-Checked($exe, [string[]]$arguments) {
   if ($code -ne 0) { throw "$exe $($arguments -join ' ') failed (exit code $code)" }
 }
 
+function Test-GitBranchCheckedOut($dir) {
+  # `git symbolic-ref` exits non-zero on a detached HEAD; relax the error preference so native stderr cannot throw on Windows PowerShell 5.1.
+  $saved = $ErrorActionPreference
+  $ErrorActionPreference = "Continue"
+  try { & git -C $dir symbolic-ref -q HEAD *> $null; return ($LASTEXITCODE -eq 0) } finally { $ErrorActionPreference = $saved }
+}
+
 # 0. Uninstall ----------------------------------------------------------------
 if ($Uninstall) {
-  if (Test-Path (Join-Path $Target "SKILL.md")) {
+  $skillMd = Join-Path $Target "SKILL.md"
+  if ((Test-Path $skillMd) -and (Select-String -Path $skillMd -Pattern "^name:\s*schwab-performance-table" -Quiet)) {
     $helper = Join-Path $Target "install_earnings_skill.py"
     if (Test-Path $helper) {
       $cleanPy = Join-Path $Target ".venv\Scripts\python.exe"
@@ -51,7 +59,7 @@ if ($Uninstall) {
     Say "Removed $Target"
     return
   }
-  throw "$Target does not look like an installed skill (no SKILL.md); nothing removed"
+  throw "$Target is not an installed copy of this skill (no SKILL.md named $SkillName); nothing removed"
 }
 
 # 1. Fetch the files -----------------------------------------------------------
@@ -63,8 +71,15 @@ if (Test-Path (Join-Path $Target ".git")) {
   if ($Ref) {
     Invoke-Checked git @("-C", $Target, "fetch", "--depth", "1", "origin", $Ref)
     Invoke-Checked git @("-C", $Target, "checkout", "-q", "FETCH_HEAD")
-  } else {
+  } elseif (Test-GitBranchCheckedOut $Target) {
     Invoke-Checked git @("-C", $Target, "pull", "--ff-only")
+  } else {
+    # Detached HEAD: an earlier -Ref left the install on a tag or commit, so `pull` would silently stay there.
+    Say "This install is pinned to a tag or commit; moving to main"
+    Invoke-Checked git @("-C", $Target, "fetch", "--depth", "1", "origin", "main")
+    Invoke-Checked git @("-C", $Target, "checkout", "-q", "-B", "main", "FETCH_HEAD")
+    Invoke-Checked git @("-C", $Target, "config", "branch.main.remote", "origin")
+    Invoke-Checked git @("-C", $Target, "config", "branch.main.merge", "refs/heads/main")
   }
 } elseif ((Test-Cmd git) -and $isEmpty) {
   Say "Cloning into $Target"

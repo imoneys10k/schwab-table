@@ -84,7 +84,7 @@ L'installateur place le skill dans `~/.claude/skills/schwab-performance-table` (
 | Option (macOS / Linux) | Option (Windows) | Effet |
 |---|---|---|
 | `--dir PATH` | `-Dir PATH` | Installer ailleurs (par exemple dans le dossier skills d'un autre agent). La variable `CLAUDE_SKILLS_DIR` change la racine par défaut |
-| `--ref TAG` | `-Ref TAG` | Installer un tag ou une branche au lieu de `main`, par exemple `v0.4.0`, pour figer une version |
+| `--ref TAG` | `-Ref TAG` | Installer un tag ou une branche au lieu de `main`, par exemple `v0.4.0`, pour figer une version. Relancez sans cette option pour revenir à `main` |
 | `--skip-deps` | `-SkipDeps` | Ignorer Python / Playwright / Chromium (récupérer seulement les fichiers) |
 | `--uninstall` | `-Uninstall` | Supprimer le dossier du skill installé |
 

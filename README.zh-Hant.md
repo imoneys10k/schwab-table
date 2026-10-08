@@ -108,7 +108,7 @@ irm https://raw.githubusercontent.com/imoneys10k/schwab-table/main/install.ps1 |
 | 選項（macOS / Linux） | 選項（Windows） | 作用 |
 |---|---|---|
 | `--dir PATH` | `-Dir PATH` | 裝到別處（比如其他 Agent 的 skills 目錄）。環境變量 `CLAUDE_SKILLS_DIR` 可修改默認根目錄 |
-| `--ref TAG` | `-Ref TAG` | 安裝指定的標籤或分支而不是 `main`，例如 `v0.4.0`，用來固定版本 |
+| `--ref TAG` | `-Ref TAG` | 安裝指定的標籤或分支而不是 `main`，例如 `v0.4.0`，用來固定版本；不帶它再運行一次就會回到 `main` |
 | `--skip-deps` | `-SkipDeps` | 跳過 Python / Playwright / Chromium，只下載文件 |
 | `--uninstall` | `-Uninstall` | 刪除已安裝的 skill 文件夾 |
 

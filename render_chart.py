@@ -36,6 +36,7 @@ from localization import traditional_html
 FONT = ('"Inter","Helvetica Neue",Helvetica,Arial,"Noto Sans CJK TC","Source Han Sans TC","PingFang TC","Microsoft JhengHei",sans-serif')
 MAX_SYMBOLS = 9
 MAX_LINES = 5
+MAX_BENCHMARKS = 2  # the theme has two benchmark styles (colour + dash); a third would look identical to the second
 
 DASHES = ["5 4", "2 3"]
 
@@ -140,6 +141,9 @@ def load(spec, base_dir):
     syms = spec.get("symbols") or [k for k, v in allpts.items() if not v["benchmark"]]
     bench_syms = spec.get("benchmarks") or d.get("benchmarks") or ([d["benchmark"]] if d.get("benchmark") else [])
     warnings, series, benches = [], [], []
+    if len(bench_syms) > MAX_BENCHMARKS:
+        warnings.append(f"{len(bench_syms)} benchmarks given, keeping the first {MAX_BENCHMARKS}: {', '.join(bench_syms[:MAX_BENCHMARKS])}")
+        bench_syms = bench_syms[:MAX_BENCHMARKS]
 
     def make(sym, is_bench):
         v = allpts[sym]
@@ -333,11 +337,11 @@ class Ctx:
         n = self.bench_label(b).split(" (")[0]
         return n if len(n) <= 10 else (b.sym if len(self.benches) > 1 else self.L["bench"])
 
-    def add_hover(self, p, rows, svg_id):
+    def add_hover(self, p, rows):
         """Register a hover panel: rows = [(label, colour, Series)] drawn in plot `p`."""
         xs = sorted({d for _, _, s in rows for d in s.dates})
         self.hov.append({
-            "svg": svg_id, "x0": round(p.x, 1), "x1": round(p.x + p.w, 1), "y0": round(p.y, 1), "y1": round(p.y + p.h, 1),
+            "x0": round(p.x, 1), "x1": round(p.x + p.w, 1), "y0": round(p.y, 1), "y1": round(p.y + p.h, 1),
             "dates": [d.isoformat() for d in xs], "xs": [round(p.px(d), 1) for d in xs],
             "rows": [{"n": n, "c": c, "m": {s.dates[i].isoformat(): round(s.idx[i], 2) for i in range(len(s.dates))}} for n, c, s in rows],
         })
@@ -353,7 +357,7 @@ body{{margin:0;background:{T['bg']};font-family:{FONT};-webkit-font-smoothing:an
 .band .t{{font-size:15px;font-weight:700}} .band .s{{font-size:12.5px;font-weight:500;margin-top:2px}}
 .legend{{padding:8px 12px 0;font-size:12.5px;color:{T['ink']};display:flex;gap:16px;flex-wrap:wrap;align-items:center}}
 .lg{{display:inline-flex;align-items:center;gap:6px}}
-.ptitle{{padding:6px 12px 0;font-size:12px;font-weight:700;color:{T['band_text'] if self.T is THEMES['light'] else T['ink']}}}
+.ptitle{{padding:6px 12px 0;font-size:12px;font-weight:700;color:{T['ptitle']}}}
 .foot{{margin-top:7px;font-size:10px;color:{T['foot']};line-height:1.4}} .foot b{{font-weight:600;color:{T['foot_b']}}}
 table{{width:100%;border-collapse:collapse;table-layout:fixed;font-size:13px;color:{T['tbl']}}}
 th{{background:{T['band']};color:{T['band_text']};font-weight:600;text-align:right;padding:5px 12px 5px 8px;font-size:12.5px;line-height:1.25;vertical-align:bottom}}
@@ -429,7 +433,7 @@ def layout_lines(c):
         nm = c.bench_short(s) if s.is_bench else s.sym
         g.append(f'<text x="{ex + 14:.1f}" y="{adj[s.sym] + 4:.1f}" font-size="12" fill="{T["ink"]}"><tspan font-weight="700">{nm}</tspan>  {f1(s.ret, True)}%</text>')
     k = len(c.hov)
-    c.add_hover(p, [(c.bench_short(s) if s.is_bench else s.sym, c.col[s.sym], s) for s in allk], f"s{k}")
+    c.add_hover(p, [(c.bench_short(s) if s.is_bench else s.sym, c.col[s.sym], s) for s in allk])
     g.append(hover_rect(p, k))
     parts = [f'<svg id="s{k}" width="{W}" height="{H1}" font-family=\'{FONT}\'>{"".join(g)}</svg>']
     legend = "".join(f'<span class="lg">{swatch(c.col[s.sym], c.dash(s))}{c.bench_label(s) if s.is_bench else s.sym}</span>' for s in allk)
@@ -491,7 +495,7 @@ def layout_multiples(c):
         g.append(f'<path d="{p.path(s.dates, s.idx)}" fill="none" stroke="{T["stock"]}" stroke-width="2" stroke-linejoin="round"/>')
         g.append(f'<circle cx="{p.px(s.dates[-1]):.1f}" cy="{p.py(s.idx[-1]):.1f}" r="3" fill="{T["stock"]}" stroke="{T["ring"]}" stroke-width="2"/>')
         k = len(c.hov)
-        c.add_hover(p, [(s.sym, T["stock"], s)] + [(c.bench_short(b), T["bench_multi"], b) for b in benches], "sm")
+        c.add_hover(p, [(s.sym, T["stock"], s)] + [(c.bench_short(b), T["bench_multi"], b) for b in benches])
         g.append(hover_rect(p, k))
         if c.dd_on:
             g.append(f'<text x="{cx + 10}" y="{cy + 36}" font-size="10.5" fill="{T["muted"]}">{L["mdd"][0]} {L["mdd"][1].replace(" (%)", "")} {f1(s.mdd)}%</text>')

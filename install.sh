@@ -7,7 +7,7 @@
 #   --dir PATH     install into PATH (default: $CLAUDE_SKILLS_DIR or ~/.claude/skills, + /schwab-performance-table)
 #   --ref REF      install a tag or branch instead of main, e.g. --ref v0.4.0 (pin a version)
 #   --skip-deps    do not create the Python venv / install Playwright + Chromium
-#   --uninstall    delete the installed skill folder (only if it contains SKILL.md)
+#   --uninstall    delete the installed skill folder (only if its SKILL.md is named schwab-performance-table)
 # Re-running updates an existing install.
 set -eu
 
@@ -36,7 +36,7 @@ die() { printf 'error: %s\n' "$*" >&2; exit 1; }
 
 # 0. Uninstall ----------------------------------------------------------------
 if [ "$UNINSTALL" -eq 1 ]; then
-  if [ -f "$TARGET/SKILL.md" ]; then
+  if [ -f "$TARGET/SKILL.md" ] && grep -q '^name: schwab-performance-table' "$TARGET/SKILL.md"; then
     if [ -f "$TARGET/install_earnings_skill.py" ]; then
       CLEAN_PY="$TARGET/.venv/bin/python"
       if [ ! -x "$CLEAN_PY" ]; then CLEAN_PY="$(command -v python3 || command -v python || true)"; fi
@@ -45,7 +45,7 @@ if [ "$UNINSTALL" -eq 1 ]; then
     rm -rf "$TARGET"
     say "Removed $TARGET"
   else
-    die "$TARGET does not look like an installed skill (no SKILL.md); nothing removed"
+    die "$TARGET is not an installed copy of this skill (no SKILL.md named $SKILL_NAME); nothing removed"
   fi
   exit 0
 fi
@@ -57,8 +57,14 @@ if [ -d "$TARGET/.git" ]; then
   say "Updating existing install in $TARGET"
   if [ -n "$REF" ]; then
     git -C "$TARGET" fetch --depth 1 origin "$REF" && git -C "$TARGET" checkout -q FETCH_HEAD
-  else
+  elif git -C "$TARGET" symbolic-ref -q HEAD >/dev/null 2>&1; then
     git -C "$TARGET" pull --ff-only
+  else
+    # Detached HEAD: an earlier --ref left the install on a tag or commit, so `pull` would silently stay there.
+    say "This install is pinned to a tag or commit; moving to main"
+    git -C "$TARGET" fetch --depth 1 origin main && git -C "$TARGET" checkout -q -B main FETCH_HEAD
+    git -C "$TARGET" config branch.main.remote origin
+    git -C "$TARGET" config branch.main.merge refs/heads/main
   fi
 elif command -v git >/dev/null 2>&1 && { [ ! -e "$TARGET" ] || [ -z "$(ls -A "$TARGET" 2>/dev/null)" ]; }; then
   say "Cloning into $TARGET${REF:+ ($REF)}"

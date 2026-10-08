@@ -7,10 +7,10 @@ from pathlib import Path
 # Series colours are the first five validated categorical slots, in fixed order (dark values are the palette's dark steps).
 THEMES = {
     "light": dict(bg="#fff", border="#D0D0D0", band="#ACDCEC", band_text="#1B2A4A", grid="#E4E4E4", axis="#9A9A9A", muted="#6B6B6B", ink="#2B2B2B",
-                  rule="#D9D9D9", foot="#6B6B6B", foot_b="#555", tbl="#595959", stock="#1B2A4A", ring="#fff", dd_fill="#ACDCEC", dd_op=".65",
+                  rule="#D9D9D9", foot="#6B6B6B", foot_b="#555", tbl="#595959", stock="#1B2A4A", ptitle="#1B2A4A", ring="#fff", dd_fill="#ACDCEC", dd_op=".65",
                   ser=["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4"], bench=["#595959", "#8E8E8E"], bench_multi="#B5B5B5"),
     "dark": dict(bg="#1a1a19", border="#3A3A37", band="#1F3A52", band_text="#DCEBF7", grid="#2C2C2A", axis="#5C5B57", muted="#A6A59B", ink="#EDEDEA",
-                 rule="#34342F", foot="#9A998F", foot_b="#C3C2B7", tbl="#C3C2B7", stock="#9EC5F4", ring="#1a1a19", dd_fill="#2B5A7A", dd_op=".55",
+                 rule="#34342F", foot="#9A998F", foot_b="#C3C2B7", tbl="#C3C2B7", stock="#9EC5F4", ptitle="#EDEDEA", ring="#1a1a19", dd_fill="#2B5A7A", dd_op=".55",
                  ser=["#3987e5", "#d95926", "#199e70", "#c98500", "#d55181"], bench=["#C3C2B7", "#8A897F"], bench_multi="#6E6D66"),
 }
 

@@ -1,6 +1,6 @@
 {
  "skill_name": "schwab-performance-table",
- "note": "Screenshot values are fictional and slightly inconsistent on purpose-by-accident (NVDA open P/L %, totals): a good run reports that and keeps the broker's figures.",
+ "note": "Screenshot values are fictional. A few are inconsistent by accident (NVDA open P/L %, the total row): a good run reports that and keeps the broker's figures.",
  "evals": [
   {
    "id": 1,

@@ -35,7 +35,7 @@ If the mode is unclear, ask one question. If the user gives only tickers and no 
 - When the total row does not match the rows (it may include holdings or cash not shown), **show the broker's figures as they are and do not correct them**; say so in the footnote or reply and tell the user the difference you computed
 
 ### Mode C (tickers only)
-- Prefer `fetch_prices.py` for the official closes (faster than a browser and reproducible); `--start` must be more than a year back to get the 1-year return, e.g. `python3 fetch_prices.py NVDA AMD MU --start 2025-09-01 -o data/x.json`; then compute YTD, 1-month and 1-year returns yourself per the "Data-source rules" below. Fall back to Claude in Chrome only if that fails
+- Prefer `fetch_prices.py` for the official closes (faster than a browser and reproducible); `--start` must be at least two weeks earlier than one year before the cutoff date to get the 1-year return (for a cutoff of 2026-10-05 use `python3 fetch_prices.py NVDA AMD MU --start 2025-09-15 -o data/x.json`; adjust the date to the cutoff, do not copy it); then compute YTD, 1-month and 1-year returns yourself per the "Data-source rules" below. Fall back to Claude in Chrome only if that fails
 - No benchmark row unless the user mentions a comparison; if they do, fetch benchmarks with `--benchmark SPY,COMP` and say that SPY is only a proxy for the S&P 500
 - With more than 15 stocks, confirm with the user first whether to include them all; a table that long loses the research-note look
 

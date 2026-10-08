@@ -17,7 +17,7 @@ Notes
   Use explicit exchange suffixes (7203.T, 0700.HK, SAP.DE); bare numeric codes are ambiguous.
 - Symbols are looked up as stock, then ETF, then index (COMP, NDX and a few other index codes go straight to index, because
   the same letters are also stock tickers). Missing or unknown symbols are reported, never guessed.
-- Responses are cached for 12 hours (~/.cache/schwab-table). If the network fails and an older cache exists, it is
+- Responses are cached for up to 12 hours (~/.cache/schwab-table), but a cache from before the latest close was published is not reused. If the network fails and an older cache exists, it is
   used with a warning, and the output's retrieval date shows when that data was actually fetched.
 - The default benchmark is SPY (an S&P 500 ETF, official Nasdaq close) because FRED is not always reachable.
 """
@@ -43,9 +43,13 @@ FRED = {"SP500": "S&P 500 (S&P Dow Jones Indices, via FRED)", "NASDAQCOM": "Nasd
 NASDAQ_SOURCE = "Nasdaq (official closing prices, split-adjusted)"
 CACHE_DIR = Path(os.environ.get("SCHWAB_TABLE_CACHE", Path.home() / ".cache" / "schwab-table"))
 CACHE_TTL = 12 * 3600
-NON_US = re.compile(r"(\.[A-Z]{1,3}$)|(^\d{4,6}$)")
-# These are indexes, but the same letters are also US stock tickers (COMP = Compass Inc), so they must not be looked up as stocks.
-INDEX_SYMBOLS = {"COMP", "NDX", "NQUS500LC", "SPX", "DJIA", "RUT"}
+# Exchange suffixes that mean "not a US listing". US share classes (BRK.B, BF.B) use other suffixes and must still reach Nasdaq.
+NON_US_SUFFIXES = {"HK", "SS", "SZ", "SH", "BJ", "T", "TO", "V", "L", "PA", "DE", "F", "AX", "SI", "KS", "KQ", "TW", "TWO", "MI", "MC",
+                   "AS", "SW", "BO", "NS", "SA", "MX", "JK", "BK", "KL"}
+SINGLE_LETTER_EXCHANGES = {"T", "V", "L", "F"}  # Tokyo, TSX Venture, London, Frankfurt: one letter, but not a share class
+# Index codes the Nasdaq API serves as indexes. COMP is also a US stock ticker (Compass Inc), so it must not be looked up as a stock.
+# Only codes confirmed against the API belong here: SPX, RUT and DJIA return "Symbol not exists".
+INDEX_SYMBOLS = {"COMP", "NDX", "NQUS500LC"}
 CLASSES = {"stock": "stocks", "stocks": "stocks", "etf": "etf", "index": "index"}
 
 
@@ -94,6 +98,37 @@ def cache_path(sym, start):
     return CACHE_DIR / f"v2_{re.sub(r'[^A-Za-z0-9_-]', '_', sym)}_{start.isoformat()}.json"
 
 
+def _nth_sunday(year, month, n):
+    first = dt.date(year, month, 1)
+    return first + dt.timedelta(days=(6 - first.weekday()) % 7 + 7 * (n - 1))
+
+
+def eastern_now(now_utc):
+    """US Eastern wall-clock time (naive) from an aware UTC time, using the US daylight-saving rule (no tz database needed)."""
+    y = now_utc.year
+    dst_start = dt.datetime(y, 3, _nth_sunday(y, 3, 2).day, 7, tzinfo=dt.timezone.utc)   # 2:00 EST
+    dst_end = dt.datetime(y, 11, _nth_sunday(y, 11, 1).day, 6, tzinfo=dt.timezone.utc)   # 2:00 EDT
+    return (now_utc + dt.timedelta(hours=-4 if dst_start <= now_utc < dst_end else -5)).replace(tzinfo=None)
+
+
+def expected_close_date(now_utc):
+    """The newest trading day whose close should be published by `now_utc` (16:30 ET on a weekday; holidays ignored)."""
+    et = eastern_now(now_utc)
+    d = et.date()
+    if d.weekday() < 5 and et.hour * 60 + et.minute >= 16 * 60 + 30:
+        return d
+    d -= dt.timedelta(days=1)
+    while d.weekday() >= 5:
+        d -= dt.timedelta(days=1)
+    return d
+
+
+def cache_has_latest_close(entry, now=None):
+    """A cache saved before the latest close was published would miss that day, so it is only reused if it already has it."""
+    now = now or dt.datetime.now(dt.timezone.utc)
+    return dt.date.fromisoformat(max(p[0] for p in entry["points"])) >= expected_close_date(now)
+
+
 def cache_read(sym, start):
     p = cache_path(sym, start)
     try:
@@ -112,6 +147,17 @@ def cache_write(sym, start, entry):
 
 
 # ---- sources ---------------------------------------------------------------------
+def is_non_us(sym):
+    """True for symbols the Nasdaq API cannot serve: bare 4-6 digit codes and known exchange suffixes (.HK, .SS, .T, ...)."""
+    m = re.search(r"\.([A-Z]{1,3})$", sym)
+    return bool(re.fullmatch(r"\d{4,6}", sym)) or bool(m and m.group(1) in NON_US_SUFFIXES)
+
+
+def is_us_share_class(sym):
+    """BRK.B, BF.B, LEN.B ...: a US ticker with a one-letter class suffix (Nasdaq serves these; Yahoo spells them BRK-B)."""
+    return bool(re.fullmatch(r"[A-Z]{1,5}\.[A-Z]", sym)) and sym[-1] not in SINGLE_LETTER_EXCHANGES
+
+
 def split_symbol(spec):
     """'etf:SPY' -> ('SPY', 'etf'); 'COMP' -> ('COMP', None). The prefix forces the Nasdaq asset class."""
     if ":" in spec:
@@ -124,7 +170,7 @@ def split_symbol(spec):
 
 def nasdaq_series(sym, start, today, forced=None):
     """Return (asset_class, [(date, close)]) ascending, or raise LookupError / FetchError."""
-    if NON_US.search(sym):
+    if is_non_us(sym):
         raise LookupError(f"{sym}: Nasdaq's API covers US-listed symbols only. For Hong Kong, A-shares or other markets, "
                           "export a CSV from your broker or the exchange and use csv_to_prices.py")
     for cls in ([forced] if forced else ["index"] if sym in INDEX_SYMBOLS else ["stocks", "etf", "index"]):
@@ -229,11 +275,11 @@ def yahoo_series(sym, start, today, forced=None):
             "timezone": zone_name, "adjustment": "provider_close", "basis": "price", "points": clean_points(prices)}
 
 
-def get_series(spec_sym, fetch_from, today, refresh=False):
+def get_series(spec_sym, fetch_from, today, refresh=False, now=None):
     """Return (entry, warning). entry = {class, source, points, fetched_at} with points as [[iso, close], ...]."""
     sym, forced = split_symbol(spec_sym)
     cached, age = cache_read(f"{forced}_{sym}" if forced else sym, fetch_from)
-    if cached and not refresh and age < CACHE_TTL:
+    if cached and not refresh and age < CACHE_TTL and cache_has_latest_close(cached, now):
         return cached, None
     try:
         if sym in FRED:
@@ -246,7 +292,7 @@ def get_series(spec_sym, fetch_from, today, refresh=False):
             raise LookupError(f"{sym}: ambiguous numeric code; include an exchange suffix, e.g. 600519.SS, 000001.SZ, 7203.T")
         elif sym.endswith(".BJ"):
             raise LookupError(f"{sym}: Beijing exchange is not supported by the official A-share adapter; use csv_to_prices.py")
-        elif "." in sym or sym.startswith("^"):
+        elif sym.startswith("^") or ("." in sym and not is_us_share_class(sym)):
             entry = yahoo_series(sym, fetch_from, today, forced)
         else:
             cls, pts = nasdaq_series(sym, fetch_from, today, forced)

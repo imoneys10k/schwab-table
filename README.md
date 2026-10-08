@@ -113,7 +113,7 @@ The installer puts the skill in `~/.claude/skills/schwab-performance-table` (`%U
 | Option (macOS / Linux) | Option (Windows) | Effect |
 |---|---|---|
 | `--dir PATH` | `-Dir PATH` | Install somewhere else (for example another agent's skills folder). `CLAUDE_SKILLS_DIR` changes the default root. |
-| `--ref TAG` | `-Ref TAG` | Install a tag or branch instead of `main`, e.g. `v0.4.0`, to pin a version |
+| `--ref TAG` | `-Ref TAG` | Install a tag or branch instead of `main`, e.g. `v0.4.0`, to pin a version Run the installer again without it to return to `main`. |
 | `--skip-deps` | `-SkipDeps` | Skip Python / Playwright / Chromium (only fetch the files) |
 | `--uninstall` | `-Uninstall` | Delete the installed skill folder |
 
