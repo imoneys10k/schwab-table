@@ -6,13 +6,13 @@
 
 [English](README.md) · [繁體中文](README.zh-Hant.md) · [日本語](README.ja.md) · **Français**
 
-<p><a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/License-MIT-2a78d6?style=flat-square"></a> <a href="https://github.com/imoneys10k/schwab-table/actions/workflows/install-test.yml"><img alt="install test" src="https://img.shields.io/github/actions/workflow/status/imoneys10k/schwab-table/install-test.yml?branch=main&style=flat-square&label=install%20test"></a> <a href="https://github.com/imoneys10k/schwab-table/actions/workflows/tests.yml"><img alt="tests" src="https://img.shields.io/github/actions/workflow/status/imoneys10k/schwab-table/tests.yml?branch=main&style=flat-square&label=tests"></a> <a href="https://github.com/imoneys10k/schwab-table/releases"><img alt="release" src="https://img.shields.io/github/v/release/imoneys10k/schwab-table?style=flat-square&color=1B2A4A"></a> <a href="https://github.com/imoneys10k/schwab-table/stargazers"><img alt="stars" src="https://img.shields.io/github/stars/imoneys10k/schwab-table?style=flat-square&color=eda100"></a> <img alt="Python 3.9+" src="https://img.shields.io/badge/Python-3.9%2B-1baf7a?style=flat-square"> <img alt="macOS, Linux, Windows" src="https://img.shields.io/badge/macOS%20%C2%B7%20Linux%20%C2%B7%20Windows-supported-ACDCEC?style=flat-square&labelColor=1B2A4A"> <img alt="Claude Skills" src="https://img.shields.io/badge/Claude-Skills-eb6834?style=flat-square"></p>
+<p><a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/License-MIT-2a78d6?style=flat-square"></a> <a href="https://github.com/imoneys10k/schwab-table/actions/workflows/install-test.yml"><img alt="install test" src="https://img.shields.io/github/actions/workflow/status/imoneys10k/schwab-table/install-test.yml?branch=main&style=flat-square&label=install%20test"></a> <a href="https://github.com/imoneys10k/schwab-table/actions/workflows/tests.yml"><img alt="tests" src="https://img.shields.io/github/actions/workflow/status/imoneys10k/schwab-table/tests.yml?branch=main&style=flat-square&label=tests"></a> <a href="https://github.com/imoneys10k/schwab-table/releases"><img alt="release" src="https://img.shields.io/github/v/release/imoneys10k/schwab-table?style=flat-square&color=1B2A4A"></a> <a href="https://github.com/imoneys10k/schwab-table/stargazers"><img alt="stars" src="https://img.shields.io/github/stars/imoneys10k/schwab-table?style=flat-square&color=eda100"></a> <img alt="Python 3.9+" src="https://img.shields.io/badge/Python-3.9%2B-1baf7a?style=flat-square"> <img alt="macOS, Linux, Windows" src="https://img.shields.io/badge/macOS%20%C2%B7%20Linux%20%C2%B7%20Windows-supported-ACDCEC?style=flat-square&labelColor=1B2A4A"> <img alt="Agent Skills" src="https://img.shields.io/badge/Agent-Skills-eb6834?style=flat-square"></p>
 
 <p><a href="#-installation"><b>🚀 Installation</b></a> · <a href="#-galerie"><b>🎨 Galerie</b></a> · <a href="https://imoneys10k.github.io/schwab-table/"><b>🌐 Site du projet</b></a> · <a href="https://imoneys10k.github.io/schwab-table/earnings/"><b>🧾 Démo résultats</b></a> · <a href="SKILL.en.md"><b>📘 Doc du skill</b></a></p>
 
 </div>
 
-Deux skills Claude dans un seul dépôt. **schwab-performance-table** transforme une liste d'actions, une capture de positions chez un courtier, des données de prix ou vos propres fichiers CSV en tableaux façon étude (dispositions Schwab, Morgan, Blackstone et IBKR) et en graphiques de cours avec drawdown et échelle logarithmique. **quarterly-earnings-review** vérifie le document trimestriel d'une société et produit un tableau de résultats de style HSBC avec des commentaires sourcés. Tout est produit en anglais et en chinois traditionnel, en PNG et en HTML autonome.
+Deux skills d'agent dans un seul dépôt, conçus pour Claude Code et utilisables avec Codex et d'autres agents de programmation. **schwab-performance-table** transforme une liste d'actions, une capture de positions chez un courtier, des données de prix ou vos propres fichiers CSV en tableaux façon étude (dispositions Schwab, Morgan, Blackstone et IBKR) et en graphiques de cours avec drawdown et échelle logarithmique. **quarterly-earnings-review** vérifie le document trimestriel d'une société et produit un tableau de résultats de style HSBC avec des commentaires sourcés. Tout est produit en anglais et en chinois traditionnel, en PNG et en HTML autonome.
 
 ## ✨ Points forts
 
@@ -38,7 +38,7 @@ Deux skills Claude dans un seul dépôt. **schwab-performance-table** transforme
 
 ```mermaid
 flowchart LR
-  A["📝 Symboles, capture, CSV<br/>ou symbole + trimestre"] --> B["🤖 Claude + skills"]
+  A["📝 Symboles, capture, CSV<br/>ou symbole + trimestre"] --> B["🤖 Votre agent IA + skills"]
   B --> C["🏛 Prix : Nasdaq, SSE/SZSE,<br/>Yahoo (indiqué), votre CSV"]
   B --> F["📑 Documents : PDF Apple,<br/>données SEC, vos imports"]
   C --> D["🖨 render_table<br/>render_chart"]
@@ -84,7 +84,7 @@ Windows (PowerShell):
 irm https://raw.githubusercontent.com/imoneys10k/schwab-table/main/install.ps1 | iex
 ```
 
-L'installateur place le skill principal dans `~/.claude/skills/schwab-performance-table` (`%USERPROFILE%\.claude\skills\...` sous Windows), crée un environnement virtuel Python dédié à l'intérieur, installe les dépendances et Chromium (environ 100 Mo), enregistre `quarterly-earnings-review` à côté, puis génère tous les styles de tableau, un graphique et un tableau de résultats comme test de fumée. Il affiche `Render OK` quand tout fonctionne. Redémarrez ensuite Claude pour que les skills soient pris en compte. Pour lire un script avant de l'exécuter, ouvrez [install.sh](install.sh) ou [install.ps1](install.ps1).
+L'installateur place le skill principal dans `~/.claude/skills/schwab-performance-table` (`%USERPROFILE%\.claude\skills\...` sous Windows), crée un environnement virtuel Python dédié à l'intérieur, installe les dépendances et Chromium (environ 100 Mo), enregistre `quarterly-earnings-review` à côté, puis génère tous les styles de tableau, un graphique et un tableau de résultats comme test de fumée. Il affiche `Render OK` quand tout fonctionne. Redémarrez ensuite votre agent (Claude, Codex, ...) pour que les skills soient pris en compte. Pour lire un script avant de l'exécuter, ouvrez [install.sh](install.sh) ou [install.ps1](install.ps1).
 
 | Option (macOS / Linux) | Option (Windows) | Effet |
 |---|---|---|
@@ -99,7 +99,7 @@ Avec un tube (pipe), passez les options après `sh -s --`, par exemple `curl -fs
 
 **Dépannage :** sous Debian/Ubuntu, installez d'abord `python3-venv`. Sous Linux, si Chromium ne démarre pas, exécutez `sudo <dossier d'installation>/.venv/bin/python -m playwright install-deps chromium`. Sur un serveur Linux minimal, installez aussi une police CJK (`sudo apt install fonts-noto-cjk`), sinon le chinois s'affiche en carrés.
 
-## 💬 Utilisation avec Claude
+## 💬 Utilisation avec votre agent
 
 Une fois installé, il suffit de demander en langage naturel, par exemple :
 

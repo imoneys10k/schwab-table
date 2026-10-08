@@ -45,7 +45,7 @@ C = {}
 C["en"] = dict(
     tagline="Research-desk tables, price charts and quarterly earnings reviews for your AI agent.",
     links=["🚀 Install", "🎨 Gallery", "🌐 Website", "🧾 Earnings demo", "📘 Skill doc"],
-    intro=("Two Claude skills in one repository. **schwab-performance-table** turns a stock list, a brokerage holdings screenshot, price data or your own "
+    intro=("Two agent skills in one repository, built for Claude Code and usable from Codex and other coding agents. **schwab-performance-table** turns a stock list, a brokerage holdings screenshot, price data or your own "
            "CSV into research-desk tables (Schwab, Morgan, Blackstone and IBKR layouts) and into price charts with drawdown and log scale. "
            "**quarterly-earnings-review** checks a company's quarterly filing and produces an HSBC-style earnings table with source-backed commentary. "
            "Everything is rendered in English and Traditional Chinese, as PNG plus self-contained HTML."),
@@ -64,7 +64,7 @@ C["en"] = dict(
              ("HSBC quarterly earnings, AAPL Q3", "繁體中文"), ("HSBC quarterly earnings, AAPL Q4", "繁體中文"), ("Holdings table", "EN")],
     gallery_note="The earnings examples use Apple's official filings and the ranking table a public Charles Schwab chart. Everything else uses fictional companies and synthetic data.",
     h_flow="How it works",
-    flow=["📝 Tickers, screenshot, CSV<br/>or ticker + quarter", "🤖 Claude + skills", "🏛 Prices: Nasdaq, SSE/SZSE,<br/>Yahoo (labelled), your CSV",
+    flow=["📝 Tickers, screenshot, CSV<br/>or ticker + quarter", "🤖 Your AI agent + skills", "🏛 Prices: Nasdaq, SSE/SZSE,<br/>Yahoo (labelled), your CSV",
           "📑 Filings: Apple PDFs,<br/>SEC facts, your imports", "🖨 render_table<br/>render_chart", "🖨 quarterly_earnings", "🖼 PNG + HTML<br/>EN · 繁體中文"],
     h_install="Install",
     install_intro="Works on macOS, Linux and Windows. You need Python 3.9+ (to render); git is optional. The installer registers both skills.",
@@ -75,7 +75,7 @@ C["en"] = dict(
     install_note=("The installer puts the main skill in `~/.claude/skills/schwab-performance-table` (`%USERPROFILE%\\.claude\\skills\\...` on Windows), "
                   "creates a private Python virtual environment inside it, installs the dependencies and Chromium (about 100 MB), registers "
                   "`quarterly-earnings-review` beside it, and renders every table style, a chart and an earnings table as a smoke test. "
-                  "It prints `Render OK` when everything works. Restart Claude afterwards so the skills are picked up. "
+                  "It prints `Render OK` when everything works. Restart your agent afterwards (Claude, Codex, ...) so the skills are picked up. "
                   "To read a script before running it, open [install.sh](install.sh) or [install.ps1](install.ps1)."),
     opt_head=["Option (macOS / Linux)", "Option (Windows)", "Effect"],
     opts=["Install somewhere else (for example another agent's skills folder). `CLAUDE_SKILLS_DIR` changes the default root.",
@@ -85,7 +85,7 @@ C["en"] = dict(
     pipe_note="When piping, pass options with `sh -s --`, for example `curl -fsSL .../install.sh | sh -s -- --dir ~/my-skills/schwab`. On Windows, save `install.ps1` and run `.\\install.ps1 -Dir C:\\path`.",
     update_note="**Update:** run the same command again. **Uninstall:** run it with `--uninstall` (`-Uninstall` on Windows).",
     trouble="**Troubleshooting:** on Debian/Ubuntu install `python3-venv` first. On Linux, if Chromium fails to start, run `sudo <install folder>/.venv/bin/python -m playwright install-deps chromium`. On a minimal Linux server install a CJK font (`sudo apt install fonts-noto-cjk`), otherwise Chinese text renders as boxes.",
-    h_using="Using it with Claude",
+    h_using="Using it with your agent",
     using_intro="Once installed, just ask in plain language, for example:",
     using=["Make a performance table for NVDA, AMD and MU.",
            "Turn this holdings screenshot into a Schwab-style table. (attach the screenshot)",
@@ -177,7 +177,7 @@ C["en"] = dict(
 C["zh"] = dict(
     tagline="給 AI Agent 用的研報風格表格、走勢圖與季度財報解讀。",
     links=["🚀 安裝", "🎨 效果圖", "🌐 專案網站", "🧾 財報示範", "📘 Skill 文件"],
-    intro=("同一個儲存庫裡有兩個 Claude skill。**schwab-performance-table** 把股票清單、券商持倉截圖、價格資料或你自己的 CSV，"
+    intro=("同一個儲存庫裡有兩個 Agent skill，為 Claude Code 打造，也能用在 Codex 等其他程式 Agent。**schwab-performance-table** 把股票清單、券商持倉截圖、價格資料或你自己的 CSV，"
            "做成研報風格的表格（Schwab、摩根士丹利、黑石、IBKR 版式），也能畫帶回撤和對數刻度的走勢圖。"
            "**quarterly-earnings-review** 核對公司的季度財報原件，輸出 HSBC 版式的財報表與有來源支持的解讀。"
            "所有輸出都有繁體中文與英文兩版，格式為 PNG 加獨立的 HTML。"),
@@ -196,7 +196,7 @@ C["zh"] = dict(
              ("HSBC 季度財報：AAPL 第三季", "繁體中文"), ("HSBC 季度財報：AAPL 第四季", "繁體中文"), ("持倉表", "EN")],
     gallery_note="財報示例使用 Apple 官方文件，排名表來自 Charles Schwab 公開圖表，其餘示例使用虛構公司與合成資料。",
     h_flow="運作方式",
-    flow=["📝 股票代碼、截圖、CSV<br/>或代碼＋季度", "🤖 Claude + skills", "🏛 價格：Nasdaq、上交所／深交所、<br/>Yahoo（已標示）、你的 CSV",
+    flow=["📝 股票代碼、截圖、CSV<br/>或代碼＋季度", "🤖 你的 AI Agent + skills", "🏛 價格：Nasdaq、上交所／深交所、<br/>Yahoo（已標示）、你的 CSV",
           "📑 財報：Apple PDF、<br/>SEC 資料、你匯入的文件", "🖨 render_table<br/>render_chart", "🖨 quarterly_earnings", "🖼 PNG + HTML<br/>EN · 繁體中文"],
     h_install="安裝",
     install_intro="支援 macOS、Linux 與 Windows。需要 Python 3.9 以上（用於渲染），git 可有可無。安裝程式會一併註冊兩個 skill。",
@@ -206,7 +206,7 @@ C["zh"] = dict(
     h_self="💻 或自己執行",
     install_note=("安裝程式會把主 skill 放進 `~/.claude/skills/schwab-performance-table`（Windows 為 `%USERPROFILE%\\.claude\\skills\\...`），"
                   "在裡面建立獨立的 Python 虛擬環境，安裝相依套件與 Chromium（約 100 MB），在旁邊註冊 `quarterly-earnings-review`，"
-                  "再渲染所有表格版式、一張圖和一份財報表作為冒煙測試。一切正常時會輸出 `Render OK`。裝完請重新啟動 Claude，skill 才會載入。"
+                  "再渲染所有表格版式、一張圖和一份財報表作為冒煙測試。一切正常時會輸出 `Render OK`。裝完請重新啟動 Agent（Claude、Codex 等），skill 才會載入。"
                   "想先看腳本內容，可以打開 [install.sh](install.sh) 或 [install.ps1](install.ps1)。"),
     opt_head=["選項（macOS / Linux）", "選項（Windows）", "作用"],
     opts=["裝到別處（例如其他 Agent 的 skills 目錄）。環境變數 `CLAUDE_SKILLS_DIR` 可修改預設根目錄。",
@@ -216,7 +216,7 @@ C["zh"] = dict(
     pipe_note="用管線執行時，選項要放在 `sh -s --` 後面，例如 `curl -fsSL .../install.sh | sh -s -- --dir ~/my-skills/schwab`。Windows 請先儲存 `install.ps1`，再執行 `.\\install.ps1 -Dir C:\\path`。",
     update_note="**更新：** 再執行一次同樣的命令。**解除安裝：** 加上 `--uninstall` 執行（Windows 用 `-Uninstall`）。",
     trouble="**常見問題：** Debian/Ubuntu 需要先裝 `python3-venv`。Linux 上 Chromium 無法啟動時，執行 `sudo <安裝目錄>/.venv/bin/python -m playwright install-deps chromium`。精簡的 Linux 伺服器請先裝一套 CJK 字型（`sudo apt install fonts-noto-cjk`），否則中文會顯示成方塊。",
-    h_using="在 Claude 裡使用",
+    h_using="在 Agent 裡使用",
     using_intro="安裝後直接用自然語言說就行，例如：",
     using=["幫我給 NVDA、AMD、MU 做個業績表。",
            "把這張持倉截圖做成 Schwab 風格的表。（附上截圖）",
@@ -303,7 +303,7 @@ C["zh"] = dict(
 C["ja"] = dict(
     tagline="AI エージェントのための、リサーチ風の表・推移チャート・四半期決算レビュー。",
     links=["🚀 インストール", "🎨 ギャラリー", "🌐 プロジェクトサイト", "🧾 決算デモ", "📘 Skill ドキュメント"],
-    intro=("1 つのリポジトリに Claude スキルが 2 つあります。**schwab-performance-table** は、銘柄リスト、証券口座の保有銘柄スクリーンショット、価格データ、自分の CSV を、"
+    intro=("1 つのリポジトリにエージェント用スキルが 2 つあります。Claude Code 向けに作られていますが、Codex など他のコーディングエージェントでも使えます。**schwab-performance-table** は、銘柄リスト、証券口座の保有銘柄スクリーンショット、価格データ、自分の CSV を、"
            "リサーチ風の表（Schwab・Morgan・Blackstone・IBKR レイアウト）に、またドローダウンと対数目盛つきの推移チャートに変換します。"
            "**quarterly-earnings-review** は企業の四半期決算の原本を確認し、出典付きの解説を添えた HSBC 風の決算表を作ります。"
            "出力はすべて英語と繁体字中国語の 2 版で、PNG と単体で完結する HTML です。"),
@@ -322,7 +322,7 @@ C["ja"] = dict(
              ("HSBC 風の四半期決算：AAPL 第 3 四半期", "繁體中文"), ("HSBC 風の四半期決算：AAPL 第 4 四半期", "繁體中文"), ("保有銘柄表", "EN")],
     gallery_note="決算の例は Apple の公式資料、ランキング表は Charles Schwab の公開チャートを使用しています。それ以外は架空の企業と合成データです。",
     h_flow="仕組み",
-    flow=["📝 ティッカー、画像、CSV<br/>またはティッカー＋四半期", "🤖 Claude + スキル", "🏛 価格：Nasdaq、上海・深圳、<br/>Yahoo（明示）、自分の CSV",
+    flow=["📝 ティッカー、画像、CSV<br/>またはティッカー＋四半期", "🤖 AI エージェント + スキル", "🏛 価格：Nasdaq、上海・深圳、<br/>Yahoo（明示）、自分の CSV",
           "📑 決算：Apple の PDF、<br/>SEC のデータ、取り込んだ資料", "🖨 render_table<br/>render_chart", "🖨 quarterly_earnings", "🖼 PNG + HTML<br/>EN · 繁體中文"],
     h_install="インストール",
     install_intro="macOS、Linux、Windows に対応しています。Python 3.9 以上（描画用）が必要で、git は任意です。インストーラーは 2 つのスキルをまとめて登録します。",
@@ -333,7 +333,7 @@ C["ja"] = dict(
     install_note=("インストーラーはメインのスキルを `~/.claude/skills/schwab-performance-table`（Windows では `%USERPROFILE%\\.claude\\skills\\...`）に置き、"
                   "その中に専用の Python 仮想環境を作って依存パッケージと Chromium（約 100 MB）を入れ、隣に `quarterly-earnings-review` を登録し、"
                   "すべての表スタイル・チャート 1 枚・決算表 1 枚をレンダリングして動作確認します。すべて正常なら `Render OK` と表示されます。"
-                  "完了後に Claude を再起動すると、スキルが読み込まれます。実行前に内容を確認したい場合は [install.sh](install.sh) または [install.ps1](install.ps1) を開いてください。"),
+                  "完了後にエージェント（Claude、Codex など）を再起動すると、スキルが読み込まれます。実行前に内容を確認したい場合は [install.sh](install.sh) または [install.ps1](install.ps1) を開いてください。"),
     opt_head=["オプション（macOS / Linux）", "オプション（Windows）", "内容"],
     opts=["別の場所にインストール（他のエージェントの skills フォルダなど）。環境変数 `CLAUDE_SKILLS_DIR` で既定のルートを変更できます。",
           "`main` の代わりにタグまたはブランチをインストール（例：`v0.6.1`）。バージョン固定に使います。付けずにもう一度実行すると `main` に戻ります。",
@@ -342,7 +342,7 @@ C["ja"] = dict(
     pipe_note="パイプで実行する場合、オプションは `sh -s --` の後ろに付けます。例：`curl -fsSL .../install.sh | sh -s -- --dir ~/my-skills/schwab`。Windows では `install.ps1` を保存してから `.\\install.ps1 -Dir C:\\path` を実行してください。",
     update_note="**更新：** 同じコマンドをもう一度実行します。**アンインストール：** `--uninstall` を付けて実行します（Windows は `-Uninstall`）。",
     trouble="**トラブルシューティング：** Debian/Ubuntu では先に `python3-venv` をインストールしてください。Linux で Chromium が起動しない場合は `sudo <インストール先>/.venv/bin/python -m playwright install-deps chromium` を実行してください。最小構成の Linux サーバーでは CJK フォント（`sudo apt install fonts-noto-cjk`）も入れてください。ないと中国語が四角で表示されます。",
-    h_using="Claude での使い方",
+    h_using="エージェントでの使い方",
     using_intro="インストール後は、普通の言葉で頼むだけです。例：",
     using=["NVDA、AMD、MU のパフォーマンス表を作って。",
            "この保有銘柄のスクリーンショットを Schwab 風の表にして。（スクリーンショットを添付）",
@@ -429,7 +429,7 @@ C["ja"] = dict(
 C["fr"] = dict(
     tagline="Tableaux façon étude, graphiques de cours et analyses de résultats trimestriels pour votre agent IA.",
     links=["🚀 Installation", "🎨 Galerie", "🌐 Site du projet", "🧾 Démo résultats", "📘 Doc du skill"],
-    intro=("Deux skills Claude dans un seul dépôt. **schwab-performance-table** transforme une liste d'actions, une capture de positions chez un courtier, des données de prix ou vos propres "
+    intro=("Deux skills d'agent dans un seul dépôt, conçus pour Claude Code et utilisables avec Codex et d'autres agents de programmation. **schwab-performance-table** transforme une liste d'actions, une capture de positions chez un courtier, des données de prix ou vos propres "
            "fichiers CSV en tableaux façon étude (dispositions Schwab, Morgan, Blackstone et IBKR) et en graphiques de cours avec drawdown et échelle logarithmique. "
            "**quarterly-earnings-review** vérifie le document trimestriel d'une société et produit un tableau de résultats de style HSBC avec des commentaires sourcés. "
            "Tout est produit en anglais et en chinois traditionnel, en PNG et en HTML autonome."),
@@ -448,7 +448,7 @@ C["fr"] = dict(
              ("Résultats HSBC, AAPL T3", "繁體中文"), ("Résultats HSBC, AAPL T4", "繁體中文"), ("Tableau de positions", "EN")],
     gallery_note="Les exemples de résultats utilisent les publications officielles d'Apple et le tableau de classement un graphique public de Charles Schwab. Tout le reste utilise des sociétés fictives et des données synthétiques.",
     h_flow="Fonctionnement",
-    flow=["📝 Symboles, capture, CSV<br/>ou symbole + trimestre", "🤖 Claude + skills", "🏛 Prix : Nasdaq, SSE/SZSE,<br/>Yahoo (indiqué), votre CSV",
+    flow=["📝 Symboles, capture, CSV<br/>ou symbole + trimestre", "🤖 Votre agent IA + skills", "🏛 Prix : Nasdaq, SSE/SZSE,<br/>Yahoo (indiqué), votre CSV",
           "📑 Documents : PDF Apple,<br/>données SEC, vos imports", "🖨 render_table<br/>render_chart", "🖨 quarterly_earnings", "🖼 PNG + HTML<br/>EN · 繁體中文"],
     h_install="Installation",
     install_intro="Fonctionne sous macOS, Linux et Windows. Python 3.9 ou supérieur est nécessaire (pour produire les rendus) ; git est facultatif. L'installateur enregistre les deux skills.",
@@ -459,7 +459,7 @@ C["fr"] = dict(
     install_note=("L'installateur place le skill principal dans `~/.claude/skills/schwab-performance-table` (`%USERPROFILE%\\.claude\\skills\\...` sous Windows), "
                   "crée un environnement virtuel Python dédié à l'intérieur, installe les dépendances et Chromium (environ 100 Mo), enregistre "
                   "`quarterly-earnings-review` à côté, puis génère tous les styles de tableau, un graphique et un tableau de résultats comme test de fumée. "
-                  "Il affiche `Render OK` quand tout fonctionne. Redémarrez ensuite Claude pour que les skills soient pris en compte. "
+                  "Il affiche `Render OK` quand tout fonctionne. Redémarrez ensuite votre agent (Claude, Codex, ...) pour que les skills soient pris en compte. "
                   "Pour lire un script avant de l'exécuter, ouvrez [install.sh](install.sh) ou [install.ps1](install.ps1)."),
     opt_head=["Option (macOS / Linux)", "Option (Windows)", "Effet"],
     opts=["Installer ailleurs (par exemple dans le dossier skills d'un autre agent). La variable `CLAUDE_SKILLS_DIR` change la racine par défaut.",
@@ -469,7 +469,7 @@ C["fr"] = dict(
     pipe_note="Avec un tube (pipe), passez les options après `sh -s --`, par exemple `curl -fsSL .../install.sh | sh -s -- --dir ~/my-skills/schwab`. Sous Windows, enregistrez `install.ps1` puis lancez `.\\install.ps1 -Dir C:\\path`.",
     update_note="**Mise à jour :** relancez la même commande. **Désinstallation :** lancez-la avec `--uninstall` (`-Uninstall` sous Windows).",
     trouble="**Dépannage :** sous Debian/Ubuntu, installez d'abord `python3-venv`. Sous Linux, si Chromium ne démarre pas, exécutez `sudo <dossier d'installation>/.venv/bin/python -m playwright install-deps chromium`. Sur un serveur Linux minimal, installez aussi une police CJK (`sudo apt install fonts-noto-cjk`), sinon le chinois s'affiche en carrés.",
-    h_using="Utilisation avec Claude",
+    h_using="Utilisation avec votre agent",
     using_intro="Une fois installé, il suffit de demander en langage naturel, par exemple :",
     using=["Fais-moi un tableau de performance pour NVDA, AMD et MU.",
            "Transforme cette capture d'écran de positions en tableau de style Schwab. (joindre la capture)",

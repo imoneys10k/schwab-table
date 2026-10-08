@@ -6,13 +6,13 @@
 
 [English](README.md) · **繁體中文** · [日本語](README.ja.md) · [Français](README.fr.md)
 
-<p><a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/License-MIT-2a78d6?style=flat-square"></a> <a href="https://github.com/imoneys10k/schwab-table/actions/workflows/install-test.yml"><img alt="install test" src="https://img.shields.io/github/actions/workflow/status/imoneys10k/schwab-table/install-test.yml?branch=main&style=flat-square&label=install%20test"></a> <a href="https://github.com/imoneys10k/schwab-table/actions/workflows/tests.yml"><img alt="tests" src="https://img.shields.io/github/actions/workflow/status/imoneys10k/schwab-table/tests.yml?branch=main&style=flat-square&label=tests"></a> <a href="https://github.com/imoneys10k/schwab-table/releases"><img alt="release" src="https://img.shields.io/github/v/release/imoneys10k/schwab-table?style=flat-square&color=1B2A4A"></a> <a href="https://github.com/imoneys10k/schwab-table/stargazers"><img alt="stars" src="https://img.shields.io/github/stars/imoneys10k/schwab-table?style=flat-square&color=eda100"></a> <img alt="Python 3.9+" src="https://img.shields.io/badge/Python-3.9%2B-1baf7a?style=flat-square"> <img alt="macOS, Linux, Windows" src="https://img.shields.io/badge/macOS%20%C2%B7%20Linux%20%C2%B7%20Windows-supported-ACDCEC?style=flat-square&labelColor=1B2A4A"> <img alt="Claude Skills" src="https://img.shields.io/badge/Claude-Skills-eb6834?style=flat-square"></p>
+<p><a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/License-MIT-2a78d6?style=flat-square"></a> <a href="https://github.com/imoneys10k/schwab-table/actions/workflows/install-test.yml"><img alt="install test" src="https://img.shields.io/github/actions/workflow/status/imoneys10k/schwab-table/install-test.yml?branch=main&style=flat-square&label=install%20test"></a> <a href="https://github.com/imoneys10k/schwab-table/actions/workflows/tests.yml"><img alt="tests" src="https://img.shields.io/github/actions/workflow/status/imoneys10k/schwab-table/tests.yml?branch=main&style=flat-square&label=tests"></a> <a href="https://github.com/imoneys10k/schwab-table/releases"><img alt="release" src="https://img.shields.io/github/v/release/imoneys10k/schwab-table?style=flat-square&color=1B2A4A"></a> <a href="https://github.com/imoneys10k/schwab-table/stargazers"><img alt="stars" src="https://img.shields.io/github/stars/imoneys10k/schwab-table?style=flat-square&color=eda100"></a> <img alt="Python 3.9+" src="https://img.shields.io/badge/Python-3.9%2B-1baf7a?style=flat-square"> <img alt="macOS, Linux, Windows" src="https://img.shields.io/badge/macOS%20%C2%B7%20Linux%20%C2%B7%20Windows-supported-ACDCEC?style=flat-square&labelColor=1B2A4A"> <img alt="Agent Skills" src="https://img.shields.io/badge/Agent-Skills-eb6834?style=flat-square"></p>
 
 <p><a href="#-安裝"><b>🚀 安裝</b></a> · <a href="#-效果圖"><b>🎨 效果圖</b></a> · <a href="https://imoneys10k.github.io/schwab-table/"><b>🌐 專案網站</b></a> · <a href="https://imoneys10k.github.io/schwab-table/earnings/"><b>🧾 財報示範</b></a> · <a href="SKILL.md"><b>📘 Skill 文件</b></a></p>
 
 </div>
 
-同一個儲存庫裡有兩個 Claude skill。**schwab-performance-table** 把股票清單、券商持倉截圖、價格資料或你自己的 CSV，做成研報風格的表格（Schwab、摩根士丹利、黑石、IBKR 版式），也能畫帶回撤和對數刻度的走勢圖。**quarterly-earnings-review** 核對公司的季度財報原件，輸出 HSBC 版式的財報表與有來源支持的解讀。所有輸出都有繁體中文與英文兩版，格式為 PNG 加獨立的 HTML。
+同一個儲存庫裡有兩個 Agent skill，為 Claude Code 打造，也能用在 Codex 等其他程式 Agent。**schwab-performance-table** 把股票清單、券商持倉截圖、價格資料或你自己的 CSV，做成研報風格的表格（Schwab、摩根士丹利、黑石、IBKR 版式），也能畫帶回撤和對數刻度的走勢圖。**quarterly-earnings-review** 核對公司的季度財報原件，輸出 HSBC 版式的財報表與有來源支持的解讀。所有輸出都有繁體中文與英文兩版，格式為 PNG 加獨立的 HTML。
 
 ## ✨ 亮點
 
@@ -38,7 +38,7 @@
 
 ```mermaid
 flowchart LR
-  A["📝 股票代碼、截圖、CSV<br/>或代碼＋季度"] --> B["🤖 Claude + skills"]
+  A["📝 股票代碼、截圖、CSV<br/>或代碼＋季度"] --> B["🤖 你的 AI Agent + skills"]
   B --> C["🏛 價格：Nasdaq、上交所／深交所、<br/>Yahoo（已標示）、你的 CSV"]
   B --> F["📑 財報：Apple PDF、<br/>SEC 資料、你匯入的文件"]
   C --> D["🖨 render_table<br/>render_chart"]
@@ -84,7 +84,7 @@ Windows (PowerShell):
 irm https://raw.githubusercontent.com/imoneys10k/schwab-table/main/install.ps1 | iex
 ```
 
-安裝程式會把主 skill 放進 `~/.claude/skills/schwab-performance-table`（Windows 為 `%USERPROFILE%\.claude\skills\...`），在裡面建立獨立的 Python 虛擬環境，安裝相依套件與 Chromium（約 100 MB），在旁邊註冊 `quarterly-earnings-review`，再渲染所有表格版式、一張圖和一份財報表作為冒煙測試。一切正常時會輸出 `Render OK`。裝完請重新啟動 Claude，skill 才會載入。想先看腳本內容，可以打開 [install.sh](install.sh) 或 [install.ps1](install.ps1)。
+安裝程式會把主 skill 放進 `~/.claude/skills/schwab-performance-table`（Windows 為 `%USERPROFILE%\.claude\skills\...`），在裡面建立獨立的 Python 虛擬環境，安裝相依套件與 Chromium（約 100 MB），在旁邊註冊 `quarterly-earnings-review`，再渲染所有表格版式、一張圖和一份財報表作為冒煙測試。一切正常時會輸出 `Render OK`。裝完請重新啟動 Agent（Claude、Codex 等），skill 才會載入。想先看腳本內容，可以打開 [install.sh](install.sh) 或 [install.ps1](install.ps1)。
 
 | 選項（macOS / Linux） | 選項（Windows） | 作用 |
 |---|---|---|
@@ -99,7 +99,7 @@ irm https://raw.githubusercontent.com/imoneys10k/schwab-table/main/install.ps1 |
 
 **常見問題：** Debian/Ubuntu 需要先裝 `python3-venv`。Linux 上 Chromium 無法啟動時，執行 `sudo <安裝目錄>/.venv/bin/python -m playwright install-deps chromium`。精簡的 Linux 伺服器請先裝一套 CJK 字型（`sudo apt install fonts-noto-cjk`），否則中文會顯示成方塊。
 
-## 💬 在 Claude 裡使用
+## 💬 在 Agent 裡使用
 
 安裝後直接用自然語言說就行，例如：
 

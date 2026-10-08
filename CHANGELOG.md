@@ -4,6 +4,12 @@ All notable changes. Versions follow the [releases](https://github.com/imoneys10
 
 
 
+
+## Unreleased
+
+### Changed
+- Docs no longer present the project as Claude-only: the banner, social card and website tag read "AI agent skills", the badge is "Agent Skills", and the intro, flow chart and install notes say the skills are built for Claude Code and usable from Codex and other coding agents.
+
 ## 0.6.2 (2026-10-08)
 
 ### Changed

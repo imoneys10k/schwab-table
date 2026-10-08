@@ -39,7 +39,7 @@ BADGES = " ".join([
     f'<a href="https://github.com/{SLUG}/stargazers"><img alt="stars" src="https://img.shields.io/github/stars/{SLUG}?style=flat-square&color=eda100"></a>',
     '<img alt="Python 3.9+" src="https://img.shields.io/badge/Python-3.9%2B-1baf7a?style=flat-square">',
     '<img alt="macOS, Linux, Windows" src="https://img.shields.io/badge/macOS%20%C2%B7%20Linux%20%C2%B7%20Windows-supported-ACDCEC?style=flat-square&labelColor=1B2A4A">',
-    '<img alt="Claude Skills" src="https://img.shields.io/badge/Claude-Skills-eb6834?style=flat-square">',
+    '<img alt="Agent Skills" src="https://img.shields.io/badge/Agent-Skills-eb6834?style=flat-square">',
 ])
 
 

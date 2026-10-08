@@ -6,13 +6,13 @@
 
 **English** · [繁體中文](README.zh-Hant.md) · [日本語](README.ja.md) · [Français](README.fr.md)
 
-<p><a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/License-MIT-2a78d6?style=flat-square"></a> <a href="https://github.com/imoneys10k/schwab-table/actions/workflows/install-test.yml"><img alt="install test" src="https://img.shields.io/github/actions/workflow/status/imoneys10k/schwab-table/install-test.yml?branch=main&style=flat-square&label=install%20test"></a> <a href="https://github.com/imoneys10k/schwab-table/actions/workflows/tests.yml"><img alt="tests" src="https://img.shields.io/github/actions/workflow/status/imoneys10k/schwab-table/tests.yml?branch=main&style=flat-square&label=tests"></a> <a href="https://github.com/imoneys10k/schwab-table/releases"><img alt="release" src="https://img.shields.io/github/v/release/imoneys10k/schwab-table?style=flat-square&color=1B2A4A"></a> <a href="https://github.com/imoneys10k/schwab-table/stargazers"><img alt="stars" src="https://img.shields.io/github/stars/imoneys10k/schwab-table?style=flat-square&color=eda100"></a> <img alt="Python 3.9+" src="https://img.shields.io/badge/Python-3.9%2B-1baf7a?style=flat-square"> <img alt="macOS, Linux, Windows" src="https://img.shields.io/badge/macOS%20%C2%B7%20Linux%20%C2%B7%20Windows-supported-ACDCEC?style=flat-square&labelColor=1B2A4A"> <img alt="Claude Skills" src="https://img.shields.io/badge/Claude-Skills-eb6834?style=flat-square"></p>
+<p><a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/License-MIT-2a78d6?style=flat-square"></a> <a href="https://github.com/imoneys10k/schwab-table/actions/workflows/install-test.yml"><img alt="install test" src="https://img.shields.io/github/actions/workflow/status/imoneys10k/schwab-table/install-test.yml?branch=main&style=flat-square&label=install%20test"></a> <a href="https://github.com/imoneys10k/schwab-table/actions/workflows/tests.yml"><img alt="tests" src="https://img.shields.io/github/actions/workflow/status/imoneys10k/schwab-table/tests.yml?branch=main&style=flat-square&label=tests"></a> <a href="https://github.com/imoneys10k/schwab-table/releases"><img alt="release" src="https://img.shields.io/github/v/release/imoneys10k/schwab-table?style=flat-square&color=1B2A4A"></a> <a href="https://github.com/imoneys10k/schwab-table/stargazers"><img alt="stars" src="https://img.shields.io/github/stars/imoneys10k/schwab-table?style=flat-square&color=eda100"></a> <img alt="Python 3.9+" src="https://img.shields.io/badge/Python-3.9%2B-1baf7a?style=flat-square"> <img alt="macOS, Linux, Windows" src="https://img.shields.io/badge/macOS%20%C2%B7%20Linux%20%C2%B7%20Windows-supported-ACDCEC?style=flat-square&labelColor=1B2A4A"> <img alt="Agent Skills" src="https://img.shields.io/badge/Agent-Skills-eb6834?style=flat-square"></p>
 
 <p><a href="#-install"><b>🚀 Install</b></a> · <a href="#-gallery"><b>🎨 Gallery</b></a> · <a href="https://imoneys10k.github.io/schwab-table/"><b>🌐 Website</b></a> · <a href="https://imoneys10k.github.io/schwab-table/earnings/"><b>🧾 Earnings demo</b></a> · <a href="SKILL.en.md"><b>📘 Skill doc</b></a></p>
 
 </div>
 
-Two Claude skills in one repository. **schwab-performance-table** turns a stock list, a brokerage holdings screenshot, price data or your own CSV into research-desk tables (Schwab, Morgan, Blackstone and IBKR layouts) and into price charts with drawdown and log scale. **quarterly-earnings-review** checks a company's quarterly filing and produces an HSBC-style earnings table with source-backed commentary. Everything is rendered in English and Traditional Chinese, as PNG plus self-contained HTML.
+Two agent skills in one repository, built for Claude Code and usable from Codex and other coding agents. **schwab-performance-table** turns a stock list, a brokerage holdings screenshot, price data or your own CSV into research-desk tables (Schwab, Morgan, Blackstone and IBKR layouts) and into price charts with drawdown and log scale. **quarterly-earnings-review** checks a company's quarterly filing and produces an HSBC-style earnings table with source-backed commentary. Everything is rendered in English and Traditional Chinese, as PNG plus self-contained HTML.
 
 ## ✨ Highlights
 
@@ -38,7 +38,7 @@ Two Claude skills in one repository. **schwab-performance-table** turns a stock 
 
 ```mermaid
 flowchart LR
-  A["📝 Tickers, screenshot, CSV<br/>or ticker + quarter"] --> B["🤖 Claude + skills"]
+  A["📝 Tickers, screenshot, CSV<br/>or ticker + quarter"] --> B["🤖 Your AI agent + skills"]
   B --> C["🏛 Prices: Nasdaq, SSE/SZSE,<br/>Yahoo (labelled), your CSV"]
   B --> F["📑 Filings: Apple PDFs,<br/>SEC facts, your imports"]
   C --> D["🖨 render_table<br/>render_chart"]
@@ -84,7 +84,7 @@ Windows (PowerShell):
 irm https://raw.githubusercontent.com/imoneys10k/schwab-table/main/install.ps1 | iex
 ```
 
-The installer puts the main skill in `~/.claude/skills/schwab-performance-table` (`%USERPROFILE%\.claude\skills\...` on Windows), creates a private Python virtual environment inside it, installs the dependencies and Chromium (about 100 MB), registers `quarterly-earnings-review` beside it, and renders every table style, a chart and an earnings table as a smoke test. It prints `Render OK` when everything works. Restart Claude afterwards so the skills are picked up. To read a script before running it, open [install.sh](install.sh) or [install.ps1](install.ps1).
+The installer puts the main skill in `~/.claude/skills/schwab-performance-table` (`%USERPROFILE%\.claude\skills\...` on Windows), creates a private Python virtual environment inside it, installs the dependencies and Chromium (about 100 MB), registers `quarterly-earnings-review` beside it, and renders every table style, a chart and an earnings table as a smoke test. It prints `Render OK` when everything works. Restart your agent afterwards (Claude, Codex, ...) so the skills are picked up. To read a script before running it, open [install.sh](install.sh) or [install.ps1](install.ps1).
 
 | Option (macOS / Linux) | Option (Windows) | Effect |
 |---|---|---|
@@ -99,7 +99,7 @@ When piping, pass options with `sh -s --`, for example `curl -fsSL .../install.s
 
 **Troubleshooting:** on Debian/Ubuntu install `python3-venv` first. On Linux, if Chromium fails to start, run `sudo <install folder>/.venv/bin/python -m playwright install-deps chromium`. On a minimal Linux server install a CJK font (`sudo apt install fonts-noto-cjk`), otherwise Chinese text renders as boxes.
 
-## 💬 Using it with Claude
+## 💬 Using it with your agent
 
 Once installed, just ask in plain language, for example:
 
