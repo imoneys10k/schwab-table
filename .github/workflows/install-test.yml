@@ -14,7 +14,7 @@ jobs:
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Install (git clone path)
         run: |
           sh ./install.sh --dir "$RUNNER_TEMP/skill-git/schwab-performance-table"
@@ -38,7 +38,7 @@ jobs:
   windows:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Install (PowerShell 7)
         shell: pwsh
         run: |
