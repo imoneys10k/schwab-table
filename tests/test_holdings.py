@@ -13,6 +13,8 @@ sys.path.insert(0, str(ROOT))
 
 import fetch_holdings as fh  # noqa: E402
 import render_holdings as rh  # noqa: E402
+sys.path.insert(0, str(ROOT / "tools"))
+import live_check as lc  # noqa: E402
 
 UTC = dt.timezone.utc
 NOW = dt.datetime(2026, 10, 12, 12, 0, tzinfo=UTC)
@@ -411,6 +413,51 @@ class Rendering(unittest.TestCase):
     def test_html_is_escaped(self):
         html = rh.build_html(fund([h("A<B", "Evil <script>alert(1)</script> Inc", 5.0)]), "en")
         self.assertNotIn("<script>alert", html)
+
+
+class LiveCheckLogic(unittest.TestCase):
+    """The weekly live check must actually catch the ways an issuer page can break."""
+    TODAY = dt.date(2026, 10, 12)
+
+    def good(self, n=20, **kw):
+        return fund([h(f"T{i}", f"Company {i}", 100.0 / n) for i in range(n)], **kw)
+
+    def check(self, res, **kw):
+        args = dict(min_holdings=10, max_age_days=10, needs_swaps=False, today=self.TODAY)
+        args.update(kw)
+        return lc.check_result(res, **args)
+
+    def test_a_healthy_result_passes(self):
+        self.assertEqual(self.check(self.good()), [])
+
+    def test_partial_file_is_caught(self):
+        self.assertTrue(any("only 3 holdings" in p for p in self.check(self.good(3))))
+
+    def test_wrong_weights_are_caught(self):
+        res = self.good()
+        for x in res["holdings"]:
+            x["weight"] = x["weight"] / 100  # a file that switched from percent to fractions
+        self.assertTrue(any("add up to 1.0%" in p for p in self.check(res)))
+
+    def test_missing_weights_are_caught(self):
+        res = self.good()
+        for x in res["holdings"][:10]:
+            x["weight"] = None
+        self.assertTrue(any("no weight" in p for p in self.check(res)))
+
+    def test_stale_and_missing_dates_are_caught(self):
+        self.assertTrue(any("days old" in p for p in self.check(self.good(as_of="2026-08-01"))))
+        self.assertTrue(any("no as-of date" in p for p in self.check(self.good(as_of=None))))
+
+    def test_swap_naming_change_is_caught(self):
+        self.assertTrue(any("no swap rows" in p for p in self.check(self.good(), needs_swaps=True)))
+
+    def test_everything_misclassified_is_caught(self):
+        res = fund([h(f"T{i}", f"Company {i}", 5.0, kind="other") for i in range(20)])
+        res["holdings"][0]["kind"] = "equity"  # one equity so the fallback to 'other' does not hide the problem
+        self.assertEqual(self.check(res, min_holdings=10), [])
+        res = fund([h(f"T{i}", f"Company {i}", 5.0, kind="cash") for i in range(20)])
+        self.assertTrue(any("nothing left to rank" in p for p in self.check(res)))
 
 
 class Examples(unittest.TestCase):

@@ -12,6 +12,7 @@ All notable changes. Versions follow the [releases](https://github.com/imoneys10
   - Issuers: State Street SPDR (SPY, XLK, ...), iShares (15 funds with verified product ids, e.g. IVV), Vanguard equity ETFs (VOO, ...), Invesco (QQQ, read through Playwright because the host rejects scripts), NEOS (QQQI), Roundhill (NCLD, DRAM, ...), Tema (DISK), Destiny (DXYZ, quarterly private-company exposure). Any other fund: `--csv` with a file you download.
   - Swap-aware ranking for funds such as NCLD and DRAM: swaps are added to the shares of the same stock (matched by CUSIP/SEDOL); cash, money-market funds, T-bills and options are listed on a separate line and not ranked. `--mode lines` ranks every line as listed. `--merge-classes` adds share classes together.
   - Weights are shown as the issuer reports them (no extra decimals), missing weights stay NA, and a warning is printed when the holdings date is more than 10 days old (Vanguard publishes monthly, DXYZ quarterly).
+  - `tools/live_check.py` and the weekly `live-check` workflow fetch one real fund per issuer (SPY, IVV, TLT, VOO, QQQ, QQQI, DRAM, DISK, DXYZ) and check holdings count, weight total, as-of age, swap rows and rendering, so a changed issuer page is noticed early. Offline tests prove each failure mode is caught.
   - Tests (`tests/test_holdings.py`, offline), fictional examples (`examples/etf_holdings_*`), SKILL.md / SKILL.en.md sections, README and website entries, an installer smoke test, and a live two-issuer check in CI.
 
 ### Changed

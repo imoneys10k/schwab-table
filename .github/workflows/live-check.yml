@@ -1,0 +1,36 @@
+name: live-check
+
+# The ETF holdings adapters read public issuer pages and files, not documented APIs, so any of them can change.
+# This fetches one real fund per issuer every week and checks the result, so a break shows up here first.
+# It never blocks a merge: it runs on a schedule, by hand, and on pull requests that touch the adapters.
+on:
+  schedule:
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - fetch_holdings.py
+      - tools/live_check.py
+      - .github/workflows/live-check.yml
+
+jobs:
+  issuer:
+    strategy:
+      fail-fast: false
+      matrix:
+        case: [ssga, ishares, ishares-bond, vanguard, invesco, neos, roundhill, tema, destiny]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Traditional Chinese conversion
+        run: python -m pip install "opencc-python-reimplemented>=0.1.7"
+      - name: Playwright and Chromium (the Invesco page is read through a browser)
+        if: matrix.case == 'invesco'
+        run: |
+          python -m pip install "playwright>=1.40"
+          python -m playwright install --with-deps chromium
+      - name: Fetch one real fund and sanity-check it
+        run: python tools/live_check.py --only ${{ matrix.case }}
