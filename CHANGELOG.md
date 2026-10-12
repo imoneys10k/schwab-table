@@ -5,7 +5,7 @@ All notable changes. Versions follow the [releases](https://github.com/imoneys10
 
 
 
-## Unreleased
+## 0.7.0 (2026-10-12)
 
 ### Added
 - **ETF top holdings.** `fetch_holdings.py` reads an ETF's holdings from the issuer's own published file and `render_holdings.py` draws the top N (13 by default) as bars plus a table, with weight, cumulative weight, sector, the total of the rest and a footnote that states source, as-of date and rules. English and Traditional Chinese, PNG + HTML, light and dark themes, optional PDF.
