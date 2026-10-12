@@ -175,6 +175,7 @@ ETF の上位保有銘柄（既定は 13 銘柄、`--top N` で変更）を、�
 | Invesco | `QQQ` | ファンドページの JSON。サイト側がスクリプトからの接続を拒否するため Playwright 経由で読み取り |
 | NEOS | `QQQI` | ファンドページの CSV |
 | Roundhill | `NCLD`、`DRAM` | Roundhill 全ファンドをまとめた日次 CSV |
+| Tema | `DISK` | ファンドページからリンクされた日次 CSV |
 | Destiny | `DXYZ` | destiny.xyz の四半期リスト（未上場企業） |
 | その他のファンド | 自分でダウンロードしたファイル | `--csv` で取り込み。名称・ティッカー・ウェイトの列が必要 |
 
@@ -222,7 +223,7 @@ python3 quarterly_earnings.py AAPL --period FY2025Q3 -o out/aapl_q3
 - `render_table.py`、`institutional_tables.py`、`prices_to_table.py`: 表のレンダラーと 4 つのスタイル。取得した価格から Morgan / Blackstone の spec を作成
 - `fetch_prices.py`、`csv_to_prices.py`: Nasdaq・上海/深圳・Yahoo の日次終値の取得、自分の CSV の変換
 - `render_chart.py`、`render_common.py`: チャートのレンダラー。共通のテーマと PNG / PDF の出力
-- `fetch_holdings.py`、`render_holdings.py`: 運用会社自身のファイルから ETF の保有銘柄を取得（SPDR・iShares・Vanguard・Invesco・NEOS・Roundhill・Destiny、自分の CSV）し、上位 N 銘柄を描画
+- `fetch_holdings.py`、`render_holdings.py`: 運用会社自身のファイルから ETF の保有銘柄を取得（SPDR・iShares・Vanguard・Invesco・NEOS・Roundhill・Tema・Destiny、自分の CSV）し、上位 N 銘柄を描画
 - `quarterly_earnings.py`、`earnings_core.py`、`earnings_sources.py`、`render_earnings.py`: 決算コマンド、検証可能な計算、出典アダプター、HSBC 風レンダラー
 - `localization.py`、`fonts.py`、`fonts/`: 繁体字中国語への変換。HTML に埋め込む同梱フォント（ライセンス付き）
 - `references/`、`EARNINGS.md`: テンプレートガイド。決算の使い方と出典の範囲（繁体字中国語）

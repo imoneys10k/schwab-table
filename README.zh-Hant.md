@@ -175,6 +175,7 @@ python3 render_chart.py examples/chart_lines_spec.json out/chart
 | Invesco | `QQQ` | 基金頁面背後的 JSON；該站拒絕腳本直連，所以透過 Playwright 讀取 |
 | NEOS | `QQQI` | 基金頁面背後的 CSV |
 | Roundhill | `NCLD`、`DRAM` | 涵蓋全部 Roundhill 基金的每日 CSV |
+| Tema | `DISK` | 基金頁面連結的每日 CSV |
 | Destiny | `DXYZ` | destiny.xyz 上的季度清單（私募公司） |
 | 其他基金 | 你自己下載的檔案 | 用 `--csv` 匯入，需有名稱、代碼、權重欄 |
 
@@ -222,7 +223,7 @@ python3 quarterly_earnings.py AAPL --period FY2025Q3 -o out/aapl_q3
 - `render_table.py`、`institutional_tables.py`、`prices_to_table.py`: 表格渲染器與四種版式；用抓下來的價格產生摩根士丹利／黑石規格
 - `fetch_prices.py`、`csv_to_prices.py`: 取得 Nasdaq、上海／深圳與 Yahoo 的日收盤價；轉換你自己的 CSV
 - `render_chart.py`、`render_common.py`: 走勢圖渲染器；共用的主題與 PNG / PDF 輸出
-- `fetch_holdings.py`、`render_holdings.py`: 從發行人自己的檔案取得 ETF 持倉（SPDR、iShares、Vanguard、Invesco、NEOS、Roundhill、Destiny，或你的 CSV），並渲染前 N 大圖
+- `fetch_holdings.py`、`render_holdings.py`: 從發行人自己的檔案取得 ETF 持倉（SPDR、iShares、Vanguard、Invesco、NEOS、Roundhill、Tema、Destiny，或你的 CSV），並渲染前 N 大圖
 - `quarterly_earnings.py`、`earnings_core.py`、`earnings_sources.py`、`render_earnings.py`: 財報指令、可核對的計算、來源轉接器與 HSBC 版式渲染器
 - `localization.py`、`fonts.py`、`fonts/`: 繁體中文轉換；嵌入 HTML 的隨附字型（含授權）
 - `references/`、`EARNINGS.md`: 範本指南；財報用法與來源涵蓋範圍（繁體中文）

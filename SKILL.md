@@ -285,7 +285,7 @@ spec 格式：
    ```bash
    python3 fetch_holdings.py QQQ NCLD -o data/        # 生成 data/QQQ_holdings.json 等
    ```
-   - 已支持：道富 SPDR（SPY、XLK…）、iShares（腳本內已核對產品編號的 15 檔，如 IVV、IWM、AGG）、Vanguard 股票型 ETF（VOO、VTI…）、Invesco（QQQ，需要 Playwright，因爲該站拒絕腳本直連）、NEOS（QQQI）、Roundhill（NCLD、DRAM…）、Destiny（DXYZ）
+   - 已支持：道富 SPDR（SPY、XLK…）、iShares（腳本內已核對產品編號的 15 檔，如 IVV、IWM、AGG）、Vanguard 股票型 ETF（VOO、VTI…）、Invesco（QQQ，需要 Playwright，因爲該站拒絕腳本直連）、NEOS（QQQI）、Roundhill（NCLD、DRAM…）、Tema（DISK）、Destiny（DXYZ）
    - 其他基金，或腳本報錯：請用戶從發行人網站下載持倉 CSV，再用 `fetch_holdings.py 代碼 --csv 文件 --name "基金全稱" --as-of YYYY-MM-DD` 匯入。**不得**用 Yahoo、聚合站或模型記憶補持倉
    - 有代碼沒取到時（退出碼 1）：**停下來告訴用戶缺哪隻**，不要自己補
    - 持倉日期是發行人的日期，不是今天：Vanguard 每月公布、DXYZ 每季公布，其他多爲每日。超過 10 天腳本會警告，圖上如實顯示截止日，交付時也向用戶說明

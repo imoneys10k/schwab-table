@@ -274,7 +274,7 @@ The user wants an ETF's largest holdings, its concentration or its heavyweight s
    ```bash
    python3 fetch_holdings.py QQQ NCLD -o data/        # writes data/QQQ_holdings.json etc.
    ```
-   - Supported: State Street SPDR (SPY, XLK, ...), iShares (the 15 funds whose product ids are verified in the script, e.g. IVV, IWM, AGG), Vanguard equity ETFs (VOO, VTI, ...), Invesco (QQQ; needs Playwright because the host rejects scripts), NEOS (QQQI), Roundhill (NCLD, DRAM, ...), Destiny (DXYZ)
+   - Supported: State Street SPDR (SPY, XLK, ...), iShares (the 15 funds whose product ids are verified in the script, e.g. IVV, IWM, AGG), Vanguard equity ETFs (VOO, VTI, ...), Invesco (QQQ; needs Playwright because the host rejects scripts), NEOS (QQQI), Roundhill (NCLD, DRAM, ...), Tema (DISK), Destiny (DXYZ)
    - Any other fund, or a script error: ask the user to download the holdings CSV from the issuer's site and import it with `fetch_holdings.py SYMBOL --csv file --name "Full fund name" --as-of YYYY-MM-DD`. **Never** fill holdings from Yahoo, aggregator sites or memory
    - If a symbol could not be fetched (exit code 1), **stop and tell the user which one**
    - The holdings date is the issuer's, not today's: Vanguard publishes monthly and DXYZ quarterly, the others mostly daily. The script warns above 10 days; the chart shows the date as is, and tell the user when you deliver

@@ -175,6 +175,7 @@ Chart an ETF's largest holdings (13 by default, `--top N` changes it) with weigh
 | Invesco | `QQQ` | JSON behind the fund page, read through Playwright because the host rejects scripts |
 | NEOS | `QQQI` | CSV behind the fund page |
 | Roundhill | `NCLD`, `DRAM` | Daily CSV covering all Roundhill funds |
+| Tema | `DISK` | Daily CSV linked from the fund page |
 | Destiny | `DXYZ` | Quarterly list on destiny.xyz (private companies) |
 | Any other fund | a file you download | `--csv` with name, ticker and weight columns |
 
@@ -222,7 +223,7 @@ python3 quarterly_earnings.py AAPL --period FY2025Q3 -o out/aapl_q3
 - `render_table.py`, `institutional_tables.py`, `prices_to_table.py`: Table renderer and its four styles; builds Morgan / Blackstone specs from fetched prices
 - `fetch_prices.py`, `csv_to_prices.py`: Daily closes from Nasdaq, Shanghai/Shenzhen and Yahoo; conversion of your own CSV files
 - `render_chart.py`, `render_common.py`: Chart renderer; shared themes and PNG / PDF output
-- `fetch_holdings.py`, `render_holdings.py`: ETF holdings from the issuer's own file (SPDR, iShares, Vanguard, Invesco, NEOS, Roundhill, Destiny, your CSV) and the top-N renderer
+- `fetch_holdings.py`, `render_holdings.py`: ETF holdings from the issuer's own file (SPDR, iShares, Vanguard, Invesco, NEOS, Roundhill, Tema, Destiny, your CSV) and the top-N renderer
 - `quarterly_earnings.py`, `earnings_core.py`, `earnings_sources.py`, `render_earnings.py`: Earnings command, audited arithmetic, source adapters and the HSBC-style renderer
 - `localization.py`, `fonts.py`, `fonts/`: Traditional Chinese conversion; bundled fonts embedded in the HTML (licences included)
 - `references/`, `EARNINGS.md`: Template guide; earnings usage and source coverage (Traditional Chinese)

@@ -73,7 +73,7 @@ S = {
 BASIS = {"en": {"% of net assets": "% of net assets", "% of portfolio (economic exposure)": "% of portfolio (economic exposure)"},
          "zh": {"% of net assets": "占净资产比例", "% of portfolio (economic exposure)": "占投资组合比例（经济敞口）"}}
 ISSUER_ZH = {"State Street (SPDR)": "道富（SPDR）", "BlackRock iShares": "贝莱德 iShares", "Vanguard": "领航 Vanguard", "Invesco": "景顺 Invesco",
-             "NEOS": "NEOS", "Roundhill": "Roundhill", "Destiny": "Destiny", "User-provided file": "用户提供的文件"}
+             "NEOS": "NEOS", "Roundhill": "Roundhill", "Tema ETFs": "Tema ETFs", "Destiny": "Destiny", "User-provided file": "用户提供的文件"}
 
 
 def class_key(name):
@@ -187,7 +187,7 @@ def build_html(data, lang, theme="light", top=13, mode="exposure", merge_classes
         swap = max(r["swap"], 0) / scale * 100
         bar = (f'<div class="bar"><i class="fp" style="width:{phys:.2f}%"></i><i class="fs" style="width:{swap:.2f}%"></i></div>')
         sector = f'<td class="sec">{escape(r["sector"] or "")}</td>' if has_sector else ""
-        body.append(f'<tr><td class="rk">{i}</td><td class="name">{display_name(r, lang, names)}</td><td class="bars">{bar}</td>'
+        body.append(f'<tr><td class="rk">{i}</td><td class="name" title="{escape(r["name"], quote=True)}">{display_name(r, lang, names)}</td><td class="bars">{bar}</td>'
                     f'<td class="num">{fnum(r["total"], dp)}</td><td class="num cum">{fnum(cum, dp)}</td>{sector}</tr>')
     span = 5 + (1 if has_sector else 0)
     rest = ranked[n:]
@@ -238,7 +238,7 @@ def build_html(data, lang, theme="light", top=13, mode="exposure", merge_classes
         legend = (f'<div class="legend"><span class="lg"><i class="sw fp"></i>{L["physical"]}</span>'
                   f'<span class="lg"><i class="sw fs"></i>{L["swap"]}</span></div>')
     head_sector = f'<th class="l">{L["h_sector"]}</th>' if has_sector else ""
-    cols = ('<col style="width:30px"><col style="width:auto"><col style="width:150px"><col style="width:76px"><col style="width:76px">'
+    cols = ('<col style="width:30px"><col style="width:auto"><col style="width:110px"><col style="width:66px"><col style="width:66px">'
             + ('<col style="width:150px">' if has_sector else ""))
     css = font_face_css() + f"""
 body{{margin:0;background:{T['bg']};font-family:{FONT};-webkit-font-smoothing:antialiased}}
@@ -257,7 +257,7 @@ th.l{{text-align:left}}
 td{{text-align:right;padding:0 12px 0 8px;height:26px;border-top:1px solid {T['rule']};font-feature-settings:"tnum" 1;white-space:nowrap}}
 td.rk{{text-align:center;padding:0;color:{T['muted']}}}
 td.name{{text-align:left;overflow:hidden;text-overflow:ellipsis;padding-left:8px}}
-td.sec{{text-align:left;overflow:hidden;text-overflow:ellipsis;color:{T['muted']};font-size:12px}}
+td.sec{{text-align:left;overflow:hidden;text-overflow:ellipsis;color:{T['muted']};font-size:11.5px;padding-right:6px}}
 td.bars{{padding:0 8px 0 4px}}
 .tk{{color:{T['muted']};font-size:12px}}
 .bar{{display:flex;height:11px;background:transparent}}

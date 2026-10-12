@@ -149,6 +149,40 @@ class Parsing(unittest.TestCase):
                           ("SK HYNIX INC-SWAP-GOLD-L", "SK HYNIX INC"), ("EVOLUTION AB (PUBL)-SWAP-NMRA-L", "EVOLUTION AB (PUBL)")):
             self.assertEqual(fh.swap_name(raw), want)
 
+    def test_tema_csv_fractions_become_percent_and_swaps_are_marked(self):
+        text = ("holdings_date,ticker,cusip,proper_name,shares,market_value,percent_of_nav,is_cash,country,sector\n"
+                "2026-10-09,SNDK,80004C200,SANDISK CORP,8680,1,0.1845,0,United States,Information Technology\n"
+                "2026-10-09,000660 KS,,SK HYNIX INC,10091,1,0.1698,0,South Korea,Information Technology\n"
+                "2026-10-09,BTMTQT8-TRS-07/27/29-L-MREX,BTMTQT8-TRS-07/27/29-L-MREX,CHANGXIN MEMORY TECHNOLOGIES-SWAP-MREX-L,5,1,0.0568,0,,\n"
+                "2026-10-09,,,CASH & CASH EQUIVALENTS,,-1,-0.019,1,,\n")
+        res = fh.parse_tema("DISK", text, "u")
+        self.assertEqual(res["as_of"], "2026-10-09")
+        self.assertEqual([(x["kind"], x["weight"]) for x in res["holdings"]], [("equity", 18.45), ("equity", 16.98), ("swap", 5.68), ("cash", -1.9)])
+        self.assertEqual(res["holdings"][2]["underlying_id"], "BTMTQT8")
+        self.assertEqual(res["holdings"][1]["id"], "000660 KS")  # no CUSIP for Korean shares: fall back to the ticker
+        self.assertEqual(res["holdings"][2]["name"], "CHANGXIN MEMORY TECHNOLOGIES")
+
+    def test_tema_walks_back_to_the_last_published_day(self):
+        asked = []
+        csv_text = "holdings_date,ticker,cusip,proper_name,percent_of_nav,is_cash\n2026-10-09,AAA,111,Alpha Inc,1.0,0\n"
+
+        def fake_fetch(url, **_):
+            asked.append(url[-12:-4])
+            if url.endswith("10092026.csv"):
+                return csv_text
+            raise fh.FetchError("HTTP 404")
+        with Patch(fh, fetch=fake_fetch):
+            res = fh.fetch_tema("DISK", now=NOW)
+            self.assertEqual(asked, ["10122026", "10092026"])
+            self.assertEqual(res["holdings"][0]["weight"], 100.0)
+
+    def test_tema_unknown_fund_is_not_this_issuer(self):
+        def never(url, **_):
+            raise fh.FetchError("HTTP 404")
+        with Patch(fh, fetch=never):
+            with self.assertRaises(fh.NotThisIssuer):
+                fh.fetch_tema("ZZZZ", now=NOW)
+
     def test_destiny_page(self):
         page = ("<main>Public access As of June 30, 2026 › Current Portfolio Summary of Economic Exposure · 3 companies "
                 "01 Anthropic¹ ↗ Artificial Intelligence 14.4 % 02 SpaceX¹ ↗ Space &amp; Frontier 10.6 % "
@@ -213,7 +247,7 @@ class Routing(unittest.TestCase):
         calls = []
         adapters = {k: (lambda key: lambda symbol, **_: (calls.append(key), self.ok(key)(symbol))[1])(k) for k in fh.ADAPTERS}
         with Patch(fh, ADAPTERS=adapters):
-            for sym, issuer in (("QQQ", "invesco"), ("VOO", "vanguard"), ("SPY", "ssga"), ("IVV", "ishares"), ("QQQI", "neos"), ("NCLD", "roundhill"), ("DRAM", "roundhill"), ("DXYZ", "destiny")):
+            for sym, issuer in (("QQQ", "invesco"), ("VOO", "vanguard"), ("SPY", "ssga"), ("IVV", "ishares"), ("QQQI", "neos"), ("NCLD", "roundhill"), ("DRAM", "roundhill"), ("DISK", "tema"), ("DXYZ", "destiny")):
                 calls.clear()
                 self.assertEqual(fh.get_holdings(sym, refresh=True, now=NOW)["issuer_key"], issuer)
                 self.assertEqual(calls, [issuer])

@@ -14,6 +14,7 @@ Sources (each is the issuer's own public holdings data; nothing is guessed or fi
   invesco   Invesco funds (QQQ, ...)                  JSON behind the fund page; needs Playwright (the host rejects scripts)
   neos      NEOS funds (QQQI, ...)                    CSV behind the fund page
   roundhill Roundhill funds (NCLD, DRAM, ...)         daily CSV covering all Roundhill funds
+  tema      Tema ETFs (DISK, ...)                     daily CSV linked from the fund page
   destiny   Destiny Tech100 (DXYZ)                    quarterly top-of-portfolio list on destiny.xyz
 Any other fund: download the issuer's CSV and pass it with --csv (columns: name, ticker, weight; sector optional).
 
@@ -49,11 +50,11 @@ ISHARES_IDS = {
     "IJH": 239763, "IJR": 239774, "ITOT": 239724, "IEFA": 244049, "IEMG": 244050, "IWF": 239706, "IWD": 239708, "IWV": 239714,
 }
 # Funds whose issuer is known up front, so no probing is needed. Everything else is probed in ISSUERS order.
-HINTS = {"QQQ": "invesco", "VOO": "vanguard", "SPY": "ssga", "QQQI": "neos", "NCLD": "roundhill", "DRAM": "roundhill", "DXYZ": "destiny",
+HINTS = {"QQQ": "invesco", "VOO": "vanguard", "SPY": "ssga", "QQQI": "neos", "NCLD": "roundhill", "DRAM": "roundhill", "DISK": "tema", "DXYZ": "destiny",
          **{k: "ishares" for k in ISHARES_IDS}}
-ISSUER_ORDER = ["ssga", "vanguard", "neos", "roundhill", "ishares", "invesco"]
+ISSUER_ORDER = ["ssga", "vanguard", "neos", "roundhill", "tema", "ishares", "invesco"]
 ISSUER_NAMES = {"ssga": "State Street (SPDR)", "ishares": "BlackRock iShares", "vanguard": "Vanguard", "invesco": "Invesco",
-                "neos": "NEOS", "roundhill": "Roundhill", "destiny": "Destiny", "csv": "User-provided file"}
+                "neos": "NEOS", "roundhill": "Roundhill", "tema": "Tema ETFs", "destiny": "Destiny", "csv": "User-provided file"}
 KINDS = {"equity", "swap", "cash", "treasury", "option", "bond", "other"}
 
 
@@ -354,6 +355,50 @@ def fetch_roundhill(symbol, now=None, **_):
     raise FetchError(f"no Roundhill holdings file found for the last 8 days{f' ({last})' if last else ''}")
 
 
+# ---- Tema ETFs -----------------------------------------------------------------------------------
+def parse_tema(symbol, text, url):
+    """Tema's CSV: holdings_date, ticker, cusip, proper_name, shares, market_value, percent_of_nav (a fraction), is_cash, country, sector."""
+    out, dates = [], []
+    for r in csv.DictReader(io.StringIO(text.lstrip("\ufeff"))):
+        name, ticker = clean(r.get("proper_name")), clean(r.get("ticker"))
+        w = pct(r.get("percent_of_nav"))
+        if not name:
+            continue
+        if clean(r.get("is_cash")) == "1":
+            kind = "cash"
+        elif "-TRS-" in ticker.upper() or "SWAP" in name.upper():
+            kind = "swap"
+        elif re.search(r"TREASURY (BILL|NOTE|BOND)", name.upper()):
+            kind = "treasury"
+        else:
+            kind = "equity"
+        under = re.split(r"-TRS-", ticker, flags=re.I)[0] if kind == "swap" else None
+        out.append(holding("" if kind in ("swap", "cash") else ticker, swap_name(name) if kind == "swap" else name,
+                           None if w is None else round(w * 100, 4), r.get("sector"), kind,
+                           ticker if kind == "swap" else (clean(r.get("cusip")) or ticker), under))
+        if parse_date(r.get("holdings_date")):
+            dates.append(parse_date(r["holdings_date"]))
+    if not out:
+        raise NotThisIssuer(f"Tema's file for {symbol} has no holdings")
+    return result(symbol, "tema", out, max(dates) if dates else None, "Tema ETFs (issuer holdings file)", url)
+
+
+def fetch_tema(symbol, now=None, **_):
+    today = (now or dt.datetime.now(dt.timezone.utc)).date()
+    for back in range(0, 8):
+        d = today - dt.timedelta(days=back)
+        if d.weekday() >= 5:
+            continue
+        url = f"https://temaetfs.com/hubfs/Website/Holdings/{symbol}-holdings-{d.strftime('%m%d%Y')}.csv"
+        try:
+            text = fetch(url, accept="text/csv,*/*", tries=1)
+        except FetchError:
+            continue  # not published for that day (or not a Tema fund)
+        if text.lstrip("\ufeff").startswith("holdings_date,"):
+            return parse_tema(symbol, text, url)
+    raise NotThisIssuer(f"Tema has no holdings file for {symbol} in the last 8 days")
+
+
 # ---- Destiny Tech100 ------------------------------------------------------------------------
 DESTINY_THEMES = ("Artificial Intelligence", "Space & Frontier", "Financial Services", "Consumer & Social", "Enterprise & Cloud")
 
@@ -426,7 +471,7 @@ def parse_user_csv(symbol, text, path, name=None):
 
 # ---- orchestration -----------------------------------------------------------------------------------
 ADAPTERS = {"ssga": fetch_ssga, "ishares": fetch_ishares, "vanguard": fetch_vanguard, "invesco": fetch_invesco,
-            "neos": fetch_neos, "roundhill": fetch_roundhill, "destiny": fetch_destiny}
+            "neos": fetch_neos, "roundhill": fetch_roundhill, "tema": fetch_tema, "destiny": fetch_destiny}
 
 
 def fund_name(symbol):

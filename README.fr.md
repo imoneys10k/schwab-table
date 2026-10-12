@@ -175,6 +175,7 @@ Représentez les plus grandes positions d'un ETF (13 par défaut, `--top N` pour
 | Invesco | `QQQ` | JSON derrière la page du fonds, lu via Playwright car le serveur refuse les scripts |
 | NEOS | `QQQI` | CSV derrière la page du fonds |
 | Roundhill | `NCLD`, `DRAM` | CSV quotidien couvrant tous les fonds Roundhill |
+| Tema | `DISK` | CSV quotidien lié depuis la page du fonds |
 | Destiny | `DXYZ` | Liste trimestrielle sur destiny.xyz (sociétés non cotées) |
 | Autre fonds | un fichier que vous téléchargez | `--csv` avec des colonnes nom, code et poids |
 
@@ -222,7 +223,7 @@ python3 quarterly_earnings.py AAPL --period FY2025Q3 -o out/aapl_q3
 - `render_table.py`, `institutional_tables.py`, `prices_to_table.py`: Moteur de rendu des tableaux et ses quatre styles ; construit des spécifications Morgan / Blackstone à partir des prix
 - `fetch_prices.py`, `csv_to_prices.py`: Cours de clôture quotidiens de Nasdaq, Shanghai/Shenzhen et Yahoo ; conversion de vos fichiers CSV
 - `render_chart.py`, `render_common.py`: Moteur de rendu des graphiques ; thèmes et sorties PNG / PDF partagés
-- `fetch_holdings.py`, `render_holdings.py`: Positions d'un ETF depuis le fichier de l'émetteur (SPDR, iShares, Vanguard, Invesco, NEOS, Roundhill, Destiny, votre CSV) et rendu du top N
+- `fetch_holdings.py`, `render_holdings.py`: Positions d'un ETF depuis le fichier de l'émetteur (SPDR, iShares, Vanguard, Invesco, NEOS, Roundhill, Tema, Destiny, votre CSV) et rendu du top N
 - `quarterly_earnings.py`, `earnings_core.py`, `earnings_sources.py`, `render_earnings.py`: Commande de résultats, calculs vérifiables, adaptateurs de sources et rendu de style HSBC
 - `localization.py`, `fonts.py`, `fonts/`: Conversion en chinois traditionnel ; polices fournies et intégrées au HTML (licences incluses)
 - `references/`, `EARNINGS.md`: Guide des modèles ; usage et couverture des sources pour les résultats (chinois traditionnel)
