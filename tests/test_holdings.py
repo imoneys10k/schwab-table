@@ -129,13 +129,6 @@ class Parsing(unittest.TestCase):
         self.assertEqual(res["as_of"], "2026-08-31")
         self.assertEqual([x["weight"] for x in res["holdings"]], [8.08, None])
 
-    def test_invesco_depositary_receipts_are_equities_not_dropped(self):
-        """Regression: ADRs (ASML, ARM, PDD) were classed as 'other' and silently left out of the ranking."""
-        types = {"Common Stock": "equity", "American Depository Receipt": "equity", "American Depository Receipt - NY": "equity",
-                 "Currency": "cash", "Currency Collateral": "cash", "Synthetic Cash": "cash", "Index Future": "other"}
-        for name, kind in types.items():
-            self.assertEqual(fh.invesco_kind(name), kind, name)
-
     def test_neos_and_roundhill_csv(self):
         text = ("Date,Account,StockTicker,Cusip,SecurityName,Shares,Price,MarketValue,Weightings,NetAssets,SharesOutstanding,CreationUnits,MoneyMarketFlag\n"
                 '10/12/2026,TST,MU,595112103,"Micron Technology Inc",1,1,1,4.44%,1,1,1,\n'
@@ -199,22 +192,10 @@ class Parsing(unittest.TestCase):
             with self.assertRaises(fh.NotThisIssuer):
                 fh.fetch_tema("ZZZZ", now=NOW)
 
-    def test_destiny_page(self):
-        page = ("<main>Public access As of June 30, 2026 › Current Portfolio Summary of Economic Exposure · 3 companies "
-                "01 Anthropic¹ ↗ Artificial Intelligence 14.4 % 02 SpaceX¹ ↗ Space &amp; Frontier 10.6 % "
-                "03 Beast Industries Consumer &amp; Social 0.9 % – Cash &amp; equivalents Treasury 74.1 % "
-                "Percentages represent economic exposure</main>")
-        res = fh.parse_destiny("DXYZ", page, "u")
-        self.assertEqual(res["as_of"], "2026-06-30")
-        self.assertEqual([(x["name"], x["weight"], x["kind"]) for x in res["holdings"]],
-                         [("Anthropic", 14.4, "equity"), ("SpaceX", 10.6, "equity"), ("Beast Industries", 0.9, "equity"), ("Cash & equivalents", 74.1, "cash")])
-        self.assertEqual(res["holdings"][1]["sector"], "Space & Frontier")
-
-    def test_destiny_layout_change_is_an_error_not_a_partial_chart(self):
-        page = ("As of June 30, 2026 › Current Portfolio Summary of Economic Exposure · 37 companies "
-                "01 Anthropic¹ ↗ Artificial Intelligence 14.4 % Percentages represent")
-        with self.assertRaises(fh.FetchError):
-            fh.parse_destiny("DXYZ", page, "u")
+    def test_user_csv_with_holding_ticker_column(self):
+        text = "Fund Ticker,Holding Ticker,Name,Weight,Sector\nQQQ,NVDA,NVIDIA Corp,8.25,Technology\nQQQ,AAPL,Apple Inc,7.34,Technology\n"
+        res = fh.parse_user_csv("QQQ", text, "qqq.csv", "Invesco QQQ Trust")
+        self.assertEqual([(x["ticker"], x["weight"]) for x in res["holdings"]], [("NVDA", 8.25), ("AAPL", 7.34)])
 
     def test_user_csv_with_preamble(self):
         text = "Fund,My ETF\nGenerated,today\nName,Ticker,Weight (%)\nApple Inc,AAPL,7.5\nCash,,1.0\nBad,BAD,n/a\n"
@@ -263,10 +244,35 @@ class Routing(unittest.TestCase):
         calls = []
         adapters = {k: (lambda key: lambda symbol, **_: (calls.append(key), self.ok(key)(symbol))[1])(k) for k in fh.ADAPTERS}
         with Patch(fh, ADAPTERS=adapters):
-            for sym, issuer in (("QQQ", "invesco"), ("VOO", "vanguard"), ("SPY", "ssga"), ("IVV", "ishares"), ("QQQI", "neos"), ("NCLD", "roundhill"), ("DRAM", "roundhill"), ("DISK", "tema"), ("DXYZ", "destiny")):
+            for sym, issuer in (("VOO", "vanguard"), ("SPY", "ssga"), ("IVV", "ishares"), ("QQQI", "neos"), ("NCLD", "roundhill"), ("DRAM", "roundhill"), ("DISK", "tema")):
                 calls.clear()
                 self.assertEqual(fh.get_holdings(sym, refresh=True, now=NOW)["issuer_key"], issuer)
                 self.assertEqual(calls, [issuer])
+
+    def test_issuers_that_forbid_automated_access_are_never_fetched(self):
+        """Invesco's and Destiny's terms of use forbid automated access, so their funds must fail with import instructions, even with a cache."""
+        calls = []
+        adapters = {k: (lambda symbol, **_: calls.append(symbol)) for k in fh.ADAPTERS}
+        with Patch(fh, ADAPTERS=adapters):
+            for sym, name in (("QQQ", "Invesco"), ("QQQM", "Invesco"), ("DXYZ", "Destiny")):
+                with self.assertRaises(fh.FetchError) as cm:
+                    fh.get_holdings(sym, refresh=True, now=NOW)
+                msg = str(cm.exception)
+                self.assertIn(name, msg)
+                self.assertIn("terms of use forbid automated access", msg)
+                self.assertIn(f"fetch_holdings.py {sym} --csv", msg)
+            with self.assertRaises(fh.FetchError):
+                fh.get_holdings("SPY", issuer="invesco", now=NOW)
+        self.assertEqual(calls, [])
+        # a result cached before the rule existed must not be served either
+        fh.cache_file("QQQ", None).write_text(json.dumps({"saved_at": 9e12, "data": {"symbol": "QQQ"}}), encoding="utf-8")
+        with self.assertRaises(fh.FetchError):
+            fh.get_holdings("QQQ", now=NOW)
+
+    def test_unknown_tickers_are_never_probed_against_forbidden_hosts(self):
+        self.assertNotIn("invesco", fh.ISSUER_ORDER)
+        self.assertNotIn("destiny", fh.ISSUER_ORDER)
+        self.assertEqual(set(fh.ADAPTERS) & set(fh.MANUAL), set())
 
     def test_unknown_ticker_is_probed_until_an_issuer_has_it(self):
         def miss(symbol, **_):

@@ -285,10 +285,11 @@ spec 格式：
    ```bash
    python3 fetch_holdings.py QQQ NCLD -o data/        # 生成 data/QQQ_holdings.json 等
    ```
-   - 已支持：道富 SPDR（SPY、XLK…）、iShares（腳本內已核對產品編號的 15 檔，如 IVV、IWM、AGG）、Vanguard 股票型 ETF（VOO、VTI…）、Invesco（QQQ，需要 Playwright，因爲該站拒絕腳本直連）、NEOS（QQQI）、Roundhill（NCLD、DRAM…）、Tema（DISK）、Destiny（DXYZ）
+   - 已支持：道富 SPDR（SPY、XLK…）、iShares（腳本內已核對產品編號的 15 檔，如 IVV、IWM、AGG）、Vanguard 股票型 ETF（VOO、VTI…）、NEOS（QQQI）、Roundhill（NCLD、DRAM…）、Tema（DISK）
+   - **Invesco（QQQ、QQQM、QQQJ、RSP）和 Destiny（DXYZ）不自動抓取：** 兩家的使用條款禁止自動化存取網站。腳本會直接報錯並給出導入命令；請用戶自己從基金頁面下載持倉，再用 `--csv` 導入。**不要**用瀏覽器自動化、聚合站或模型記憶去繞過
    - 其他基金，或腳本報錯：請用戶從發行人網站下載持倉 CSV，再用 `fetch_holdings.py 代碼 --csv 文件 --name "基金全稱" --as-of YYYY-MM-DD` 匯入。**不得**用 Yahoo、聚合站或模型記憶補持倉
    - 有代碼沒取到時（退出碼 1）：**停下來告訴用戶缺哪隻**，不要自己補
-   - 持倉日期是發行人的日期，不是今天：Vanguard 每月公布、DXYZ 每季公布，其他多爲每日。超過 10 天腳本會警告，圖上如實顯示截止日，交付時也向用戶說明
+   - 持倉日期是發行人的日期，不是今天：Vanguard 每月公布，其他多爲每日（用戶自己導入的 CSV 要用 `--as-of` 寫明日期）。超過 10 天腳本會警告，圖上如實顯示截止日，交付時也向用戶說明
    - 響應緩存 6 小時，`--refresh` 繞過
 3. **渲染：**
    ```bash
@@ -302,7 +303,7 @@ spec 格式：
 - **`--mode lines`：** 照發行人列示的每一行直接排名，掉期和國債不合併、不剔除。用戶要「發行人原樣的明細」時用
 - **股份類別：** GOOGL 與 GOOG 默認分開（發行人也分開列）。用戶要按公司看集中度時加 `--merge-classes`，腳註會寫明已合併
 - **權重照發行人披露原樣顯示：** 小數位不超過發行人給的位數；缺權重的持倉不排名、顯示 NA，不當成 0。已列示權重合計明顯偏離 100% 時腳註會提示
-- **DXYZ 等私募持倉基金：** 數據是季度未經審計的經濟敞口，不是可交易倉位，腳註已寫明；不要把它們說成實時持倉
+- **私募公司持倉基金（如 DXYZ，只能用戶 CSV 導入）：** 披露多爲季度、未經審計的經濟敞口，不是可交易倉位；導入時用 `--as-of` 寫明日期，不要把它們說成實時持倉
 
 ## 自查清單（持倉）
 - [ ] 持倉來自 `fetch_holdings.py` 的發行人文件或用戶自己提供的 CSV；沒有用聚合站或記憶補數

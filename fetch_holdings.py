@@ -11,12 +11,12 @@ Sources (each is the issuer's own public holdings data; nothing is guessed or fi
   ssga      State Street SPDR funds (SPY, XLK, ...)   daily xlsx file
   ishares   iShares funds (IVV, IWM, AGG, ...)         latest-holdings.csv; product ids are listed in ISHARES_IDS
   vanguard  Vanguard equity ETFs (VOO, VTI, ...)      JSON behind the fund page (published monthly)
-  invesco   Invesco funds (QQQ, ...)                  JSON behind the fund page; needs Playwright (the host rejects scripts)
   neos      NEOS funds (QQQI, ...)                    CSV behind the fund page
   roundhill Roundhill funds (NCLD, DRAM, ...)         daily CSV covering all Roundhill funds
   tema      Tema ETFs (DISK, ...)                     daily CSV linked from the fund page
-  destiny   Destiny Tech100 (DXYZ)                    quarterly top-of-portfolio list on destiny.xyz
-Any other fund: download the issuer's CSV and pass it with --csv (columns: name, ticker, weight; sector optional).
+Invesco (QQQ, QQQM, ...) and Destiny (DXYZ) are not fetched: their terms of use forbid automated access to their websites.
+Download the holdings yourself from the fund page and import them with --csv. The same goes for any other fund:
+--csv takes columns name, ticker (optional) and weight; sector is optional.
 
 Output JSON: {symbol, name, issuer, as_of, retrieved_at, source, source_url, weight_basis, holdings[], warnings[]}.
 Each holding has ticker, name, weight (percent, null if unreported), sector, kind and id. kind is one of
@@ -50,11 +50,17 @@ ISHARES_IDS = {
     "IJH": 239763, "IJR": 239774, "ITOT": 239724, "IEFA": 244049, "IEMG": 244050, "IWF": 239706, "IWD": 239708, "IWV": 239714,
 }
 # Funds whose issuer is known up front, so no probing is needed. Everything else is probed in ISSUERS order.
-HINTS = {"QQQ": "invesco", "VOO": "vanguard", "SPY": "ssga", "QQQI": "neos", "NCLD": "roundhill", "DRAM": "roundhill", "DISK": "tema", "DXYZ": "destiny",
+HINTS = {"VOO": "vanguard", "SPY": "ssga", "QQQI": "neos", "NCLD": "roundhill", "DRAM": "roundhill", "DISK": "tema",
          **{k: "ishares" for k in ISHARES_IDS}}
-ISSUER_ORDER = ["ssga", "vanguard", "neos", "roundhill", "tema", "ishares", "invesco"]
-ISSUER_NAMES = {"ssga": "State Street (SPDR)", "ishares": "BlackRock iShares", "vanguard": "Vanguard", "invesco": "Invesco",
-                "neos": "NEOS", "roundhill": "Roundhill", "tema": "Tema ETFs", "destiny": "Destiny", "csv": "User-provided file"}
+# Issuers whose terms of use forbid automated access. The tool does not fetch them; it tells the user how to import a file instead.
+MANUAL = {
+    "invesco": ("Invesco", "https://www.invesco.com/", {"QQQ", "QQQM", "QQQJ", "RSP"}),
+    "destiny": ("Destiny", "https://destiny.xyz/tech100", {"DXYZ"}),
+}
+MANUAL_HINTS = {sym: key for key, (_, _, syms) in MANUAL.items() for sym in syms}
+ISSUER_ORDER = ["ssga", "vanguard", "neos", "roundhill", "tema", "ishares"]
+ISSUER_NAMES = {"ssga": "State Street (SPDR)", "ishares": "BlackRock iShares", "vanguard": "Vanguard",
+                "neos": "NEOS", "roundhill": "Roundhill", "tema": "Tema ETFs", "csv": "User-provided file"}
 KINDS = {"equity", "swap", "cash", "treasury", "option", "bond", "other"}
 
 
@@ -243,62 +249,6 @@ def fetch_vanguard(symbol, **_):
     return parse_vanguard(symbol, pages, base)
 
 
-# ---- Invesco ----------------------------------------------------------------------
-def invesco_kind(type_name):
-    """Invesco's securityTypeName: Common Stock, American Depository Receipt(-NY), Currency, Currency Collateral, Synthetic Cash, Index Future."""
-    t = clean(type_name).lower()
-    if any(k in t for k in ("money market", "cash", "currency")):
-        return "cash"
-    if "treasury" in t or "t-bill" in t:
-        return "treasury"
-    if "option" in t:
-        return "option"
-    if "future" in t:
-        return "other"
-    if "bond" in t or "note" in t:
-        return "bond"
-    return "equity" if any(k in t for k in ("stock", "adr", "deposit", "equity", "reit", "share")) else "other"
-
-
-def parse_invesco(symbol, data, url):
-    out = [holding(h.get("ticker"), h.get("issuerName"), pct(h.get("percentageOfTotalNetAssets")), h.get("sectorName"),
-                   invesco_kind(h.get("securityTypeName")), h.get("cusip")) for h in data.get("holdings", [])]
-    return result(symbol, "invesco", out, parse_date(data.get("effectiveBusinessDate") or data.get("effectiveDate")),
-                  "Invesco (issuer holdings data)", url)
-
-
-def fetch_invesco(symbol, **_):
-    """invesco.com's data host rejects scripts but answers its own pages, so read it from inside a loaded page."""
-    try:
-        from playwright.sync_api import sync_playwright
-    except ImportError:
-        from render_common import reexec_in_venv
-        reexec_in_venv()
-        raise FetchError("Invesco data needs Playwright (pip install playwright && playwright install chromium); "
-                         "or download the holdings from invesco.com and pass them with --csv") from None
-    url = (f"https://dng-api.invesco.com/cache/v1/accounts/en_US/shareclasses/{symbol}/holdings/fund"
-           "?idType=ticker&interval=monthly&productType=ETF")
-    with sync_playwright() as p:
-        try:
-            browser = p.chromium.launch()
-        except Exception as e:
-            raise FetchError(f"Chromium is not available ({str(e).splitlines()[0]}); run: playwright install chromium") from None
-        try:
-            page = browser.new_page()
-            page.goto(f"https://www.invesco.com/{symbol.lower()}-etf/en/about.html", wait_until="domcontentloaded", timeout=60000)
-            reply = page.evaluate("async u => { const r = await fetch(u); return {s: r.status, t: await r.text()}; }", url)
-        except Exception as e:
-            raise FetchError(f"Invesco page failed to load: {str(e).splitlines()[0]}") from None
-        finally:
-            browser.close()
-    if reply["s"] != 200 or not reply["t"].lstrip().startswith("{"):
-        raise NotThisIssuer(f"Invesco returned HTTP {reply['s']} for {symbol}")
-    data = json.loads(reply["t"])
-    if not data.get("holdings"):
-        raise NotThisIssuer(f"Invesco lists no holdings for {symbol}")
-    return parse_invesco(symbol, data, url)
-
-
 # ---- NEOS and Roundhill (same CSV layout) ------------------------------------------------
 def classify_neos_like(ticker, name, flag, cusip):
     u, t = name.upper(), ticker.strip()
@@ -405,44 +355,9 @@ def fetch_tema(symbol, now=None, **_):
     raise NotThisIssuer(f"Tema has no holdings file for {symbol} in the last 8 days")
 
 
-# ---- Destiny Tech100 ------------------------------------------------------------------------
-DESTINY_THEMES = ("Artificial Intelligence", "Space & Frontier", "Financial Services", "Consumer & Social", "Enterprise & Cloud")
-
-
-def parse_destiny(symbol, page, url):
-    text = clean(re.sub(r"<script[\s\S]*?</script>|<style[\s\S]*?</style>|<[^>]+>", " ", page))
-    m = re.search(r"As of ([A-Z][a-z]+ \d{1,2}, \d{4}) .{0,40}?Current Portfolio Summary of Economic Exposure\s*·\s*(\d+) companies", text)
-    if not m:
-        raise FetchError("could not find the 'Current Portfolio' list on destiny.xyz; the page layout changed (use --csv)")
-    as_of, count = parse_date(m.group(1)), int(m.group(2))
-    section = text[m.end():].split("Percentages represent", 1)[0]
-    themes = "|".join(re.escape(t) for t in DESTINY_THEMES)
-    out, expected = [], 1
-    for rank, name, theme, weight in re.findall(rf"(\d{{2}}|–) (.+?)\s*(?:↗\s+)?({themes}|Treasury) (\d+(?:\.\d+)?) %", section):
-        name = re.sub(r"[¹²³⁴⁵⁶⁷⁸⁹⁰]+\s*$", "", name).strip()
-        if rank != "–":
-            if int(rank) != expected:
-                break
-            expected += 1
-        kind = "cash" if theme == "Treasury" else "equity"
-        out.append(holding("", name, float(weight), None if kind == "cash" else theme, kind))
-    if expected - 1 != count:
-        raise FetchError(f"parsed {expected - 1} of {count} Destiny holdings; the page layout changed (use --csv)")
-    warnings = ["Destiny reports private-company holdings quarterly as unaudited economic exposure, not tradable positions."]
-    return result(symbol, "destiny", out, as_of, "Destiny (destiny.xyz, quarterly portfolio disclosure)", url, "Destiny Tech100 Inc.",
-                  "% of portfolio (economic exposure)", warnings)
-
-
-def fetch_destiny(symbol, **_):
-    if symbol != "DXYZ":
-        raise NotThisIssuer("the destiny adapter only covers DXYZ")
-    url = "https://destiny.xyz/tech100"
-    return parse_destiny(symbol, fetch(url, accept="text/html"), url)
-
-
 # ---- user CSV ----------------------------------------------------------------------------------
 NAME_COLS = ("name", "security name", "holding", "holding name", "issuer", "description", "名称", "名稱", "证券名称")
-TICKER_COLS = ("ticker", "symbol", "stock ticker", "identifier", "代码", "代碼")
+TICKER_COLS = ("ticker", "symbol", "stock ticker", "holding ticker", "identifier", "代码", "代碼")
 WEIGHT_COLS = ("weight", "weight (%)", "weighting", "weightings", "% of net assets", "% of fund", "% weight", "percent", "占比", "權重", "权重")
 SECTOR_COLS = ("sector", "industry", "行业", "行業")
 
@@ -476,8 +391,14 @@ def parse_user_csv(symbol, text, path, name=None):
 
 
 # ---- orchestration -----------------------------------------------------------------------------------
-ADAPTERS = {"ssga": fetch_ssga, "ishares": fetch_ishares, "vanguard": fetch_vanguard, "invesco": fetch_invesco,
-            "neos": fetch_neos, "roundhill": fetch_roundhill, "tema": fetch_tema, "destiny": fetch_destiny}
+ADAPTERS = {"ssga": fetch_ssga, "ishares": fetch_ishares, "vanguard": fetch_vanguard,
+            "neos": fetch_neos, "roundhill": fetch_roundhill, "tema": fetch_tema}
+
+
+def manual_message(symbol, key):
+    name, site, _ = MANUAL[key]
+    return (f"{name}'s terms of use forbid automated access to its website, so this tool does not fetch {symbol}. Download the holdings from the fund "
+            f"page at {site} and import the file: python3 fetch_holdings.py {symbol} --csv FILE --name \"Fund name\" --as-of YYYY-MM-DD")
 
 
 def fund_name(symbol):
@@ -503,7 +424,7 @@ def validate(res):
     if not weights:
         raise FetchError(f"{res['symbol']}: no weights in the {res['issuer']} file")
     total = sum(weights)
-    if not 90 <= total <= 110 and res.get("issuer_key") != "destiny":
+    if not 90 <= total <= 110:
         res["warnings"].append(f"listed weights add up to {total:.1f}%, not about 100%; the file may be partial")
     missing = len(rows) - len(weights)
     if missing:
@@ -530,6 +451,9 @@ def cache_file(symbol, issuer):
 def get_holdings(symbol, issuer=None, refresh=False, now=None):
     symbol = symbol.strip().upper()
     now = now or dt.datetime.now(dt.timezone.utc)
+    manual = issuer if issuer in MANUAL else (MANUAL_HINTS.get(symbol) if not issuer else None)
+    if manual:
+        raise FetchError(manual_message(symbol, manual))
     cf = cache_file(symbol, issuer)
     if not refresh:
         try:

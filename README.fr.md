@@ -172,16 +172,16 @@ Représentez les plus grandes positions d'un ETF (13 par défaut, `--top N` pour
 | State Street SPDR | `SPY`, `XLK` et autres fonds SPDR | Fichier xlsx quotidien |
 | iShares | `IVV`, `IWM`, `AGG` et 12 autres (liste d'identifiants vérifiés) | `latest-holdings.csv` |
 | Vanguard | `VOO`, `VTI` et autres ETF actions | JSON derrière la page du fonds (publié chaque mois) |
-| Invesco | `QQQ` | JSON derrière la page du fonds, lu via Playwright car le serveur refuse les scripts |
 | NEOS | `QQQI` | CSV derrière la page du fonds |
 | Roundhill | `NCLD`, `DRAM` | CSV quotidien couvrant tous les fonds Roundhill |
 | Tema | `DISK` | CSV quotidien lié depuis la page du fonds |
-| Destiny | `DXYZ` | Liste trimestrielle sur destiny.xyz (sociétés non cotées) |
+| Invesco, Destiny | `QQQ`, `QQQM`, `DXYZ` | Non récupérés : leurs conditions d'utilisation interdisent l'accès automatisé. Téléchargez le fichier sur la page du fonds et importez-le avec `--csv` |
 | Autre fonds | un fichier que vous téléchargez | `--csv` avec des colonnes nom, code et poids |
 
 - **Classement avec les swaps :** pour des fonds comme NCLD et DRAM, un swap sur une action s'ajoute à la position en titres de la même action (rapprochement par CUSIP/SEDOL), comme dans la vue « principales positions » de l'émetteur ; la barre montre les deux parts. Liquidités, fonds monétaires, bons du Trésor et options figurent sur une ligne à part, sans être classés. `--mode lines` classe au contraire chaque ligne telle que l'émetteur la liste.
 - **Catégories d'actions :** GOOGL et GOOG restent séparés sauf avec `--merge-classes`.
-- **Dates honnêtes :** la date de situation est celle de l'émetteur (Vanguard publie chaque mois, DXYZ chaque trimestre), avec un avertissement au-delà de 10 jours. Les poids sont affichés tels que publiés ; un poids absent s'affiche NA et n'est jamais compté comme zéro.
+- **Dates honnêtes :** la date de situation est celle de l'émetteur (Vanguard publie chaque mois), avec un avertissement au-delà de 10 jours. Les poids sont affichés tels que publiés ; un poids absent s'affiche NA et n'est jamais compté comme zéro.
+- **Conditions d'utilisation :** seuls des fichiers et pages publics sont lus, et chaque chemin est autorisé par le robots.txt du site. Invesco et Destiny interdisent l'accès automatisé : leurs fonds se traitent uniquement par import (`--csv`). Les conditions n'ont été vérifiées que pour Invesco, Destiny et SSGA ; lisez celles des autres émetteurs avant tout usage commercial.
 - **Options :** `--top N`, `--names names.json` (noms en langue locale), `--theme dark`, `--pdf`, `--langs`.
 
 ```bash
@@ -223,7 +223,7 @@ python3 quarterly_earnings.py AAPL --period FY2025Q3 -o out/aapl_q3
 - `render_table.py`, `institutional_tables.py`, `prices_to_table.py`: Moteur de rendu des tableaux et ses quatre styles ; construit des spécifications Morgan / Blackstone à partir des prix
 - `fetch_prices.py`, `csv_to_prices.py`: Cours de clôture quotidiens de Nasdaq, Shanghai/Shenzhen et Yahoo ; conversion de vos fichiers CSV
 - `render_chart.py`, `render_common.py`: Moteur de rendu des graphiques ; thèmes et sorties PNG / PDF partagés
-- `fetch_holdings.py`, `render_holdings.py`: Positions d'un ETF depuis le fichier de l'émetteur (SPDR, iShares, Vanguard, Invesco, NEOS, Roundhill, Tema, Destiny, votre CSV) et rendu du top N
+- `fetch_holdings.py`, `render_holdings.py`: Positions d'un ETF depuis le fichier de l'émetteur (SPDR, iShares, Vanguard, NEOS, Roundhill, Tema, votre CSV) et rendu du top N
 - `quarterly_earnings.py`, `earnings_core.py`, `earnings_sources.py`, `render_earnings.py`: Commande de résultats, calculs vérifiables, adaptateurs de sources et rendu de style HSBC
 - `localization.py`, `fonts.py`, `fonts/`: Conversion en chinois traditionnel ; polices fournies et intégrées au HTML (licences incluses)
 - `references/`, `EARNINGS.md`: Guide des modèles ; usage et couverture des sources pour les résultats (chinois traditionnel)

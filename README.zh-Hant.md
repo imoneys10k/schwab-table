@@ -172,16 +172,16 @@ python3 render_chart.py examples/chart_lines_spec.json out/chart
 | 道富 SPDR | `SPY`、`XLK` 等 SPDR 基金 | 每日 xlsx 檔 |
 | iShares | `IVV`、`IWM`、`AGG` 等共 15 檔（已核對的產品編號清單） | `latest-holdings.csv` |
 | Vanguard | `VOO`、`VTI` 等股票型 ETF | 基金頁面背後的 JSON（每月公布） |
-| Invesco | `QQQ` | 基金頁面背後的 JSON；該站拒絕腳本直連，所以透過 Playwright 讀取 |
 | NEOS | `QQQI` | 基金頁面背後的 CSV |
 | Roundhill | `NCLD`、`DRAM` | 涵蓋全部 Roundhill 基金的每日 CSV |
 | Tema | `DISK` | 基金頁面連結的每日 CSV |
-| Destiny | `DXYZ` | destiny.xyz 上的季度清單（私募公司） |
+| Invesco、Destiny | `QQQ`、`QQQM`、`DXYZ` | 不自動抓取：其使用條款禁止自動化存取。請從基金頁面自行下載，再用 `--csv` 匯入 |
 | 其他基金 | 你自己下載的檔案 | 用 `--csv` 匯入，需有名稱、代碼、權重欄 |
 
 - **掉期敞口一併計算：** NCLD、DRAM 這類基金，股票上的掉期會加到同一檔股票的現貨持倉上（以 CUSIP／SEDOL 對應），與發行人自己的前十大持倉口徑一致，條形圖分兩段顯示。現金、貨幣基金、國債與期權另列一行，不參與排名。`--mode lines` 則照發行人列示的每一行直接排名。
 - **股份類別：** GOOGL 與 GOOG 預設分開，加 `--merge-classes` 才合併。
-- **日期如實：** 持倉截止日是發行人的日期（Vanguard 每月公布、DXYZ 每季公布），超過 10 天會加警告。權重照披露原樣列示；缺權重顯示 NA，不當成 0。
+- **日期如實：** 持倉截止日是發行人的日期（Vanguard 每月公布），超過 10 天會加警告。權重照披露原樣列示；缺權重顯示 NA，不當成 0。
+- **使用條款：** 只讀取公開的檔案與頁面，且每個路徑都符合該站的 robots.txt。Invesco 與 Destiny 禁止自動化存取，所以這兩家的基金只能匯入（`--csv`）。條款只核對了 Invesco、Destiny 和 SSGA，其他發行人的條款請在商業使用前自行閱讀。
 - **選項：** `--top N`、`--names names.json`（本地語言名稱）、`--theme dark`、`--pdf`、`--langs`。
 
 ```bash
@@ -223,7 +223,7 @@ python3 quarterly_earnings.py AAPL --period FY2025Q3 -o out/aapl_q3
 - `render_table.py`、`institutional_tables.py`、`prices_to_table.py`: 表格渲染器與四種版式；用抓下來的價格產生摩根士丹利／黑石規格
 - `fetch_prices.py`、`csv_to_prices.py`: 取得 Nasdaq、上海／深圳與 Yahoo 的日收盤價；轉換你自己的 CSV
 - `render_chart.py`、`render_common.py`: 走勢圖渲染器；共用的主題與 PNG / PDF 輸出
-- `fetch_holdings.py`、`render_holdings.py`: 從發行人自己的檔案取得 ETF 持倉（SPDR、iShares、Vanguard、Invesco、NEOS、Roundhill、Tema、Destiny，或你的 CSV），並渲染前 N 大圖
+- `fetch_holdings.py`、`render_holdings.py`: 從發行人自己的檔案取得 ETF 持倉（SPDR、iShares、Vanguard、NEOS、Roundhill、Tema，或你的 CSV），並渲染前 N 大圖
 - `quarterly_earnings.py`、`earnings_core.py`、`earnings_sources.py`、`render_earnings.py`: 財報指令、可核對的計算、來源轉接器與 HSBC 版式渲染器
 - `localization.py`、`fonts.py`、`fonts/`: 繁體中文轉換；嵌入 HTML 的隨附字型（含授權）
 - `references/`、`EARNINGS.md`: 範本指南；財報用法與來源涵蓋範圍（繁體中文）

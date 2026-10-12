@@ -274,10 +274,11 @@ The user wants an ETF's largest holdings, its concentration or its heavyweight s
    ```bash
    python3 fetch_holdings.py QQQ NCLD -o data/        # writes data/QQQ_holdings.json etc.
    ```
-   - Supported: State Street SPDR (SPY, XLK, ...), iShares (the 15 funds whose product ids are verified in the script, e.g. IVV, IWM, AGG), Vanguard equity ETFs (VOO, VTI, ...), Invesco (QQQ; needs Playwright because the host rejects scripts), NEOS (QQQI), Roundhill (NCLD, DRAM, ...), Tema (DISK), Destiny (DXYZ)
+   - Supported: State Street SPDR (SPY, XLK, ...), iShares (the 15 funds whose product ids are verified in the script, e.g. IVV, IWM, AGG), Vanguard equity ETFs (VOO, VTI, ...), NEOS (QQQI), Roundhill (NCLD, DRAM, ...), Tema (DISK)
+   - **Invesco (QQQ, QQQM, QQQJ, RSP) and Destiny (DXYZ) are not fetched automatically:** their terms of use forbid automated access to their websites. The script stops with an error that includes the import command; ask the user to download the holdings from the fund page and import them with `--csv`. **Do not** work around this with browser automation, aggregator sites or memory
    - Any other fund, or a script error: ask the user to download the holdings CSV from the issuer's site and import it with `fetch_holdings.py SYMBOL --csv file --name "Full fund name" --as-of YYYY-MM-DD`. **Never** fill holdings from Yahoo, aggregator sites or memory
    - If a symbol could not be fetched (exit code 1), **stop and tell the user which one**
-   - The holdings date is the issuer's, not today's: Vanguard publishes monthly and DXYZ quarterly, the others mostly daily. The script warns above 10 days; the chart shows the date as is, and tell the user when you deliver
+   - The holdings date is the issuer's, not today's: Vanguard publishes monthly, the others mostly daily (give a user-imported CSV its date with `--as-of`). The script warns above 10 days; the chart shows the date as is, and tell the user when you deliver
    - Responses are cached for 6 hours (`--refresh` bypasses the cache)
 3. **Render:**
    ```bash
@@ -291,7 +292,7 @@ The user wants an ETF's largest holdings, its concentration or its heavyweight s
 - **`--mode lines`:** every line is ranked exactly as the issuer lists it, with no merging or removal. Use it when the user wants the issuer's raw listing
 - **Share classes:** GOOGL and GOOG stay separate by default (issuers list them separately). Add `--merge-classes` for concentration by company; the footnote states that classes were combined
 - **Weights are shown as the issuer reports them:** no more decimals than the issuer gave; a holding without a weight is not ranked and shows NA, never zero. The footnote warns when the listed weights are far from 100%
-- **Private-company funds such as DXYZ:** the data is quarterly, unaudited economic exposure, not tradable positions (the footnote says so); do not describe it as live holdings
+- **Private-company funds such as DXYZ (user CSV import only):** disclosures are usually quarterly, unaudited economic exposure, not tradable positions; give the import its date with `--as-of` and do not describe it as live holdings
 
 ### Checklist (holdings)
 - [ ] Holdings come from `fetch_holdings.py` (the issuer's file) or the user's own CSV; nothing filled from aggregators or memory

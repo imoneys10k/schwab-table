@@ -72,8 +72,8 @@ S = {
 }
 BASIS = {"en": {"% of net assets": "% of net assets", "% of portfolio (economic exposure)": "% of portfolio (economic exposure)"},
          "zh": {"% of net assets": "占净资产比例", "% of portfolio (economic exposure)": "占投资组合比例（经济敞口）"}}
-ISSUER_ZH = {"State Street (SPDR)": "道富（SPDR）", "BlackRock iShares": "贝莱德 iShares", "Vanguard": "领航 Vanguard", "Invesco": "景顺 Invesco",
-             "NEOS": "NEOS", "Roundhill": "Roundhill", "Tema ETFs": "Tema ETFs", "Destiny": "Destiny", "User-provided file": "用户提供的文件"}
+ISSUER_ZH = {"State Street (SPDR)": "道富（SPDR）", "BlackRock iShares": "贝莱德 iShares", "Vanguard": "领航 Vanguard", 
+             "NEOS": "NEOS", "Roundhill": "Roundhill", "Tema ETFs": "Tema ETFs", "User-provided file": "用户提供的文件"}
 
 
 def class_key(name):

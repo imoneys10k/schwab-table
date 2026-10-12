@@ -4,9 +4,9 @@ The issuers' endpoints are public pages and files, not documented APIs, so any o
 weekly by .github/workflows/live-check.yml (and on demand) so a break is noticed before a user hits it.
 
 Usage:
-  python3 tools/live_check.py                 # every issuer (the Invesco check needs Playwright and Chromium)
+  python3 tools/live_check.py                 # every issuer 
   python3 tools/live_check.py --only ssga,vanguard
-  python3 tools/live_check.py --skip invesco
+  python3 tools/live_check.py --skip tema
 Exit code 1 if any check fails. Nothing is written except the local response cache.
 """
 import argparse
@@ -27,11 +27,9 @@ CASES = {
     "ishares": ("IVV", 400, 10, False),
     "ishares-bond": ("TLT", 20, 10, False),
     "vanguard": ("VOO", 400, 50, False),      # Vanguard publishes monthly
-    "invesco": ("QQQ", 90, 10, False),
     "neos": ("QQQI", 90, 10, False),
     "roundhill": ("DRAM", 10, 10, True),
     "tema": ("DISK", 10, 10, True),
-    "destiny": ("DXYZ", 20, 140, False),       # quarterly disclosure
 }
 
 
