@@ -43,16 +43,16 @@ C = {}
 
 # =====================================================================================================================
 C["en"] = dict(
-    tagline="Research-desk tables, price charts and quarterly earnings reviews for your AI agent.",
+    tagline="Research-desk tables, price charts, ETF holdings and quarterly earnings reviews for your AI agent.",
     links=["🚀 Install", "🎨 Gallery", "🌐 Website", "🧾 Earnings demo", "📘 Skill doc"],
     intro=("Two agent skills in one repository, built for Claude Code and usable from Codex and other coding agents. **schwab-performance-table** turns a stock list, a brokerage holdings screenshot, price data or your own "
-           "CSV into research-desk tables (Schwab, Morgan, Blackstone and IBKR layouts) and into price charts with drawdown and log scale. "
+           "CSV into research-desk tables (Schwab, Morgan, Blackstone and IBKR layouts) , into price charts with drawdown and log scale, and into top-holdings charts for ETFs. "
            "**quarterly-earnings-review** checks a company's quarterly filing and produces an HSBC-style earnings table with source-backed commentary. "
            "Everything is rendered in English and Traditional Chinese, as PNG plus self-contained HTML."),
     h_high="Highlights",
     cards=[
         ("🎯", "Four report layouts", "Schwab, Morgan, Blackstone and IBKR styles with explicit column schemas. Independent templates, not reports issued by those institutions."),
-        ("📊", "Tables, charts, earnings", "Ranking, holdings and watchlist tables; line charts and small multiples with drawdown and log scale; HSBC-style quarterly earnings."),
+        ("📊", "Tables, charts, earnings", "Ranking, holdings and watchlist tables; line charts and small multiples with drawdown and log scale; ETF top-holdings charts; HSBC-style quarterly earnings."),
         ("🌏", "English and Traditional Chinese", "Every output in both languages: 2x PNG and self-contained HTML, with an optional dark theme and PDF."),
         ("🔒", "Sources always shown", "Nasdaq and Shanghai/Shenzhen exchange closes, clearly labelled Yahoo data for other markets, SEC and Apple filings for earnings. Missing data is NA, never invented."),
         ("🤖", "One-line agent install", "Paste a prompt into Claude Code or Codex. Works on macOS, Linux and Windows, and installs both skills."),
@@ -61,11 +61,11 @@ C["en"] = dict(
     h_gallery="Gallery",
     gallery=[("Ranking table", "EN"), ("Watchlist table", "繁體中文"), ("Line chart with drawdown", "EN"), ("Small multiples, log scale", "繁體中文"),
              ("Morgan-style matrix", "繁體中文"), ("Blackstone-style performance", "繁體中文"), ("IBKR-style holdings", "繁體中文"),
-             ("HSBC quarterly earnings, AAPL Q3", "繁體中文"), ("HSBC quarterly earnings, AAPL Q4", "繁體中文"), ("Holdings table", "EN")],
+             ("HSBC quarterly earnings, AAPL Q3", "繁體中文"), ("HSBC quarterly earnings, AAPL Q4", "繁體中文"), ("Holdings table", "EN"), ('ETF top 13 holdings', 'EN'), ('ETF with swap exposure', '繁體中文')],
     gallery_note="The earnings examples use Apple's official filings and the ranking table a public Charles Schwab chart. Everything else uses fictional companies and synthetic data.",
     h_flow="How it works",
     flow=["📝 Tickers, screenshot, CSV<br/>or ticker + quarter", "🤖 Your AI agent + skills", "🏛 Prices: Nasdaq, SSE/SZSE,<br/>Yahoo (labelled), your CSV",
-          "📑 Filings: Apple PDFs,<br/>SEC facts, your imports", "🖨 render_table<br/>render_chart", "🖨 quarterly_earnings", "🖼 PNG + HTML<br/>EN · 繁體中文"],
+          "📑 Filings: Apple PDFs,<br/>SEC facts, your imports", "🖨 render_table<br/>render_chart<br/>render_holdings", "🖨 quarterly_earnings", "🖼 PNG + HTML<br/>EN · 繁體中文"],
     h_install="Install",
     install_intro="Works on macOS, Linux and Windows. You need Python 3.9+ (to render); git is optional. The installer registers both skills.",
     tip="💡 **Easiest way:** paste the prompt below into your AI agent and it installs everything for you.",
@@ -93,7 +93,8 @@ C["en"] = dict(
            "Compare these six stocks from March to June on a log scale.",
            "Show AAPL, MSFT and NVDA in a Morgan-style return and risk matrix.",
            "Chart 7203.T, 0700.HK and 600519.SS year to date.",
-           "Review AAPL FY2025Q3 in an HSBC-style table."],
+           "Review AAPL FY2025Q3 in an HSBC-style table.",
+           'Show the top 13 holdings of QQQ, VOO and SPY.'],
     h_styles="Table styles",
     styles_intro="Four layouts, chosen with `--style` (or `spec.style`; the default is Schwab). They are independent templates, not reports issued by or affiliated with the named institutions.",
     style_head=["Style", "What it shows", "Example"],
@@ -117,6 +118,11 @@ C["en"] = dict(
     chart_bullets=["**Benchmark:** SPY by default (labelled as a proxy for the S&P 500), up to two benchmarks (`--benchmark SPY,COMP`), or `--benchmark none`.",
                    "**Axis:** one y-axis, indexed to 100 at the start. It switches to a log scale automatically when the range is wide (or set `y_scale`).",
                    "**Options:** `--theme dark`, `--pdf`, custom line colours, and hover tooltips in the HTML files."],
+    h_etf='ETF top holdings',
+    etf_intro="Chart an ETF's largest holdings (13 by default, `--top N` changes it) with weight, cumulative weight, sector and the total of everything else. The source is each fund's own issuer file, and the as-of date is always printed on the chart.",
+    etf_head=['Issuer', 'Funds', 'How it is fetched'],
+    etf_rows=[('State Street SPDR', '`SPY`, `XLK` and other SPDR funds', 'Daily xlsx file'), ('iShares', '`IVV`, `IWM`, `AGG` and 12 more (verified product-id list)', '`latest-holdings.csv`'), ('Vanguard', '`VOO`, `VTI` and other equity ETFs', 'JSON behind the fund page (published monthly, so it can be weeks old)'), ('NEOS', '`QQQI`', 'CSV behind the fund page'), ('Roundhill', '`NCLD`, `DRAM`', 'Daily CSV covering all Roundhill funds'), ('Tema', '`DISK`', 'Daily CSV linked from the fund page'), ('Invesco, Destiny', '`QQQ`, `QQQM`, `DXYZ`', 'Not fetched: their terms of use forbid automated access. Download from the fund page and import with `--csv`'), ('Any other fund', 'a file you download', '`--csv` with name, ticker and weight columns')],
+    etf_bullets=["**Swap-aware ranking:** for funds such as NCLD and DRAM, a swap on a stock is added to the shares held in the same stock (matched by CUSIP/SEDOL), which is how Roundhill's own site adds them, and the bar shows both parts. For Roundhill funds a company's other listings are added too (DRAM's SK hynix and Samsung). Cash, money-market funds, T-bills and options go on a separate line and are not ranked. `--mode lines` ranks every line exactly as listed instead.", '**Share classes:** GOOGL and GOOG stay separate unless you pass `--merge-classes`.', "**Honest dates:** the as-of date is the day the issuer's prices are from (NEOS and Roundhill stamp their files with the next trading day; the tool shows the pricing day and says so in the footnote, and the weekly live check verifies it against official closes; Vanguard publishes monthly), with a warning when it is more than 10 days old. Weights are shown as reported; a missing weight is NA, never zero.", "**Terms of use:** only public files and pages are read, and each path is allowed by the host's robots.txt. Invesco and Destiny forbid automated access, so those funds are import-only (`--csv`). Terms were checked for Invesco, Destiny and SSGA only, so read the others' terms before commercial use.", '**Options:** `--top N`, `--by sector|name` (for funds with thousands of lines, such as bond ETFs), `--names names.json` for local-language names, `--theme dark`, `--pdf`, `--langs`.'],
     h_earn="Quarterly earnings review",
     earn_intro="Ask “Review AAPL FY2025Q3 in an HSBC-style table.” The **quarterly-earnings-review** skill verifies the fiscal dates and the primary filing, computes single-quarter, year-over-year and quarter-over-quarter values, and adds commentary that cites its sources. Output is an English and Traditional Chinese PNG + HTML, plus the raw facts and an audit ledger.",
     earn_points=["**Sources:** Apple's official financial PDFs (verified live for FY2025Q3 and FY2025Q4); other US-GAAP companies through SEC Company Facts (the parser is covered by fixed fixtures, live access can be refused); other markets through verified official reports imported with `--facts`.",
@@ -129,6 +135,7 @@ C["en"] = dict(
            "**Price return only from automatic sources.** Nasdaq dividend amounts are not split-adjusted and ETFs have none, so total return needs your own adjusted-close CSV.",
            "**Yahoo is labelled as aggregated data**, not as exchange-published closes. A-share website prices are unadjusted; the tools warn about corporate-action distortion.",
            "**Hong Kong and other markets need the exchange suffix** (`0700.HK`); bare numeric codes are ambiguous and rejected.",
+           "**Sites that forbid automated access are not fetched.** Invesco (QQQ) and Destiny (DXYZ) do so in their terms of use, so those funds are import-only (`--csv`). The tool never works around a block with browser automation.",
            "Details for agents are in [SKILL.md](SKILL.md) (Traditional Chinese) and [SKILL.en.md](SKILL.en.md) (English)."],
     sum_files="📁 Files",
     files=[("`SKILL.md`, `SKILL.en.md`", "The skill Claude loads (Traditional Chinese) and its English translation"),
@@ -137,6 +144,7 @@ C["en"] = dict(
            ("`render_table.py`, `institutional_tables.py`, `prices_to_table.py`", "Table renderer and its four styles; builds Morgan / Blackstone specs from fetched prices"),
            ("`fetch_prices.py`, `csv_to_prices.py`", "Daily closes from Nasdaq, Shanghai/Shenzhen and Yahoo; conversion of your own CSV files"),
            ("`render_chart.py`, `render_common.py`", "Chart renderer; shared themes and PNG / PDF output"),
+           ('`fetch_holdings.py`, `render_holdings.py`', "ETF holdings from the issuer's own file (SPDR, iShares, Vanguard, NEOS, Roundhill, Tema, or your CSV) and the top-N renderer"),
            ("`quarterly_earnings.py`, `earnings_core.py`, `earnings_sources.py`, `render_earnings.py`", "Earnings command, audited arithmetic, source adapters and the HSBC-style renderer"),
            ("`localization.py`, `fonts.py`, `fonts/`", "Traditional Chinese conversion; bundled fonts embedded in the HTML (licences included)"),
            ("`references/`, `EARNINGS.md`", "Template guide; earnings usage and source coverage (Traditional Chinese)"),
@@ -155,16 +163,16 @@ C["en"] = dict(
     manual_fonts=("Fonts: Inter, Source Sans 3 and Droid Sans are bundled and embedded for Latin text; Chinese text uses the system Traditional Chinese font. "
                   "Source-font substitutions are documented in [the template guide](references/institutional-tables.md). Proprietary fonts from reference PDFs or macOS are not distributed."),
     h_test="Tests and evals",
-    test_text=("`python3 -m unittest discover -s tests -v` runs known-answer tests for returns, drawdown, volatility, symbol routing, cache freshness, CSV import, table styles and earnings arithmetic. "
-               "CI runs them on Ubuntu, macOS and Windows (Python 3.9 and 3.13), regenerates the examples to check they are unchanged, runs a live Nasdaq smoke test, and installs the skills on all three systems. "
+    test_text=("`python3 -m unittest discover -s tests -v` runs known-answer tests for returns, drawdown, volatility, symbol routing, cache freshness, CSV import, ETF holdings parsers and ranking rules, table styles and earnings arithmetic. "
+               "CI runs them on Ubuntu, macOS and Windows (Python 3.9 and 3.13), regenerates the examples to check they are unchanged, runs a live Nasdaq smoke test, and installs the skills on all three systems. A weekly workflow fetches one real fund per ETF issuer and checks the result, so a changed issuer page is noticed early. "
                "[evals/](evals/README.md) holds realistic agent requests and the first results. The READMEs and the website are generated by `python3 tools/build_docs.py`, and a test fails if they are out of date."),
     h_disc="Disclaimer",
     disc="This project formats data and does not provide investment advice. Examples use fictional companies and synthetic values unless the gallery note says otherwise. The report layouts are independent templates, not reports issued by the named institutions.",
     h_lic="License",
     star="⭐ If this saves you time, a star helps others find it.",
     # ---- website only
-    hero_a="Research-desk tables,", hero_b="charts and earnings reviews.",
-    site_sub="Institutional-style tables and price charts, plus HSBC-style quarterly earnings reviews built from primary filings. English and Traditional Chinese, PNG + HTML.",
+    hero_a="Research-desk tables,", hero_b="charts, ETF holdings and earnings.",
+    site_sub="Institutional-style tables, price charts and ETF top-holdings charts, plus HSBC-style quarterly earnings reviews built from primary filings. English and Traditional Chinese, PNG + HTML.",
     cta1="Install in one line", cta2="View on GitHub", cta3="Earnings demo",
     t_modes="Pick a layout",
     t_earn="Quarterly earnings, from the filing",
@@ -175,16 +183,16 @@ C["en"] = dict(
 
 # =====================================================================================================================
 C["zh"] = dict(
-    tagline="給 AI Agent 用的研報風格表格、走勢圖與季度財報解讀。",
+    tagline="給 AI Agent 用的研報風格表格、走勢圖、ETF 持倉與季度財報解讀。",
     links=["🚀 安裝", "🎨 效果圖", "🌐 專案網站", "🧾 財報示範", "📘 Skill 文件"],
     intro=("同一個儲存庫裡有兩個 Agent skill，為 Claude Code 打造，也能用在 Codex 等其他程式 Agent。**schwab-performance-table** 把股票清單、券商持倉截圖、價格資料或你自己的 CSV，"
-           "做成研報風格的表格（Schwab、摩根士丹利、黑石、IBKR 版式），也能畫帶回撤和對數刻度的走勢圖。"
+           "做成研報風格的表格（Schwab、摩根士丹利、黑石、IBKR 版式），也能畫帶回撤和對數刻度的走勢圖，以及 ETF 前 N 大持倉圖。"
            "**quarterly-earnings-review** 核對公司的季度財報原件，輸出 HSBC 版式的財報表與有來源支持的解讀。"
            "所有輸出都有繁體中文與英文兩版，格式為 PNG 加獨立的 HTML。"),
     h_high="亮點",
     cards=[
         ("🎯", "四種報表版式", "Schwab、摩根士丹利、黑石與 IBKR 版式，欄位結構明確。這些是獨立的範本，並非上述機構發布的報告。"),
-        ("📊", "表格、走勢圖、財報", "排名表、持倉表、自選股表；帶回撤與對數刻度的線圖和小圖矩陣；HSBC 版式的季度財報。"),
+        ("📊", "表格、走勢圖、財報", "排名表、持倉表、自選股表；帶回撤與對數刻度的線圖和小圖矩陣；ETF 前 N 大持倉圖；HSBC 版式的季度財報。"),
         ("🌏", "繁體中文與英文", "每次輸出兩種語言：2x PNG 加獨立 HTML，另可選深色主題與 PDF。"),
         ("🔒", "來源一定標明", "Nasdaq 與上海／深圳交易所收盤價、明確標示的 Yahoo 資料（其他市場）、財報用 SEC 與 Apple 官方文件。缺資料寫 NA，絕不編造。"),
         ("🤖", "一句話讓 Agent 安裝", "把提示詞貼給 Claude Code 或 Codex 即可。支援 macOS、Linux、Windows，兩個 skill 一起裝好。"),
@@ -193,11 +201,11 @@ C["zh"] = dict(
     h_gallery="效果圖",
     gallery=[("排名表", "EN"), ("自選股表", "繁體中文"), ("帶回撤的線圖", "EN"), ("小圖矩陣（對數刻度）", "繁體中文"),
              ("摩根士丹利矩陣", "繁體中文"), ("黑石分組業績", "繁體中文"), ("IBKR 持倉明細", "繁體中文"),
-             ("HSBC 季度財報：AAPL 第三季", "繁體中文"), ("HSBC 季度財報：AAPL 第四季", "繁體中文"), ("持倉表", "EN")],
+             ("HSBC 季度財報：AAPL 第三季", "繁體中文"), ("HSBC 季度財報：AAPL 第四季", "繁體中文"), ("持倉表", "EN"), ('ETF 前 13 大持倉', 'EN'), ('含掉期敞口的 ETF', '繁體中文')],
     gallery_note="財報示例使用 Apple 官方文件，排名表來自 Charles Schwab 公開圖表，其餘示例使用虛構公司與合成資料。",
     h_flow="運作方式",
     flow=["📝 股票代碼、截圖、CSV<br/>或代碼＋季度", "🤖 你的 AI Agent + skills", "🏛 價格：Nasdaq、上交所／深交所、<br/>Yahoo（已標示）、你的 CSV",
-          "📑 財報：Apple PDF、<br/>SEC 資料、你匯入的文件", "🖨 render_table<br/>render_chart", "🖨 quarterly_earnings", "🖼 PNG + HTML<br/>EN · 繁體中文"],
+          "📑 財報：Apple PDF、<br/>SEC 資料、你匯入的文件", "🖨 render_table<br/>render_chart<br/>render_holdings", "🖨 quarterly_earnings", "🖼 PNG + HTML<br/>EN · 繁體中文"],
     h_install="安裝",
     install_intro="支援 macOS、Linux 與 Windows。需要 Python 3.9 以上（用於渲染），git 可有可無。安裝程式會一併註冊兩個 skill。",
     tip="💡 **最省事的辦法：** 把下面的提示詞直接貼給你的 AI Agent，它會替你裝好。",
@@ -224,7 +232,8 @@ C["zh"] = dict(
            "把這六檔股票 3 月到 6 月的走勢用對數刻度對比一下。",
            "把 AAPL、MSFT、NVDA 做成摩根士丹利風格的回報與風險矩陣。",
            "畫 7203.T、0700.HK、600519.SS 今年以來的走勢。",
-           "用 HSBC 表幫我看看 AAPL FY2025Q3 的財報。"],
+           "用 HSBC 表幫我看看 AAPL FY2025Q3 的財報。",
+           '列出 QQQ、VOO、SPY 的前 13 大持倉。'],
     h_styles="表格版式",
     styles_intro="四種版式，用 `--style`（或 `spec.style`）選擇，預設是 Schwab。它們是獨立的範本，並非所列機構發布或與其有關的報告。",
     style_head=["版式", "呈現內容", "示例"],
@@ -247,6 +256,11 @@ C["zh"] = dict(
     chart_bullets=["**基準：** 預設 SPY（標示為標普 500 的替代），最多兩個基準（`--benchmark SPY,COMP`），或用 `--benchmark none` 不畫基準。",
                    "**縱軸：** 只有一個縱軸，起點為 100。範圍很大時自動改用對數刻度（也可用 `y_scale` 指定）。",
                    "**選項：** `--theme dark`、`--pdf`、自訂線條顏色，HTML 檔裡還有滑鼠懸停提示。"],
+    h_etf='ETF 前 N 大持倉',
+    etf_intro='畫出 ETF 的前幾大持倉（預設 13 檔，用 `--top N` 修改），含權重、累計權重、行業，以及其餘持倉的合計。資料取自各基金發行人自己公布的檔案，圖上一定印出持倉截止日。',
+    etf_head=['發行人', '基金', '取得方式'],
+    etf_rows=[('道富 SPDR', '`SPY`、`XLK` 等 SPDR 基金', '每日 xlsx 檔'), ('iShares', '`IVV`、`IWM`、`AGG` 等共 15 檔（已核對的產品編號清單）', '`latest-holdings.csv`'), ('Vanguard', '`VOO`、`VTI` 等股票型 ETF', '基金頁面背後的 JSON（每月公布，資料可能已是數週前的）'), ('NEOS', '`QQQI`', '基金頁面背後的 CSV'), ('Roundhill', '`NCLD`、`DRAM`', '涵蓋全部 Roundhill 基金的每日 CSV'), ('Tema', '`DISK`', '基金頁面連結的每日 CSV'), ('Invesco、Destiny', '`QQQ`、`QQQM`、`DXYZ`', '不自動抓取：其使用條款禁止自動化存取。請從基金頁面自行下載，再用 `--csv` 匯入'), ('其他基金', '你自己下載的檔案', '用 `--csv` 匯入，需有名稱、代碼、權重欄')],
+    etf_bullets=['**掉期敞口一併計算：** NCLD、DRAM 這類基金，股票上的掉期會加到同一檔股票的現貨持倉上（以 CUSIP／SEDOL 對應），Roundhill 官網也是這樣相加，條形圖分兩段顯示。Roundhill 的基金還會併入同一公司的其他上市線（如 DRAM 的 SK hynix、三星）。現金、貨幣基金、國債與期權另列一行，不參與排名。`--mode lines` 則照發行人列示的每一行直接排名。', '**股份類別：** GOOGL 與 GOOG 預設分開，加 `--merge-classes` 才合併。', '**日期如實：** 持倉截止日是發行人價格所屬的那一天（NEOS、Roundhill 的檔案標的是下一個交易日，工具改用估值日並在腳註說明，每週的實時檢查會用官方收盤價核對；Vanguard 每月公布），超過 10 天會加警告。權重照披露原樣列示；缺權重顯示 NA，不當成 0。', '**使用條款：** 只讀取公開的檔案與頁面，且每個路徑都符合該站的 robots.txt。Invesco 與 Destiny 禁止自動化存取，所以這兩家的基金只能匯入（`--csv`）。條款只核對了 Invesco、Destiny 和 SSGA，其他發行人的條款請在商業使用前自行閱讀。', '**選項：** `--top N`、`--by sector|name`（幾千行的基金，如債券 ETF）、`--names names.json`（本地語言名稱）、`--theme dark`、`--pdf`、`--langs`。'],
     h_earn="季度財報解讀",
     earn_intro="直接說「用 HSBC 表幫我看看 AAPL FY2025Q3 的財報」。**quarterly-earnings-review** 會核對財季日期與原始財報，算出單季、同比與環比數字，並附上引用來源的解讀。輸出為繁體中文與英文的 PNG + HTML，另附原始事實與核對帳本。",
     earn_points=["**來源：** Apple 官方財務 PDF（FY2025Q3、FY2025Q4 已用真實原件驗證）；其他美國 GAAP 公司用 SEC Company Facts（解析器有固定測資覆蓋，即時存取可能被拒）；其他市場用 `--facts` 匯入已核實的官方財報。",
@@ -259,6 +273,7 @@ C["zh"] = dict(
            "**自動來源只提供價格回報。** Nasdaq 的股息金額沒有按拆股調整，ETF 也沒有股息，所以總回報需要你自己提供復權收盤價 CSV。",
            "**Yahoo 一律標示為聚合資料**，不冒充交易所公布的收盤價。A 股網站價格未復權，工具會提醒公司行動造成的失真。",
            "**港股與其他市場要帶交易所後綴**（`0700.HK`）；單純的數字代碼有歧義，會被拒絕。",
+           "**禁止自動化存取的網站不抓取。** Invesco（QQQ）和 Destiny（DXYZ）的使用條款有此限制，所以這兩家的基金只能匯入（`--csv`）。工具不會用瀏覽器自動化去繞過封鎖。",
            "給 Agent 看的細節在 [SKILL.md](SKILL.md)（繁體中文）與 [SKILL.en.md](SKILL.en.md)（英文）。"],
     sum_files="📁 檔案",
     files=[("`SKILL.md`、`SKILL.en.md`", "Claude 實際載入的 skill（繁體中文）與它的英文譯本"),
@@ -267,6 +282,7 @@ C["zh"] = dict(
            ("`render_table.py`、`institutional_tables.py`、`prices_to_table.py`", "表格渲染器與四種版式；用抓下來的價格產生摩根士丹利／黑石規格"),
            ("`fetch_prices.py`、`csv_to_prices.py`", "取得 Nasdaq、上海／深圳與 Yahoo 的日收盤價；轉換你自己的 CSV"),
            ("`render_chart.py`、`render_common.py`", "走勢圖渲染器；共用的主題與 PNG / PDF 輸出"),
+           ('`fetch_holdings.py`、`render_holdings.py`', '從發行人自己的檔案取得 ETF 持倉（SPDR、iShares、Vanguard、NEOS、Roundhill、Tema，或你的 CSV），並渲染前 N 大圖'),
            ("`quarterly_earnings.py`、`earnings_core.py`、`earnings_sources.py`、`render_earnings.py`", "財報指令、可核對的計算、來源轉接器與 HSBC 版式渲染器"),
            ("`localization.py`、`fonts.py`、`fonts/`", "繁體中文轉換；嵌入 HTML 的隨附字型（含授權）"),
            ("`references/`、`EARNINGS.md`", "範本指南；財報用法與來源涵蓋範圍（繁體中文）"),
@@ -282,15 +298,15 @@ C["zh"] = dict(
                   "代碼有歧義時，可用 `index:COMP`、`etf:SPY` 指定資產類別。走勢圖分兩步：先抓價格再渲染，用 `--start` / `--end` 指定期間。"),
     manual_fonts=("字型：隨附並嵌入 Inter、Source Sans 3 與 Droid Sans 用於拉丁字母；中文使用系統的繁體中文字型。與原稿字型的替代差異見[範本指南](references/institutional-tables.md)。不散布參考 PDF 或 macOS 的專有字型。"),
     h_test="測試與評測",
-    test_text=("`python3 -m unittest discover -s tests -v` 會跑回報、回撤、波動率、代碼路由、快取新鮮度、CSV 匯入、表格版式與財報計算的標準答案測試。"
-               "CI 在 Ubuntu、macOS、Windows（Python 3.9 與 3.13）上執行這些測試，重新產生範例並檢查沒有變動，執行即時的 Nasdaq 冒煙測試，並在三個系統上安裝 skill。"
+    test_text=("`python3 -m unittest discover -s tests -v` 會跑回報、回撤、波動率、代碼路由、快取新鮮度、CSV 匯入、ETF 持倉解析與排名規則、表格版式與財報計算的標準答案測試。"
+               "CI 在 Ubuntu、macOS、Windows（Python 3.9 與 3.13）上執行這些測試，重新產生範例並檢查沒有變動，執行即時的 Nasdaq 冒煙測試，並在三個系統上安裝 skill。另有每週一次的工作流，對每家 ETF 發行人各取一檔真實基金並檢查結果，發行人頁面改版時能及早發現。"
                "[evals/](evals/README.md) 收錄貼近真實使用的 Agent 請求與第一輪結果。README 與網站由 `python3 tools/build_docs.py` 產生，內容過期時測試會失敗。"),
     h_disc="免責聲明",
     disc="本專案只負責整理資料的呈現，不提供任何投資建議。除圖庫說明另有註明外，示例使用虛構公司與合成數值。報表版式是獨立範本，並非所列機構發布的報告。",
     h_lic="授權",
     star="⭐ 如果它幫你省了時間，點個 star 能讓更多人看到。",
-    hero_a="研報風格的表格、", hero_b="走勢圖與財報解讀。",
-    site_sub="機構版式的表格與走勢圖，加上用原始財報做出的 HSBC 版式季度財報解讀。繁體中文與英文，PNG + HTML。",
+    hero_a="研報風格的表格、", hero_b="走勢圖、ETF 持倉與財報解讀。",
+    site_sub="機構版式的表格、走勢圖與 ETF 前 N 大持倉圖，加上用原始財報做出的 HSBC 版式季度財報解讀。繁體中文與英文，PNG + HTML。",
     cta1="一行指令安裝", cta2="在 GitHub 查看", cta3="財報示範",
     t_modes="選個版式",
     t_earn="從財報原件出發的季度解讀",
@@ -301,16 +317,16 @@ C["zh"] = dict(
 
 # =====================================================================================================================
 C["ja"] = dict(
-    tagline="AI エージェントのための、リサーチ風の表・推移チャート・四半期決算レビュー。",
+    tagline="AI エージェントのための、リサーチ風の表・推移チャート・ETF 保有銘柄・四半期決算レビュー。",
     links=["🚀 インストール", "🎨 ギャラリー", "🌐 プロジェクトサイト", "🧾 決算デモ", "📘 Skill ドキュメント"],
     intro=("1 つのリポジトリにエージェント用スキルが 2 つあります。Claude Code 向けに作られていますが、Codex など他のコーディングエージェントでも使えます。**schwab-performance-table** は、銘柄リスト、証券口座の保有銘柄スクリーンショット、価格データ、自分の CSV を、"
-           "リサーチ風の表（Schwab・Morgan・Blackstone・IBKR レイアウト）に、またドローダウンと対数目盛つきの推移チャートに変換します。"
+           "リサーチ風の表（Schwab・Morgan・Blackstone・IBKR レイアウト）に、またドローダウンと対数目盛つきの推移チャート、ETF の上位保有銘柄チャートに変換します。"
            "**quarterly-earnings-review** は企業の四半期決算の原本を確認し、出典付きの解説を添えた HSBC 風の決算表を作ります。"
            "出力はすべて英語と繁体字中国語の 2 版で、PNG と単体で完結する HTML です。"),
     h_high="特長",
     cards=[
         ("🎯", "4 つのレポートレイアウト", "Schwab、Morgan、Blackstone、IBKR 風。列の構成は明示されています。独立したテンプレートで、各機関が発行したレポートではありません。"),
-        ("📊", "表・チャート・決算", "ランキング表・保有銘柄表・ウォッチリスト表、ドローダウンと対数目盛つきの折れ線とスモールマルチプル、HSBC 風の四半期決算。"),
+        ("📊", "表・チャート・決算", "ランキング表・保有銘柄表・ウォッチリスト表、ドローダウンと対数目盛つきの折れ線とスモールマルチプル、ETF の上位保有銘柄チャート、HSBC 風の四半期決算。"),
         ("🌏", "英語と繁体字中国語", "出力は常に 2 言語。2x PNG と単体で完結する HTML に加え、ダークテーマと PDF も選べます。"),
         ("🔒", "出典を必ず明示", "Nasdaq と上海・深圳取引所の終値、出典を明示した Yahoo のデータ（その他の市場）、決算は SEC と Apple の公式資料。欠損は NA で、作り話はしません。"),
         ("🤖", "ワンフレーズで導入", "プロンプトを Claude Code や Codex に貼るだけ。macOS・Linux・Windows に対応し、2 つのスキルを一緒に入れます。"),
@@ -319,11 +335,11 @@ C["ja"] = dict(
     h_gallery="ギャラリー",
     gallery=[("ランキング表", "EN"), ("ウォッチリスト表", "繁體中文"), ("ドローダウン付き折れ線", "EN"), ("スモールマルチプル（対数目盛）", "繁體中文"),
              ("Morgan 風マトリクス", "繁體中文"), ("Blackstone 風の成績表", "繁體中文"), ("IBKR 風の保有明細", "繁體中文"),
-             ("HSBC 風の四半期決算：AAPL 第 3 四半期", "繁體中文"), ("HSBC 風の四半期決算：AAPL 第 4 四半期", "繁體中文"), ("保有銘柄表", "EN")],
+             ("HSBC 風の四半期決算：AAPL 第 3 四半期", "繁體中文"), ("HSBC 風の四半期決算：AAPL 第 4 四半期", "繁體中文"), ("保有銘柄表", "EN"), ('ETF 上位 13 銘柄', 'EN'), ('スワップ・エクスポージャーのある ETF', '繁體中文')],
     gallery_note="決算の例は Apple の公式資料、ランキング表は Charles Schwab の公開チャートを使用しています。それ以外は架空の企業と合成データです。",
     h_flow="仕組み",
     flow=["📝 ティッカー、画像、CSV<br/>またはティッカー＋四半期", "🤖 AI エージェント + スキル", "🏛 価格：Nasdaq、上海・深圳、<br/>Yahoo（明示）、自分の CSV",
-          "📑 決算：Apple の PDF、<br/>SEC のデータ、取り込んだ資料", "🖨 render_table<br/>render_chart", "🖨 quarterly_earnings", "🖼 PNG + HTML<br/>EN · 繁體中文"],
+          "📑 決算：Apple の PDF、<br/>SEC のデータ、取り込んだ資料", "🖨 render_table<br/>render_chart<br/>render_holdings", "🖨 quarterly_earnings", "🖼 PNG + HTML<br/>EN · 繁體中文"],
     h_install="インストール",
     install_intro="macOS、Linux、Windows に対応しています。Python 3.9 以上（描画用）が必要で、git は任意です。インストーラーは 2 つのスキルをまとめて登録します。",
     tip="💡 **いちばん簡単な方法：** 下のプロンプトを AI エージェントに貼れば、すべてインストールしてくれます。",
@@ -350,7 +366,8 @@ C["ja"] = dict(
            "この 6 銘柄の 3 月から 6 月の推移を対数目盛で比較して。",
            "AAPL、MSFT、NVDA を Morgan 風のリターンとリスクのマトリクスにして。",
            "7203.T、0700.HK、600519.SS の年初来の推移をチャートにして。",
-           "AAPL の FY2025Q3 決算を HSBC 風の表でレビューして。"],
+           "AAPL の FY2025Q3 決算を HSBC 風の表でレビューして。",
+           'QQQ、VOO、SPY の上位 13 銘柄を表示して。'],
     h_styles="表のスタイル",
     styles_intro="4 つのレイアウトを `--style`（または `spec.style`。既定は Schwab）で選びます。独立したテンプレートで、記載の機関が発行した、あるいは関係するレポートではありません。",
     style_head=["スタイル", "内容", "サンプル"],
@@ -373,6 +390,11 @@ C["ja"] = dict(
     chart_bullets=["**ベンチマーク：** 既定は SPY（S&P 500 の代用と明記）。最大 2 つまで（`--benchmark SPY,COMP`）、`--benchmark none` で非表示。",
                    "**軸：** Y 軸は 1 本だけで、開始時点を 100 に指数化します。値幅が大きいときは自動で対数目盛に切り替わります（`y_scale` で指定も可能）。",
                    "**オプション：** `--theme dark`、`--pdf`、線の色の指定、HTML でのマウスオーバー表示。"],
+    h_etf='ETF の上位保有銘柄',
+    etf_intro='ETF の上位保有銘柄（既定は 13 銘柄、`--top N` で変更）を、ウェイト・累計ウェイト・セクター・残りの合計つきでチャート化します。出典は各ファンドの運用会社が公表するファイルで、保有日は必ずチャートに印字されます。',
+    etf_head=['運用会社', 'ファンド', '取得方法'],
+    etf_rows=[('State Street SPDR', '`SPY`、`XLK` など SPDR ファンド', '日次の xlsx ファイル'), ('iShares', '`IVV`、`IWM`、`AGG` ほか計 15 本（確認済みの商品 ID リスト）', '`latest-holdings.csv`'), ('Vanguard', '`VOO`、`VTI` など株式型 ETF', 'ファンドページの JSON（月次公表のため数週間前のこともあります）'), ('NEOS', '`QQQI`', 'ファンドページの CSV'), ('Roundhill', '`NCLD`、`DRAM`', 'Roundhill 全ファンドをまとめた日次 CSV'), ('Tema', '`DISK`', 'ファンドページからリンクされた日次 CSV'), ('Invesco、Destiny', '`QQQ`、`QQQM`、`DXYZ`', '自動取得しません。利用規約が自動アクセスを禁じているためです。ファンドページから自分でダウンロードし、`--csv` で取り込みます'), ('その他のファンド', '自分でダウンロードしたファイル', '`--csv` で取り込み。名称・ティッカー・ウェイトの列が必要')],
+    etf_bullets=['**スワップを含めたランキング：** NCLD や DRAM のようなファンドでは、株式に対するスワップを同じ銘柄の現物（CUSIP/SEDOL で対応付け）に加算します。Roundhill 自身のサイトも同じ足し方で、棒は 2 つの部分に分かれます。Roundhill のファンドでは同じ会社の別の上場ラインも合算します（DRAM の SK hynix とサムスン）。現金、MMF、短期国債、オプションは別の行に出し、ランキングには入れません。`--mode lines` なら運用会社の一覧の各行をそのまま順位付けします。', '**株式クラス：** GOOGL と GOOG は既定では別々で、`--merge-classes` を付けると合算します。', '**日付は正直に：** 保有日は運用会社の価格がどの日のものかを示します（NEOS と Roundhill はファイルに翌営業日の日付を付けるため、評価日を表示して注記し、毎週のライブチェックが公式終値で照合します。Vanguard は月次）。10 日より古いと警告を付けます。ウェイトは開示どおりに表示し、欠損は NA で 0 とは扱いません。', '**利用規約：** 読み取るのは公開されているファイルとページだけで、各パスはそのサイトの robots.txt で許可されています。Invesco と Destiny は自動アクセスを禁じているため、これらのファンドは取り込み専用（`--csv`）です。規約を確認したのは Invesco・Destiny・SSGA だけなので、商用で使う前に他の運用会社の規約も読んでください。', '**オプション：** `--top N`、`--by sector|name`（数千行のファンド、例：債券 ETF）、`--names names.json`（現地語の名称）、`--theme dark`、`--pdf`、`--langs`。'],
     h_earn="四半期決算レビュー",
     earn_intro="「AAPL の FY2025Q3 決算を HSBC 風の表でレビューして」と頼むだけです。**quarterly-earnings-review** は会計期間と決算の原本を確認し、単四半期・前年同期比・前四半期比の数値を計算して、出典を引用した解説を添えます。出力は英語と繁体字中国語の PNG + HTML に、元データと検証台帳が付きます。",
     earn_points=["**出典：** Apple の公式決算 PDF（FY2025Q3・FY2025Q4 は実物で検証済み）。その他の米国 GAAP 企業は SEC Company Facts（パーサーは固定フィクスチャで検証済み、実アクセスは拒否されることがあります）。他の市場は `--facts` で取り込んだ検証済みの公式資料。",
@@ -385,6 +407,7 @@ C["ja"] = dict(
            "**自動取得は価格リターンのみ。** Nasdaq の配当額は株式分割調整がされておらず、ETF には配当データがないため、総リターンには自分で用意した調整後終値の CSV が必要です。",
            "**Yahoo は集約データと明記**し、取引所が公表した終値とは扱いません。A 株のウェブサイト価格は調整なしで、コーポレートアクションによる歪みを警告します。",
            "**香港などの市場は取引所サフィックスが必要**です（`0700.HK`）。数字だけのコードは曖昧なので拒否されます。",
+           "**自動アクセスを禁じるサイトは取得しません。** Invesco（QQQ）と Destiny（DXYZ）は利用規約で禁止しているため、これらのファンドは取り込み専用（`--csv`）です。ブラウザ自動化でブロックを回避することはありません。",
            "エージェント向けの詳細は [SKILL.md](SKILL.md)（繁体字中国語）と [SKILL.en.md](SKILL.en.md)（英語）にあります。"],
     sum_files="📁 ファイル",
     files=[("`SKILL.md`、`SKILL.en.md`", "Claude が読み込むスキル（繁体字中国語）とその英語訳"),
@@ -393,6 +416,7 @@ C["ja"] = dict(
            ("`render_table.py`、`institutional_tables.py`、`prices_to_table.py`", "表のレンダラーと 4 つのスタイル。取得した価格から Morgan / Blackstone の spec を作成"),
            ("`fetch_prices.py`、`csv_to_prices.py`", "Nasdaq・上海/深圳・Yahoo の日次終値の取得、自分の CSV の変換"),
            ("`render_chart.py`、`render_common.py`", "チャートのレンダラー。共通のテーマと PNG / PDF の出力"),
+           ('`fetch_holdings.py`、`render_holdings.py`', '運用会社自身のファイルから ETF の保有銘柄を取得（SPDR・iShares・Vanguard・NEOS・Roundhill・Tema、自分の CSV）し、上位 N 銘柄を描画'),
            ("`quarterly_earnings.py`、`earnings_core.py`、`earnings_sources.py`、`render_earnings.py`", "決算コマンド、検証可能な計算、出典アダプター、HSBC 風レンダラー"),
            ("`localization.py`、`fonts.py`、`fonts/`", "繁体字中国語への変換。HTML に埋め込む同梱フォント（ライセンス付き）"),
            ("`references/`、`EARNINGS.md`", "テンプレートガイド。決算の使い方と出典の範囲（繁体字中国語）"),
@@ -408,15 +432,15 @@ C["ja"] = dict(
                   "コードが曖昧なときは `index:COMP`、`etf:SPY` で資産クラスを指定できます。チャートは価格を取得してから描画する 2 ステップで、期間は `--start` / `--end` で指定します。"),
     manual_fonts=("フォント：Inter、Source Sans 3、Droid Sans を同梱して英数字用に埋め込みます。中国語はシステムの繁体字フォントを使います。原本とのフォント代替は[テンプレートガイド](references/institutional-tables.md)を参照してください。参照 PDF や macOS の専有フォントは配布しません。"),
     h_test="テストと評価",
-    test_text=("`python3 -m unittest discover -s tests -v` は、リターン・ドローダウン・変動率・銘柄ルーティング・キャッシュの鮮度・CSV 取り込み・表スタイル・決算計算の正解つきテストを実行します。"
-               "CI は Ubuntu・macOS・Windows（Python 3.9 と 3.13）でこれらを実行し、例を再生成して変化がないか確認し、Nasdaq への実データのスモークテストを行い、3 つの OS でスキルをインストールします。"
+    test_text=("`python3 -m unittest discover -s tests -v` は、リターン・ドローダウン・変動率・銘柄ルーティング・キャッシュの鮮度・CSV 取り込み・ETF 保有銘柄のパーサーと順位付けルール・表スタイル・決算計算の正解つきテストを実行します。"
+               "CI は Ubuntu・macOS・Windows（Python 3.9 と 3.13）でこれらを実行し、例を再生成して変化がないか確認し、Nasdaq への実データのスモークテストを行い、3 つの OS でスキルをインストールします。さらに週 1 回のワークフローが ETF 運用会社ごとに実在するファンドを 1 本取得して結果を検査し、運用会社のページ変更を早期に見つけます。"
                "[evals/](evals/README.md) には実際の使い方に近いエージェント依頼と最初の結果があります。README とサイトは `python3 tools/build_docs.py` で生成され、内容が古いとテストが失敗します。"),
     h_disc="免責事項",
     disc="このプロジェクトはデータの見せ方を整えるだけで、投資助言は行いません。ギャラリーの注記に別の記載がない限り、例は架空の企業と合成値です。レポートのレイアウトは独立したテンプレートで、記載の機関が発行したレポートではありません。",
     h_lic="ライセンス",
     star="⭐ 役に立ったら、スターをもらえると他の人にも見つけてもらえます。",
-    hero_a="リサーチ風の表、", hero_b="チャート、決算レビュー。",
-    site_sub="機関投資家風の表と推移チャート、さらに原本をもとにした HSBC 風の四半期決算レビュー。英語と繁体字中国語、PNG + HTML。",
+    hero_a="リサーチ風の表、", hero_b="チャート、ETF 保有銘柄、決算。",
+    site_sub="機関投資家風の表、推移チャート、ETF の上位保有銘柄チャート、さらに原本をもとにした HSBC 風の四半期決算レビュー。英語と繁体字中国語、PNG + HTML。",
     cta1="1 行でインストール", cta2="GitHub で見る", cta3="決算デモ",
     t_modes="レイアウトを選ぶ",
     t_earn="原本から作る四半期決算",
@@ -427,16 +451,16 @@ C["ja"] = dict(
 
 # =====================================================================================================================
 C["fr"] = dict(
-    tagline="Tableaux façon étude, graphiques de cours et analyses de résultats trimestriels pour votre agent IA.",
+    tagline="Tableaux façon étude, graphiques de cours, positions d'ETF et analyses de résultats trimestriels pour votre agent IA.",
     links=["🚀 Installation", "🎨 Galerie", "🌐 Site du projet", "🧾 Démo résultats", "📘 Doc du skill"],
     intro=("Deux skills d'agent dans un seul dépôt, conçus pour Claude Code et utilisables avec Codex et d'autres agents de programmation. **schwab-performance-table** transforme une liste d'actions, une capture de positions chez un courtier, des données de prix ou vos propres "
-           "fichiers CSV en tableaux façon étude (dispositions Schwab, Morgan, Blackstone et IBKR) et en graphiques de cours avec drawdown et échelle logarithmique. "
+           "fichiers CSV en tableaux façon étude (dispositions Schwab, Morgan, Blackstone et IBKR) , en graphiques de cours avec drawdown et échelle logarithmique, et en graphiques des principales positions d'ETF. "
            "**quarterly-earnings-review** vérifie le document trimestriel d'une société et produit un tableau de résultats de style HSBC avec des commentaires sourcés. "
            "Tout est produit en anglais et en chinois traditionnel, en PNG et en HTML autonome."),
     h_high="Points forts",
     cards=[
         ("🎯", "Quatre dispositions de rapport", "Styles Schwab, Morgan, Blackstone et IBKR, avec des schémas de colonnes explicites. Ce sont des modèles indépendants, pas des rapports publiés par ces institutions."),
-        ("📊", "Tableaux, graphiques, résultats", "Tableaux de classement, de positions et de liste de suivi ; courbes et petits multiples avec drawdown et échelle logarithmique ; résultats trimestriels de style HSBC."),
+        ("📊", "Tableaux, graphiques, résultats", "Tableaux de classement, de positions et de liste de suivi ; courbes et petits multiples avec drawdown et échelle logarithmique ; graphiques des principales positions d'ETF ; résultats trimestriels de style HSBC."),
         ("🌏", "Anglais et chinois traditionnel", "Chaque sortie existe dans les deux langues : PNG en 2x et HTML autonome, avec thème sombre et PDF en option."),
         ("🔒", "Sources toujours indiquées", "Cours des bourses Nasdaq et Shanghai/Shenzhen, données Yahoo clairement identifiées pour les autres marchés, documents SEC et Apple pour les résultats. Une donnée manquante est marquée NA, jamais inventée."),
         ("🤖", "Installation en une phrase", "Collez un message dans Claude Code ou Codex. Fonctionne sous macOS, Linux et Windows et installe les deux skills."),
@@ -445,11 +469,11 @@ C["fr"] = dict(
     h_gallery="Galerie",
     gallery=[("Tableau de classement", "EN"), ("Tableau de liste de suivi", "繁體中文"), ("Courbes avec drawdown", "EN"), ("Petits multiples, échelle log", "繁體中文"),
              ("Matrice façon Morgan", "繁體中文"), ("Performance façon Blackstone", "繁體中文"), ("Positions façon IBKR", "繁體中文"),
-             ("Résultats HSBC, AAPL T3", "繁體中文"), ("Résultats HSBC, AAPL T4", "繁體中文"), ("Tableau de positions", "EN")],
+             ("Résultats HSBC, AAPL T3", "繁體中文"), ("Résultats HSBC, AAPL T4", "繁體中文"), ("Tableau de positions", "EN"), ("Top 13 des positions d'un ETF", 'EN'), ('ETF avec exposition par swaps', '繁體中文')],
     gallery_note="Les exemples de résultats utilisent les publications officielles d'Apple et le tableau de classement un graphique public de Charles Schwab. Tout le reste utilise des sociétés fictives et des données synthétiques.",
     h_flow="Fonctionnement",
     flow=["📝 Symboles, capture, CSV<br/>ou symbole + trimestre", "🤖 Votre agent IA + skills", "🏛 Prix : Nasdaq, SSE/SZSE,<br/>Yahoo (indiqué), votre CSV",
-          "📑 Documents : PDF Apple,<br/>données SEC, vos imports", "🖨 render_table<br/>render_chart", "🖨 quarterly_earnings", "🖼 PNG + HTML<br/>EN · 繁體中文"],
+          "📑 Documents : PDF Apple,<br/>données SEC, vos imports", "🖨 render_table<br/>render_chart<br/>render_holdings", "🖨 quarterly_earnings", "🖼 PNG + HTML<br/>EN · 繁體中文"],
     h_install="Installation",
     install_intro="Fonctionne sous macOS, Linux et Windows. Python 3.9 ou supérieur est nécessaire (pour produire les rendus) ; git est facultatif. L'installateur enregistre les deux skills.",
     tip="💡 **Le plus simple :** collez le message ci-dessous dans votre agent IA, il installe tout pour vous.",
@@ -477,7 +501,8 @@ C["fr"] = dict(
            "Compare ces six actions de mars à juin en échelle logarithmique.",
            "Présente AAPL, MSFT et NVDA dans une matrice rendement/risque façon Morgan.",
            "Trace 7203.T, 0700.HK et 600519.SS depuis le début de l'année.",
-           "Analyse les résultats AAPL FY2025Q3 dans un tableau de style HSBC."],
+           "Analyse les résultats AAPL FY2025Q3 dans un tableau de style HSBC.",
+           'Montre les 13 principales positions de QQQ, VOO et SPY.'],
     h_styles="Styles de tableau",
     styles_intro="Quatre dispositions, choisies avec `--style` (ou `spec.style` ; Schwab par défaut). Ce sont des modèles indépendants, pas des rapports publiés par les institutions citées ni liés à elles.",
     style_head=["Style", "Contenu", "Exemple"],
@@ -500,6 +525,11 @@ C["fr"] = dict(
     chart_bullets=["**Référence :** SPY par défaut (indiqué comme substitut du S&P 500), jusqu'à deux références (`--benchmark SPY,COMP`), ou `--benchmark none`.",
                    "**Axe :** un seul axe vertical, indexé à 100 au départ. Il passe automatiquement en échelle logarithmique quand l'écart est grand (ou fixez `y_scale`).",
                    "**Options :** `--theme dark`, `--pdf`, couleurs de courbes personnalisées et infobulles au survol dans les fichiers HTML."],
+    h_etf="Principales positions d'un ETF",
+    etf_intro="Représentez les plus grandes positions d'un ETF (13 par défaut, `--top N` pour changer) avec leur poids, le poids cumulé, le secteur et le total du reste. La source est le fichier publié par l'émetteur de chaque fonds, et la date de situation est toujours imprimée sur le graphique.",
+    etf_head=['Émetteur', 'Fonds', 'Récupération'],
+    etf_rows=[('State Street SPDR', '`SPY`, `XLK` et autres fonds SPDR', 'Fichier xlsx quotidien'), ('iShares', "`IVV`, `IWM`, `AGG` et 12 autres (liste d'identifiants vérifiés)", '`latest-holdings.csv`'), ('Vanguard', '`VOO`, `VTI` et autres ETF actions', 'JSON derrière la page du fonds (publié chaque mois, donc parfois vieux de plusieurs semaines)'), ('NEOS', '`QQQI`', 'CSV derrière la page du fonds'), ('Roundhill', '`NCLD`, `DRAM`', 'CSV quotidien couvrant tous les fonds Roundhill'), ('Tema', '`DISK`', 'CSV quotidien lié depuis la page du fonds'), ('Invesco, Destiny', '`QQQ`, `QQQM`, `DXYZ`', "Non récupérés : leurs conditions d'utilisation interdisent l'accès automatisé. Téléchargez le fichier sur la page du fonds et importez-le avec `--csv`"), ('Autre fonds', 'un fichier que vous téléchargez', '`--csv` avec des colonnes nom, code et poids')],
+    etf_bullets=["**Classement avec les swaps :** pour des fonds comme NCLD et DRAM, un swap sur une action s'ajoute à la position en titres de la même action (rapprochement par CUSIP/SEDOL), comme le fait le site de Roundhill ; la barre montre les deux parts. Pour les fonds Roundhill, les autres lignes cotées d'une même société sont aussi ajoutées (SK hynix et Samsung dans DRAM). Liquidités, fonds monétaires, bons du Trésor et options figurent sur une ligne à part, sans être classés. `--mode lines` classe au contraire chaque ligne telle que l'émetteur la liste.", "**Catégories d'actions :** GOOGL et GOOG restent séparés sauf avec `--merge-classes`.", "**Dates honnêtes :** la date de situation est le jour d'où viennent les prix de l'émetteur (NEOS et Roundhill datent leurs fichiers du jour de bourse suivant : l'outil affiche le jour de valorisation, le signale en note, et le contrôle hebdomadaire le vérifie avec les cours officiels ; Vanguard publie chaque mois), avec un avertissement au-delà de 10 jours. Les poids sont affichés tels que publiés ; un poids absent s'affiche NA et n'est jamais compté comme zéro.", "**Conditions d'utilisation :** seuls des fichiers et pages publics sont lus, et chaque chemin est autorisé par le robots.txt du site. Invesco et Destiny interdisent l'accès automatisé : leurs fonds se traitent uniquement par import (`--csv`). Les conditions n'ont été vérifiées que pour Invesco, Destiny et SSGA ; lisez celles des autres émetteurs avant tout usage commercial.", '**Options :** `--top N`, `--by sector|name` (fonds de milliers de lignes, ex. ETF obligataires), `--names names.json` (noms en langue locale), `--theme dark`, `--pdf`, `--langs`.'],
     h_earn="Analyse des résultats trimestriels",
     earn_intro="Demandez « Analyse les résultats AAPL FY2025Q3 dans un tableau de style HSBC ». Le skill **quarterly-earnings-review** vérifie les dates de l'exercice et le document d'origine, calcule les valeurs du trimestre, en glissement annuel et par rapport au trimestre précédent, et ajoute des commentaires qui citent leurs sources. La sortie est un PNG + HTML en anglais et en chinois traditionnel, avec les faits bruts et un registre de vérification.",
     earn_points=["**Sources :** PDF financiers officiels d'Apple (vérifiés sur pièces pour FY2025Q3 et FY2025Q4) ; autres sociétés US-GAAP via SEC Company Facts (l'analyseur est couvert par des jeux de test fixes, l'accès en direct peut être refusé) ; autres marchés via des rapports officiels vérifiés importés avec `--facts`.",
@@ -512,6 +542,7 @@ C["fr"] = dict(
            "**Rendement de prix seulement pour les sources automatiques.** Les montants de dividendes de Nasdaq ne sont pas ajustés des divisions de titres et les ETF n'en ont pas ; le rendement total demande donc votre propre CSV de cours ajustés.",
            "**Yahoo est indiqué comme donnée agrégée**, pas comme cours publiés par la bourse. Les prix des sites des bourses chinoises ne sont pas ajustés ; les outils avertissent des distorsions dues aux opérations sur titres.",
            "**Hong Kong et les autres marchés demandent le suffixe de la bourse** (`0700.HK`) ; un code purement numérique est ambigu et refusé.",
+           "**Les sites qui interdisent l'accès automatisé ne sont pas interrogés.** Invesco (QQQ) et Destiny (DXYZ) l'interdisent dans leurs conditions d'utilisation : ces fonds se traitent uniquement par import (`--csv`). L'outil ne contourne jamais un blocage par automatisation de navigateur.",
            "Les détails pour les agents sont dans [SKILL.md](SKILL.md) (chinois traditionnel) et [SKILL.en.md](SKILL.en.md) (anglais)."],
     sum_files="📁 Fichiers",
     files=[("`SKILL.md`, `SKILL.en.md`", "Le skill chargé par Claude (chinois traditionnel) et sa traduction anglaise"),
@@ -520,6 +551,7 @@ C["fr"] = dict(
            ("`render_table.py`, `institutional_tables.py`, `prices_to_table.py`", "Moteur de rendu des tableaux et ses quatre styles ; construit des spécifications Morgan / Blackstone à partir des prix"),
            ("`fetch_prices.py`, `csv_to_prices.py`", "Cours de clôture quotidiens de Nasdaq, Shanghai/Shenzhen et Yahoo ; conversion de vos fichiers CSV"),
            ("`render_chart.py`, `render_common.py`", "Moteur de rendu des graphiques ; thèmes et sorties PNG / PDF partagés"),
+           ('`fetch_holdings.py`, `render_holdings.py`', "Positions d'un ETF depuis le fichier de l'émetteur (SPDR, iShares, Vanguard, NEOS, Roundhill, Tema, votre CSV) et rendu du top N"),
            ("`quarterly_earnings.py`, `earnings_core.py`, `earnings_sources.py`, `render_earnings.py`", "Commande de résultats, calculs vérifiables, adaptateurs de sources et rendu de style HSBC"),
            ("`localization.py`, `fonts.py`, `fonts/`", "Conversion en chinois traditionnel ; polices fournies et intégrées au HTML (licences incluses)"),
            ("`references/`, `EARNINGS.md`", "Guide des modèles ; usage et couverture des sources pour les résultats (chinois traditionnel)"),
@@ -537,15 +569,15 @@ C["fr"] = dict(
     manual_fonts=("Polices : Inter, Source Sans 3 et Droid Sans sont fournies et intégrées pour les caractères latins ; le chinois utilise la police système en chinois traditionnel. "
                   "Les substitutions par rapport aux polices d'origine sont documentées dans le [guide des modèles](references/institutional-tables.md). Les polices propriétaires des PDF de référence ou de macOS ne sont pas distribuées."),
     h_test="Tests et évaluations",
-    test_text=("`python3 -m unittest discover -s tests -v` exécute des tests à réponses connues pour les rendements, le drawdown, la volatilité, le routage des symboles, la fraîcheur du cache, l'import CSV, les styles de tableau et les calculs de résultats. "
-               "La CI les exécute sous Ubuntu, macOS et Windows (Python 3.9 et 3.13), régénère les exemples pour vérifier qu'ils n'ont pas changé, lance un test de fumée en direct sur Nasdaq et installe les skills sur les trois systèmes. "
+    test_text=("`python3 -m unittest discover -s tests -v` exécute des tests à réponses connues pour les rendements, le drawdown, la volatilité, le routage des symboles, la fraîcheur du cache, l'import CSV, l'analyse des positions d'ETF et leurs règles de classement, les styles de tableau et les calculs de résultats. "
+               "La CI les exécute sous Ubuntu, macOS et Windows (Python 3.9 et 3.13), régénère les exemples pour vérifier qu'ils n'ont pas changé, lance un test de fumée en direct sur Nasdaq et installe les skills sur les trois systèmes. Un workflow hebdomadaire récupère un vrai fonds par émetteur d'ETF et vérifie le résultat, afin de repérer tôt le changement d'une page d'émetteur. "
                "[evals/](evals/README.md) contient des demandes d'agent réalistes et les premiers résultats. Les README et le site sont générés par `python3 tools/build_docs.py`, et un test échoue s'ils sont périmés."),
     h_disc="Avertissement",
     disc="Ce projet met en forme des données et ne fournit aucun conseil en investissement. Sauf indication contraire dans la note de la galerie, les exemples utilisent des sociétés fictives et des valeurs synthétiques. Les dispositions de rapport sont des modèles indépendants, pas des rapports publiés par les institutions citées.",
     h_lic="Licence",
     star="⭐ Si cela vous fait gagner du temps, une étoile aide d'autres personnes à le trouver.",
-    hero_a="Tableaux façon étude,", hero_b="graphiques et résultats.",
-    site_sub="Tableaux et graphiques de cours de style institutionnel, plus analyses de résultats trimestriels de style HSBC construites à partir des documents d'origine. Anglais et chinois traditionnel, PNG + HTML.",
+    hero_a="Tableaux façon étude,", hero_b="graphiques, ETF et résultats.",
+    site_sub="Tableaux, graphiques de cours et graphiques des principales positions d'ETF de style institutionnel, plus analyses de résultats trimestriels de style HSBC construites à partir des documents d'origine. Anglais et chinois traditionnel, PNG + HTML.",
     cta1="Installer en une ligne", cta2="Voir sur GitHub", cta3="Démo résultats",
     t_modes="Choisissez une disposition",
     t_earn="Résultats trimestriels, depuis le document d'origine",

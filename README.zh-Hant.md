@@ -2,7 +2,7 @@
 
 <img src="assets/banner.png" alt="schwab-table" width="100%">
 
-**給 AI Agent 用的研報風格表格、走勢圖與季度財報解讀。**
+**給 AI Agent 用的研報風格表格、走勢圖、ETF 持倉與季度財報解讀。**
 
 [English](README.md) · **繁體中文** · [日本語](README.ja.md) · [Français](README.fr.md)
 
@@ -12,12 +12,12 @@
 
 </div>
 
-同一個儲存庫裡有兩個 Agent skill，為 Claude Code 打造，也能用在 Codex 等其他程式 Agent。**schwab-performance-table** 把股票清單、券商持倉截圖、價格資料或你自己的 CSV，做成研報風格的表格（Schwab、摩根士丹利、黑石、IBKR 版式），也能畫帶回撤和對數刻度的走勢圖。**quarterly-earnings-review** 核對公司的季度財報原件，輸出 HSBC 版式的財報表與有來源支持的解讀。所有輸出都有繁體中文與英文兩版，格式為 PNG 加獨立的 HTML。
+同一個儲存庫裡有兩個 Agent skill，為 Claude Code 打造，也能用在 Codex 等其他程式 Agent。**schwab-performance-table** 把股票清單、券商持倉截圖、價格資料或你自己的 CSV，做成研報風格的表格（Schwab、摩根士丹利、黑石、IBKR 版式），也能畫帶回撤和對數刻度的走勢圖，以及 ETF 前 N 大持倉圖。**quarterly-earnings-review** 核對公司的季度財報原件，輸出 HSBC 版式的財報表與有來源支持的解讀。所有輸出都有繁體中文與英文兩版，格式為 PNG 加獨立的 HTML。
 
 ## ✨ 亮點
 
 <table>
-<tr><td width="50%" valign="top"><h3>🎯 四種報表版式</h3><p>Schwab、摩根士丹利、黑石與 IBKR 版式，欄位結構明確。這些是獨立的範本，並非上述機構發布的報告。</p></td><td width="50%" valign="top"><h3>📊 表格、走勢圖、財報</h3><p>排名表、持倉表、自選股表；帶回撤與對數刻度的線圖和小圖矩陣；HSBC 版式的季度財報。</p></td></tr>
+<tr><td width="50%" valign="top"><h3>🎯 四種報表版式</h3><p>Schwab、摩根士丹利、黑石與 IBKR 版式，欄位結構明確。這些是獨立的範本，並非上述機構發布的報告。</p></td><td width="50%" valign="top"><h3>📊 表格、走勢圖、財報</h3><p>排名表、持倉表、自選股表；帶回撤與對數刻度的線圖和小圖矩陣；ETF 前 N 大持倉圖；HSBC 版式的季度財報。</p></td></tr>
 <tr><td width="50%" valign="top"><h3>🌏 繁體中文與英文</h3><p>每次輸出兩種語言：2x PNG 加獨立 HTML，另可選深色主題與 PDF。</p></td><td width="50%" valign="top"><h3>🔒 來源一定標明</h3><p>Nasdaq 與上海／深圳交易所收盤價、明確標示的 Yahoo 資料（其他市場）、財報用 SEC 與 Apple 官方文件。缺資料寫 NA，絕不編造。</p></td></tr>
 <tr><td width="50%" valign="top"><h3>🤖 一句話讓 Agent 安裝</h3><p>把提示詞貼給 Claude Code 或 Codex 即可。支援 macOS、Linux、Windows，兩個 skill 一起裝好。</p></td><td width="50%" valign="top"><h3>🧪 有測試</h3><p>有標準答案的單元測試、三個作業系統的 CI、即時資料冒煙測試，以及第一輪 Agent 評測。</p></td></tr>
 </table>
@@ -30,6 +30,7 @@
 <tr><td width="50%" align="center"><img src="examples/morgan_zh.png" alt="摩根士丹利矩陣"><br><sub><b>摩根士丹利矩陣</b> · 繁體中文</sub></td><td width="50%" align="center"><img src="examples/blackstone_zh.png" alt="黑石分組業績"><br><sub><b>黑石分組業績</b> · 繁體中文</sub></td></tr>
 <tr><td width="50%" align="center"><img src="examples/ibkr_zh.png" alt="IBKR 持倉明細"><br><sub><b>IBKR 持倉明細</b> · 繁體中文</sub></td><td width="50%" align="center"><img src="examples/earnings/aapl_2025q3_zh.png" alt="HSBC 季度財報：AAPL 第三季"><br><sub><b>HSBC 季度財報：AAPL 第三季</b> · 繁體中文</sub></td></tr>
 <tr><td width="50%" align="center"><img src="examples/earnings/aapl_2025q4_zh.png" alt="HSBC 季度財報：AAPL 第四季"><br><sub><b>HSBC 季度財報：AAPL 第四季</b> · 繁體中文</sub></td><td width="50%" align="center"><img src="examples/holdings_en.png" alt="持倉表"><br><sub><b>持倉表</b> · EN</sub></td></tr>
+<tr><td width="50%" align="center"><img src="examples/etf_holdings_equity_en.png" alt="ETF 前 13 大持倉"><br><sub><b>ETF 前 13 大持倉</b> · EN</sub></td><td width="50%" align="center"><img src="examples/etf_holdings_swap_zh.png" alt="含掉期敞口的 ETF"><br><sub><b>含掉期敞口的 ETF</b> · 繁體中文</sub></td></tr>
 </table>
 
 <sub>財報示例使用 Apple 官方文件，排名表來自 Charles Schwab 公開圖表，其餘示例使用虛構公司與合成資料。</sub>
@@ -41,7 +42,7 @@ flowchart LR
   A["📝 股票代碼、截圖、CSV<br/>或代碼＋季度"] --> B["🤖 你的 AI Agent + skills"]
   B --> C["🏛 價格：Nasdaq、上交所／深交所、<br/>Yahoo（已標示）、你的 CSV"]
   B --> F["📑 財報：Apple PDF、<br/>SEC 資料、你匯入的文件"]
-  C --> D["🖨 render_table<br/>render_chart"]
+  C --> D["🖨 render_table<br/>render_chart<br/>render_holdings"]
   F --> G["🖨 quarterly_earnings"]
   D --> E["🖼 PNG + HTML<br/>EN · 繁體中文"]
   G --> E
@@ -110,6 +111,7 @@ irm https://raw.githubusercontent.com/imoneys10k/schwab-table/main/install.ps1 |
 - 把 AAPL、MSFT、NVDA 做成摩根士丹利風格的回報與風險矩陣。
 - 畫 7203.T、0700.HK、600519.SS 今年以來的走勢。
 - 用 HSBC 表幫我看看 AAPL FY2025Q3 的財報。
+- 列出 QQQ、VOO、SPY 的前 13 大持倉。
 
 ## 🧩 表格版式
 
@@ -161,6 +163,34 @@ python3 fetch_prices.py 7203.T 0700.HK SAP.DE 600519.SS --start 2026-08-01 --ben
 python3 render_chart.py examples/chart_lines_spec.json out/chart
 ```
 
+## 🧱 ETF 前 N 大持倉
+
+畫出 ETF 的前幾大持倉（預設 13 檔，用 `--top N` 修改），含權重、累計權重、行業，以及其餘持倉的合計。資料取自各基金發行人自己公布的檔案，圖上一定印出持倉截止日。
+
+| 發行人 | 基金 | 取得方式 |
+|---|---|---|
+| 道富 SPDR | `SPY`、`XLK` 等 SPDR 基金 | 每日 xlsx 檔 |
+| iShares | `IVV`、`IWM`、`AGG` 等共 15 檔（已核對的產品編號清單） | `latest-holdings.csv` |
+| Vanguard | `VOO`、`VTI` 等股票型 ETF | 基金頁面背後的 JSON（每月公布，資料可能已是數週前的） |
+| NEOS | `QQQI` | 基金頁面背後的 CSV |
+| Roundhill | `NCLD`、`DRAM` | 涵蓋全部 Roundhill 基金的每日 CSV |
+| Tema | `DISK` | 基金頁面連結的每日 CSV |
+| Invesco、Destiny | `QQQ`、`QQQM`、`DXYZ` | 不自動抓取：其使用條款禁止自動化存取。請從基金頁面自行下載，再用 `--csv` 匯入 |
+| 其他基金 | 你自己下載的檔案 | 用 `--csv` 匯入，需有名稱、代碼、權重欄 |
+
+- **掉期敞口一併計算：** NCLD、DRAM 這類基金，股票上的掉期會加到同一檔股票的現貨持倉上（以 CUSIP／SEDOL 對應），Roundhill 官網也是這樣相加，條形圖分兩段顯示。Roundhill 的基金還會併入同一公司的其他上市線（如 DRAM 的 SK hynix、三星）。現金、貨幣基金、國債與期權另列一行，不參與排名。`--mode lines` 則照發行人列示的每一行直接排名。
+- **股份類別：** GOOGL 與 GOOG 預設分開，加 `--merge-classes` 才合併。
+- **日期如實：** 持倉截止日是發行人價格所屬的那一天（NEOS、Roundhill 的檔案標的是下一個交易日，工具改用估值日並在腳註說明，每週的實時檢查會用官方收盤價核對；Vanguard 每月公布），超過 10 天會加警告。權重照披露原樣列示；缺權重顯示 NA，不當成 0。
+- **使用條款：** 只讀取公開的檔案與頁面，且每個路徑都符合該站的 robots.txt。Invesco 與 Destiny 禁止自動化存取，所以這兩家的基金只能匯入（`--csv`）。條款只核對了 Invesco、Destiny 和 SSGA，其他發行人的條款請在商業使用前自行閱讀。
+- **選項：** `--top N`、`--by sector|name`（幾千行的基金，如債券 ETF）、`--names names.json`（本地語言名稱）、`--theme dark`、`--pdf`、`--langs`。
+
+```bash
+python3 fetch_holdings.py QQQ NCLD -o data/                  # data/QQQ_holdings.json, data/NCLD_holdings.json
+python3 render_holdings.py data/QQQ_holdings.json out/qqq    # top 13 by default
+python3 render_holdings.py data/NCLD_holdings.json out/ncld --top 10 --merge-classes
+python3 fetch_holdings.py MYETF --csv my_holdings.csv --name "My ETF"   # any other fund
+```
+
 ## 🧾 季度財報解讀
 
 直接說「用 HSBC 表幫我看看 AAPL FY2025Q3 的財報」。**quarterly-earnings-review** 會核對財季日期與原始財報，算出單季、同比與環比數字，並附上引用來源的解讀。輸出為繁體中文與英文的 PNG + HTML，另附原始事實與核對帳本。
@@ -182,6 +212,7 @@ python3 quarterly_earnings.py AAPL --period FY2025Q3 -o out/aapl_q3
 - **自動來源只提供價格回報。** Nasdaq 的股息金額沒有按拆股調整，ETF 也沒有股息，所以總回報需要你自己提供復權收盤價 CSV。
 - **Yahoo 一律標示為聚合資料**，不冒充交易所公布的收盤價。A 股網站價格未復權，工具會提醒公司行動造成的失真。
 - **港股與其他市場要帶交易所後綴**（`0700.HK`）；單純的數字代碼有歧義，會被拒絕。
+- **禁止自動化存取的網站不抓取。** Invesco（QQQ）和 Destiny（DXYZ）的使用條款有此限制，所以這兩家的基金只能匯入（`--csv`）。工具不會用瀏覽器自動化去繞過封鎖。
 - 給 Agent 看的細節在 [SKILL.md](SKILL.md)（繁體中文）與 [SKILL.en.md](SKILL.en.md)（英文）。
 
 <details>
@@ -193,6 +224,7 @@ python3 quarterly_earnings.py AAPL --period FY2025Q3 -o out/aapl_q3
 - `render_table.py`、`institutional_tables.py`、`prices_to_table.py`: 表格渲染器與四種版式；用抓下來的價格產生摩根士丹利／黑石規格
 - `fetch_prices.py`、`csv_to_prices.py`: 取得 Nasdaq、上海／深圳與 Yahoo 的日收盤價；轉換你自己的 CSV
 - `render_chart.py`、`render_common.py`: 走勢圖渲染器；共用的主題與 PNG / PDF 輸出
+- `fetch_holdings.py`、`render_holdings.py`: 從發行人自己的檔案取得 ETF 持倉（SPDR、iShares、Vanguard、NEOS、Roundhill、Tema，或你的 CSV），並渲染前 N 大圖
 - `quarterly_earnings.py`、`earnings_core.py`、`earnings_sources.py`、`render_earnings.py`: 財報指令、可核對的計算、來源轉接器與 HSBC 版式渲染器
 - `localization.py`、`fonts.py`、`fonts/`: 繁體中文轉換；嵌入 HTML 的隨附字型（含授權）
 - `references/`、`EARNINGS.md`: 範本指南；財報用法與來源涵蓋範圍（繁體中文）
@@ -214,6 +246,7 @@ python3 render_table.py examples/neural9_spec.json out/neural9
 python3 render_table.py examples/morgan_spec.json out/matrix
 python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 -o data/watch.json
 python3 render_chart.py examples/chart_lines_spec.json out/chart --theme dark --pdf
+python3 fetch_holdings.py QQQ -o data/ && python3 render_holdings.py data/QQQ_holdings.json out/qqq
 python3 csv_to_prices.py 0700.HK=tencent.csv --benchmark HSI=hsi.csv -o data/hk.json
 python3 quarterly_earnings.py AAPL --period FY2025Q3 -o out/aapl_q3
 ```
@@ -228,7 +261,7 @@ python3 quarterly_earnings.py AAPL --period FY2025Q3 -o out/aapl_q3
 
 ## 🧪 測試與評測
 
-`python3 -m unittest discover -s tests -v` 會跑回報、回撤、波動率、代碼路由、快取新鮮度、CSV 匯入、表格版式與財報計算的標準答案測試。CI 在 Ubuntu、macOS、Windows（Python 3.9 與 3.13）上執行這些測試，重新產生範例並檢查沒有變動，執行即時的 Nasdaq 冒煙測試，並在三個系統上安裝 skill。[evals/](evals/README.md) 收錄貼近真實使用的 Agent 請求與第一輪結果。README 與網站由 `python3 tools/build_docs.py` 產生，內容過期時測試會失敗。
+`python3 -m unittest discover -s tests -v` 會跑回報、回撤、波動率、代碼路由、快取新鮮度、CSV 匯入、ETF 持倉解析與排名規則、表格版式與財報計算的標準答案測試。CI 在 Ubuntu、macOS、Windows（Python 3.9 與 3.13）上執行這些測試，重新產生範例並檢查沒有變動，執行即時的 Nasdaq 冒煙測試，並在三個系統上安裝 skill。另有每週一次的工作流，對每家 ETF 發行人各取一檔真實基金並檢查結果，發行人頁面改版時能及早發現。[evals/](evals/README.md) 收錄貼近真實使用的 Agent 請求與第一輪結果。README 與網站由 `python3 tools/build_docs.py` 產生，內容過期時測試會失敗。
 
 ## 📌 免責聲明
 

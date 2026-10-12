@@ -1,0 +1,218 @@
+{
+ "symbol": "EXGR",
+ "name": "Example Growth ETF",
+ "issuer": "Synthetic sample",
+ "issuer_key": "sample",
+ "as_of": "2026-10-02",
+ "source": "Synthetic sample data (not a real fund)",
+ "source_url": "",
+ "weight_basis": "% of net assets",
+ "holdings": [
+  {
+   "ticker": "ACRB",
+   "name": "Acme Robotics Inc",
+   "weight": 9.84,
+   "sector": "Industrials",
+   "kind": "equity",
+   "id": "ACRB0001"
+  },
+  {
+   "ticker": "STRK",
+   "name": "Stark Aerospace Corp",
+   "weight": 7.91,
+   "sector": "Industrials",
+   "kind": "equity",
+   "id": "STRK0001"
+  },
+  {
+   "ticker": "HOOL",
+   "name": "Hooli Cloud Inc",
+   "weight": 6.42,
+   "sector": "Technology",
+   "kind": "equity",
+   "id": "HOOL0001"
+  },
+  {
+   "ticker": "INSY",
+   "name": "Initech Systems Inc",
+   "weight": 5.57,
+   "sector": "Technology",
+   "kind": "equity",
+   "id": "INSY0001"
+  },
+  {
+   "ticker": "UMBB",
+   "name": "Umbrella Biotech Inc",
+   "weight": 4.88,
+   "sector": "Health Care",
+   "kind": "equity",
+   "id": "UMBB0001"
+  },
+  {
+   "ticker": "CYDN",
+   "name": "Cyberdyne Labs Inc",
+   "weight": 4.43,
+   "sector": "Technology",
+   "kind": "equity",
+   "id": "CYDN0001"
+  },
+  {
+   "ticker": "GLBXA",
+   "name": "Globex Energy Corp Class A",
+   "weight": 3.92,
+   "sector": "Energy",
+   "kind": "equity",
+   "id": "GLBXA0001"
+  },
+  {
+   "ticker": "GLBXB",
+   "name": "Globex Energy Corp Class B",
+   "weight": 3.51,
+   "sector": "Energy",
+   "kind": "equity",
+   "id": "GLBXB0001"
+  },
+  {
+   "ticker": "WAYN",
+   "name": "Wayne Industries Inc",
+   "weight": 3.14,
+   "sector": "Industrials",
+   "kind": "equity",
+   "id": "WAYN0001"
+  },
+  {
+   "ticker": "SOYL",
+   "name": "Soylent Foods Corp",
+   "weight": 2.86,
+   "sector": "Consumer Staples",
+   "kind": "equity",
+   "id": "SOYL0001"
+  },
+  {
+   "ticker": "VAND",
+   "name": "Vandelay Imports Inc",
+   "weight": 2.62,
+   "sector": "Consumer Discretionary",
+   "kind": "equity",
+   "id": "VAND0001"
+  },
+  {
+   "ticker": "PIED",
+   "name": "Pied Piper Inc",
+   "weight": 2.41,
+   "sector": "Technology",
+   "kind": "equity",
+   "id": "PIED0001"
+  },
+  {
+   "ticker": "DUND",
+   "name": "Dunder Paper Co",
+   "weight": 2.23,
+   "sector": "Materials",
+   "kind": "equity",
+   "id": "DUND0001"
+  },
+  {
+   "ticker": "MASS",
+   "name": "Massive Dynamic Inc",
+   "weight": 5.82,
+   "sector": "Health Care",
+   "kind": "equity",
+   "id": "MASS0001"
+  },
+  {
+   "ticker": "OSCP",
+   "name": "Oscorp Therapeutics",
+   "weight": 5.23,
+   "sector": "Health Care",
+   "kind": "equity",
+   "id": "OSCP0001"
+  },
+  {
+   "ticker": "TYRL",
+   "name": "Tyrell Devices Corp",
+   "weight": 4.71,
+   "sector": "Technology",
+   "kind": "equity",
+   "id": "TYRL0001"
+  },
+  {
+   "ticker": "WONK",
+   "name": "Wonka Confections Inc",
+   "weight": 4.24,
+   "sector": "Consumer Staples",
+   "kind": "equity",
+   "id": "WONK0001"
+  },
+  {
+   "ticker": "BLTH",
+   "name": "Bluth Homes Inc",
+   "weight": 3.82,
+   "sector": "Real Estate",
+   "kind": "equity",
+   "id": "BLTH0001"
+  },
+  {
+   "ticker": "STRK2",
+   "name": "Sterling Archer Media",
+   "weight": 3.43,
+   "sector": "Communication Services",
+   "kind": "equity",
+   "id": "STRK20001"
+  },
+  {
+   "ticker": "NAKA",
+   "name": "Nakatomi Trading Corp",
+   "weight": 3.09,
+   "sector": "Financials",
+   "kind": "equity",
+   "id": "NAKA0001"
+  },
+  {
+   "ticker": "GEKK",
+   "name": "Gekko Capital Group",
+   "weight": 2.78,
+   "sector": "Financials",
+   "kind": "equity",
+   "id": "GEKK0001"
+  },
+  {
+   "ticker": "PRSC",
+   "name": "Prestige Cruises Ltd",
+   "weight": 2.5,
+   "sector": "Consumer Discretionary",
+   "kind": "equity",
+   "id": "PRSC0001"
+  },
+  {
+   "ticker": "WYLD",
+   "name": "Wyld Stallyns Audio",
+   "weight": 2.25,
+   "sector": "Consumer Discretionary",
+   "kind": "equity",
+   "id": "WYLD0001"
+  },
+  {
+   "ticker": "KRUS",
+   "name": "Krusty Krab Holdings",
+   "weight": 2.04,
+   "sector": "Consumer Discretionary",
+   "kind": "equity",
+   "id": "KRUS0001"
+  },
+  {
+   "ticker": "",
+   "name": "Cash & equivalents",
+   "weight": 0.35,
+   "sector": null,
+   "kind": "cash",
+   "id": "CASHUSD"
+  }
+ ],
+ "warnings": [],
+ "retrieved_at": "2026-10-02T00:00:00+00:00",
+ "note": {
+  "en": "Hypothetical example with fictional companies; not a real fund.",
+  "zh": "虚构示例，公司均为虚构，并非真实基金。"
+ }
+}

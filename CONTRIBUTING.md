@@ -22,7 +22,10 @@ python3 -m unittest discover -s tests -v      # no browser needed
    python3 examples/make_sample_prices.py
    for m in neural9 holdings watchlist; do python3 render_table.py examples/${m}_spec.json examples/$m; done
    for m in chart_lines chart_multiples; do python3 render_chart.py examples/${m}_spec.json examples/$m; done
+   python3 examples/make_etf_holdings.py
+   for m in equity swap; do python3 render_holdings.py examples/etf_holdings_$m.json examples/etf_holdings_$m; done
    ```
    CI regenerates the HTML and fails if it differs from what is committed.
 3. For a new calculation, add a known-answer test in `tests/test_calc.py`.
+   For a new ETF issuer, add an adapter in `fetch_holdings.py` with an offline parser test in `tests/test_holdings.py`, and a case in `tools/live_check.py` (run it with `python3 tools/live_check.py --only <case>`). The `live-check` workflow runs every case weekly against the real issuer pages.
 4. If you changed text or examples shown in the READMEs or the website, run `python3 tools/build_docs.py` and commit the result.

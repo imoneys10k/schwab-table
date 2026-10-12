@@ -2,7 +2,7 @@
 
 <img src="assets/banner.png" alt="schwab-table" width="100%">
 
-**AI エージェントのための、リサーチ風の表・推移チャート・四半期決算レビュー。**
+**AI エージェントのための、リサーチ風の表・推移チャート・ETF 保有銘柄・四半期決算レビュー。**
 
 [English](README.md) · [繁體中文](README.zh-Hant.md) · **日本語** · [Français](README.fr.md)
 
@@ -12,12 +12,12 @@
 
 </div>
 
-1 つのリポジトリにエージェント用スキルが 2 つあります。Claude Code 向けに作られていますが、Codex など他のコーディングエージェントでも使えます。**schwab-performance-table** は、銘柄リスト、証券口座の保有銘柄スクリーンショット、価格データ、自分の CSV を、リサーチ風の表（Schwab・Morgan・Blackstone・IBKR レイアウト）に、またドローダウンと対数目盛つきの推移チャートに変換します。**quarterly-earnings-review** は企業の四半期決算の原本を確認し、出典付きの解説を添えた HSBC 風の決算表を作ります。出力はすべて英語と繁体字中国語の 2 版で、PNG と単体で完結する HTML です。
+1 つのリポジトリにエージェント用スキルが 2 つあります。Claude Code 向けに作られていますが、Codex など他のコーディングエージェントでも使えます。**schwab-performance-table** は、銘柄リスト、証券口座の保有銘柄スクリーンショット、価格データ、自分の CSV を、リサーチ風の表（Schwab・Morgan・Blackstone・IBKR レイアウト）に、またドローダウンと対数目盛つきの推移チャート、ETF の上位保有銘柄チャートに変換します。**quarterly-earnings-review** は企業の四半期決算の原本を確認し、出典付きの解説を添えた HSBC 風の決算表を作ります。出力はすべて英語と繁体字中国語の 2 版で、PNG と単体で完結する HTML です。
 
 ## ✨ 特長
 
 <table>
-<tr><td width="50%" valign="top"><h3>🎯 4 つのレポートレイアウト</h3><p>Schwab、Morgan、Blackstone、IBKR 風。列の構成は明示されています。独立したテンプレートで、各機関が発行したレポートではありません。</p></td><td width="50%" valign="top"><h3>📊 表・チャート・決算</h3><p>ランキング表・保有銘柄表・ウォッチリスト表、ドローダウンと対数目盛つきの折れ線とスモールマルチプル、HSBC 風の四半期決算。</p></td></tr>
+<tr><td width="50%" valign="top"><h3>🎯 4 つのレポートレイアウト</h3><p>Schwab、Morgan、Blackstone、IBKR 風。列の構成は明示されています。独立したテンプレートで、各機関が発行したレポートではありません。</p></td><td width="50%" valign="top"><h3>📊 表・チャート・決算</h3><p>ランキング表・保有銘柄表・ウォッチリスト表、ドローダウンと対数目盛つきの折れ線とスモールマルチプル、ETF の上位保有銘柄チャート、HSBC 風の四半期決算。</p></td></tr>
 <tr><td width="50%" valign="top"><h3>🌏 英語と繁体字中国語</h3><p>出力は常に 2 言語。2x PNG と単体で完結する HTML に加え、ダークテーマと PDF も選べます。</p></td><td width="50%" valign="top"><h3>🔒 出典を必ず明示</h3><p>Nasdaq と上海・深圳取引所の終値、出典を明示した Yahoo のデータ（その他の市場）、決算は SEC と Apple の公式資料。欠損は NA で、作り話はしません。</p></td></tr>
 <tr><td width="50%" valign="top"><h3>🤖 ワンフレーズで導入</h3><p>プロンプトを Claude Code や Codex に貼るだけ。macOS・Linux・Windows に対応し、2 つのスキルを一緒に入れます。</p></td><td width="50%" valign="top"><h3>🧪 テスト済み</h3><p>正解つきの単体テスト、3 つの OS での CI、実データのスモークテスト、最初のエージェント評価。</p></td></tr>
 </table>
@@ -30,6 +30,7 @@
 <tr><td width="50%" align="center"><img src="examples/morgan_zh.png" alt="Morgan 風マトリクス"><br><sub><b>Morgan 風マトリクス</b> · 繁體中文</sub></td><td width="50%" align="center"><img src="examples/blackstone_zh.png" alt="Blackstone 風の成績表"><br><sub><b>Blackstone 風の成績表</b> · 繁體中文</sub></td></tr>
 <tr><td width="50%" align="center"><img src="examples/ibkr_zh.png" alt="IBKR 風の保有明細"><br><sub><b>IBKR 風の保有明細</b> · 繁體中文</sub></td><td width="50%" align="center"><img src="examples/earnings/aapl_2025q3_zh.png" alt="HSBC 風の四半期決算：AAPL 第 3 四半期"><br><sub><b>HSBC 風の四半期決算：AAPL 第 3 四半期</b> · 繁體中文</sub></td></tr>
 <tr><td width="50%" align="center"><img src="examples/earnings/aapl_2025q4_zh.png" alt="HSBC 風の四半期決算：AAPL 第 4 四半期"><br><sub><b>HSBC 風の四半期決算：AAPL 第 4 四半期</b> · 繁體中文</sub></td><td width="50%" align="center"><img src="examples/holdings_en.png" alt="保有銘柄表"><br><sub><b>保有銘柄表</b> · EN</sub></td></tr>
+<tr><td width="50%" align="center"><img src="examples/etf_holdings_equity_en.png" alt="ETF 上位 13 銘柄"><br><sub><b>ETF 上位 13 銘柄</b> · EN</sub></td><td width="50%" align="center"><img src="examples/etf_holdings_swap_zh.png" alt="スワップ・エクスポージャーのある ETF"><br><sub><b>スワップ・エクスポージャーのある ETF</b> · 繁體中文</sub></td></tr>
 </table>
 
 <sub>決算の例は Apple の公式資料、ランキング表は Charles Schwab の公開チャートを使用しています。それ以外は架空の企業と合成データです。</sub>
@@ -41,7 +42,7 @@ flowchart LR
   A["📝 ティッカー、画像、CSV<br/>またはティッカー＋四半期"] --> B["🤖 AI エージェント + スキル"]
   B --> C["🏛 価格：Nasdaq、上海・深圳、<br/>Yahoo（明示）、自分の CSV"]
   B --> F["📑 決算：Apple の PDF、<br/>SEC のデータ、取り込んだ資料"]
-  C --> D["🖨 render_table<br/>render_chart"]
+  C --> D["🖨 render_table<br/>render_chart<br/>render_holdings"]
   F --> G["🖨 quarterly_earnings"]
   D --> E["🖼 PNG + HTML<br/>EN · 繁體中文"]
   G --> E
@@ -110,6 +111,7 @@ irm https://raw.githubusercontent.com/imoneys10k/schwab-table/main/install.ps1 |
 - AAPL、MSFT、NVDA を Morgan 風のリターンとリスクのマトリクスにして。
 - 7203.T、0700.HK、600519.SS の年初来の推移をチャートにして。
 - AAPL の FY2025Q3 決算を HSBC 風の表でレビューして。
+- QQQ、VOO、SPY の上位 13 銘柄を表示して。
 
 ## 🧩 表のスタイル
 
@@ -161,6 +163,34 @@ python3 fetch_prices.py 7203.T 0700.HK SAP.DE 600519.SS --start 2026-08-01 --ben
 python3 render_chart.py examples/chart_lines_spec.json out/chart
 ```
 
+## 🧱 ETF の上位保有銘柄
+
+ETF の上位保有銘柄（既定は 13 銘柄、`--top N` で変更）を、ウェイト・累計ウェイト・セクター・残りの合計つきでチャート化します。出典は各ファンドの運用会社が公表するファイルで、保有日は必ずチャートに印字されます。
+
+| 運用会社 | ファンド | 取得方法 |
+|---|---|---|
+| State Street SPDR | `SPY`、`XLK` など SPDR ファンド | 日次の xlsx ファイル |
+| iShares | `IVV`、`IWM`、`AGG` ほか計 15 本（確認済みの商品 ID リスト） | `latest-holdings.csv` |
+| Vanguard | `VOO`、`VTI` など株式型 ETF | ファンドページの JSON（月次公表のため数週間前のこともあります） |
+| NEOS | `QQQI` | ファンドページの CSV |
+| Roundhill | `NCLD`、`DRAM` | Roundhill 全ファンドをまとめた日次 CSV |
+| Tema | `DISK` | ファンドページからリンクされた日次 CSV |
+| Invesco、Destiny | `QQQ`、`QQQM`、`DXYZ` | 自動取得しません。利用規約が自動アクセスを禁じているためです。ファンドページから自分でダウンロードし、`--csv` で取り込みます |
+| その他のファンド | 自分でダウンロードしたファイル | `--csv` で取り込み。名称・ティッカー・ウェイトの列が必要 |
+
+- **スワップを含めたランキング：** NCLD や DRAM のようなファンドでは、株式に対するスワップを同じ銘柄の現物（CUSIP/SEDOL で対応付け）に加算します。Roundhill 自身のサイトも同じ足し方で、棒は 2 つの部分に分かれます。Roundhill のファンドでは同じ会社の別の上場ラインも合算します（DRAM の SK hynix とサムスン）。現金、MMF、短期国債、オプションは別の行に出し、ランキングには入れません。`--mode lines` なら運用会社の一覧の各行をそのまま順位付けします。
+- **株式クラス：** GOOGL と GOOG は既定では別々で、`--merge-classes` を付けると合算します。
+- **日付は正直に：** 保有日は運用会社の価格がどの日のものかを示します（NEOS と Roundhill はファイルに翌営業日の日付を付けるため、評価日を表示して注記し、毎週のライブチェックが公式終値で照合します。Vanguard は月次）。10 日より古いと警告を付けます。ウェイトは開示どおりに表示し、欠損は NA で 0 とは扱いません。
+- **利用規約：** 読み取るのは公開されているファイルとページだけで、各パスはそのサイトの robots.txt で許可されています。Invesco と Destiny は自動アクセスを禁じているため、これらのファンドは取り込み専用（`--csv`）です。規約を確認したのは Invesco・Destiny・SSGA だけなので、商用で使う前に他の運用会社の規約も読んでください。
+- **オプション：** `--top N`、`--by sector|name`（数千行のファンド、例：債券 ETF）、`--names names.json`（現地語の名称）、`--theme dark`、`--pdf`、`--langs`。
+
+```bash
+python3 fetch_holdings.py QQQ NCLD -o data/                  # data/QQQ_holdings.json, data/NCLD_holdings.json
+python3 render_holdings.py data/QQQ_holdings.json out/qqq    # top 13 by default
+python3 render_holdings.py data/NCLD_holdings.json out/ncld --top 10 --merge-classes
+python3 fetch_holdings.py MYETF --csv my_holdings.csv --name "My ETF"   # any other fund
+```
+
 ## 🧾 四半期決算レビュー
 
 「AAPL の FY2025Q3 決算を HSBC 風の表でレビューして」と頼むだけです。**quarterly-earnings-review** は会計期間と決算の原本を確認し、単四半期・前年同期比・前四半期比の数値を計算して、出典を引用した解説を添えます。出力は英語と繁体字中国語の PNG + HTML に、元データと検証台帳が付きます。
@@ -182,6 +212,7 @@ python3 quarterly_earnings.py AAPL --period FY2025Q3 -o out/aapl_q3
 - **自動取得は価格リターンのみ。** Nasdaq の配当額は株式分割調整がされておらず、ETF には配当データがないため、総リターンには自分で用意した調整後終値の CSV が必要です。
 - **Yahoo は集約データと明記**し、取引所が公表した終値とは扱いません。A 株のウェブサイト価格は調整なしで、コーポレートアクションによる歪みを警告します。
 - **香港などの市場は取引所サフィックスが必要**です（`0700.HK`）。数字だけのコードは曖昧なので拒否されます。
+- **自動アクセスを禁じるサイトは取得しません。** Invesco（QQQ）と Destiny（DXYZ）は利用規約で禁止しているため、これらのファンドは取り込み専用（`--csv`）です。ブラウザ自動化でブロックを回避することはありません。
 - エージェント向けの詳細は [SKILL.md](SKILL.md)（繁体字中国語）と [SKILL.en.md](SKILL.en.md)（英語）にあります。
 
 <details>
@@ -193,6 +224,7 @@ python3 quarterly_earnings.py AAPL --period FY2025Q3 -o out/aapl_q3
 - `render_table.py`、`institutional_tables.py`、`prices_to_table.py`: 表のレンダラーと 4 つのスタイル。取得した価格から Morgan / Blackstone の spec を作成
 - `fetch_prices.py`、`csv_to_prices.py`: Nasdaq・上海/深圳・Yahoo の日次終値の取得、自分の CSV の変換
 - `render_chart.py`、`render_common.py`: チャートのレンダラー。共通のテーマと PNG / PDF の出力
+- `fetch_holdings.py`、`render_holdings.py`: 運用会社自身のファイルから ETF の保有銘柄を取得（SPDR・iShares・Vanguard・NEOS・Roundhill・Tema、自分の CSV）し、上位 N 銘柄を描画
 - `quarterly_earnings.py`、`earnings_core.py`、`earnings_sources.py`、`render_earnings.py`: 決算コマンド、検証可能な計算、出典アダプター、HSBC 風レンダラー
 - `localization.py`、`fonts.py`、`fonts/`: 繁体字中国語への変換。HTML に埋め込む同梱フォント（ライセンス付き）
 - `references/`、`EARNINGS.md`: テンプレートガイド。決算の使い方と出典の範囲（繁体字中国語）
@@ -214,6 +246,7 @@ python3 render_table.py examples/neural9_spec.json out/neural9
 python3 render_table.py examples/morgan_spec.json out/matrix
 python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 -o data/watch.json
 python3 render_chart.py examples/chart_lines_spec.json out/chart --theme dark --pdf
+python3 fetch_holdings.py QQQ -o data/ && python3 render_holdings.py data/QQQ_holdings.json out/qqq
 python3 csv_to_prices.py 0700.HK=tencent.csv --benchmark HSI=hsi.csv -o data/hk.json
 python3 quarterly_earnings.py AAPL --period FY2025Q3 -o out/aapl_q3
 ```
@@ -228,7 +261,7 @@ python3 quarterly_earnings.py AAPL --period FY2025Q3 -o out/aapl_q3
 
 ## 🧪 テストと評価
 
-`python3 -m unittest discover -s tests -v` は、リターン・ドローダウン・変動率・銘柄ルーティング・キャッシュの鮮度・CSV 取り込み・表スタイル・決算計算の正解つきテストを実行します。CI は Ubuntu・macOS・Windows（Python 3.9 と 3.13）でこれらを実行し、例を再生成して変化がないか確認し、Nasdaq への実データのスモークテストを行い、3 つの OS でスキルをインストールします。[evals/](evals/README.md) には実際の使い方に近いエージェント依頼と最初の結果があります。README とサイトは `python3 tools/build_docs.py` で生成され、内容が古いとテストが失敗します。
+`python3 -m unittest discover -s tests -v` は、リターン・ドローダウン・変動率・銘柄ルーティング・キャッシュの鮮度・CSV 取り込み・ETF 保有銘柄のパーサーと順位付けルール・表スタイル・決算計算の正解つきテストを実行します。CI は Ubuntu・macOS・Windows（Python 3.9 と 3.13）でこれらを実行し、例を再生成して変化がないか確認し、Nasdaq への実データのスモークテストを行い、3 つの OS でスキルをインストールします。さらに週 1 回のワークフローが ETF 運用会社ごとに実在するファンドを 1 本取得して結果を検査し、運用会社のページ変更を早期に見つけます。[evals/](evals/README.md) には実際の使い方に近いエージェント依頼と最初の結果があります。README とサイトは `python3 tools/build_docs.py` で生成され、内容が古いとテストが失敗します。
 
 ## 📌 免責事項
 

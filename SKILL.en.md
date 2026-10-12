@@ -5,7 +5,7 @@
 ## When to use
 The user wants to turn a set of stocks into the kind of table found in Schwab research: a light-blue title/header band, thin grey row dividers, and a small-print disclaimer footnote. By default, output **both a Chinese and an English version**, one HTML file each, then render each to PNG with Playwright at 2x.
 
-For a **price chart** (several symbols over a period), jump to "Chart mode" at the end.
+For a **price chart** (several symbols over a period), jump to "Chart mode" at the end. For an **ETF's largest holdings**, jump to "ETF top-holdings mode".
 
 ## Step 1: Identify the mode
 
@@ -261,6 +261,46 @@ Everything except `data` is optional. Without `start` / `end` the data file's ra
 - [ ] When an ETF is the benchmark the footnote says it is a proxy; when a log scale is used the subtitle says so
 - [ ] Summary table sorted by return descending, benchmark row bold, numbers consistent with the line-end labels
 - [ ] A-share unadjusted-price risks and local currencies are disclosed; Yahoo is not called official; total-return charts use user-supplied dividend-adjusted closes
+
+
+## ETF top-holdings mode
+
+### When to use
+The user wants an ETF's largest holdings, its concentration or its heavyweight stocks (for example "the top 13 holdings of QQQ", "what's in NCLD", "compare VOO and SPY"). Same style as the other outputs: light-blue title band, thin dividers, small-print footnote, both a Chinese and an English version (PNG + HTML).
+
+### Workflow
+1. **Identify the ETF and how many holdings to show.** Default **13**; `--top N` changes it.
+2. **Fetch the holdings** (only the issuer's own published file; the script picks the issuer):
+   ```bash
+   python3 fetch_holdings.py QQQ NCLD -o data/        # writes data/QQQ_holdings.json etc.
+   ```
+   - Supported: State Street SPDR (SPY, XLK, ...), iShares (the 15 funds whose product ids are verified in the script, e.g. IVV, IWM, AGG), Vanguard equity ETFs (VOO, VTI, ...), NEOS (QQQI), Roundhill (NCLD, DRAM, ...), Tema (DISK)
+   - **Invesco (QQQ, QQQM, QQQJ, RSP) and Destiny (DXYZ) are not fetched automatically:** their terms of use forbid automated access to their websites. The script stops with an error that includes the import command; ask the user to download the holdings from the fund page and import them with `--csv`. **Do not** work around this with browser automation, aggregator sites or memory
+   - Any other fund, or a script error: ask the user to download the holdings CSV from the issuer's site and import it with `fetch_holdings.py SYMBOL --csv file --name "Full fund name" --as-of YYYY-MM-DD`. **Never** fill holdings from Yahoo, aggregator sites or memory
+   - If a symbol could not be fetched (exit code 1), **stop and tell the user which one**
+   - The holdings date is the pricing day, not today (NEOS and Roundhill stamp files with the next trading day but price them at the previous close; the tool uses the pricing day and says so in the footnote): Vanguard publishes monthly, the others mostly daily (give a user-imported CSV its date with `--as-of`). The script warns above 10 days and the chart subtitle says "(N days old)"; tell the user when you deliver. Vanguard has nothing newer, and SPY/IVV holdings must not stand in for VOO (different funds); if the user wants current weights of the same index, chart SPY or IVV separately and say so
+   - Responses are cached for 1 hour and the script says when it served the cache (`--refresh` downloads again)
+3. **Render:**
+   ```bash
+   python3 render_holdings.py data/QQQ_holdings.json out/qqq
+   ```
+   This writes `out/qqq_en.html/.png` and `out/qqq_zh.html/.png`. For local-language names add `--names names.json` (`{"NVDA": {"zh": "英伟达"}}`); other options: `--top N`, `--langs en`, `--no-png`, `--pdf`, `--scale 3`, `--theme dark`
+4. Open both PNGs and go through the checklist. Deliver both PNGs (HTML too) and state the holdings date
+
+### Ranking rules
+- **Default `--mode exposure` (economic exposure):** a swap on a stock is added to the shares held in the same stock, matched by CUSIP/SEDOL (funds such as NCLD and DRAM; Roundhill's own site script adds swap and stock weights the same way, which was checked in its code, but a swap's notional basis is not verified). For Roundhill funds, lines of the same company (other listings, share classes) are also added together, as its site does, so DRAM's SK hynix and Samsung include their second listings; `--mode lines` undoes this), and the bar shows both parts; a swap with no physical position is ranked on its own. Cash, money-market funds, Treasury bills and options are **not ranked**; they appear on one separate line and in the footnote. Negative cash offsets the swap exposure, and the footnote says so
+- **`--mode lines`:** every line is ranked exactly as the issuer lists it, with no merging or removal. Use it when the user wants the issuer's raw listing
+- **Funds with thousands of lines (bond ETFs, Russell 2000, ...):** the top 13 single lines add up to a few percent and say little about concentration; the footnote says so. Add `--by sector` (totals per sector) or `--by name` (lines with the same security name added together, e.g. every "TREASURY NOTE") and tell the user which view was used. Bond lines already carry their coupon and maturity
+- **Share classes:** GOOGL and GOOG stay separate by default (issuers list them separately). Add `--merge-classes` for concentration by company; the footnote states that classes were combined
+- **Weights are shown as the issuer reports them:** no more decimals than the issuer gave; a holding without a weight is not ranked and shows NA, never zero. The footnote warns when the listed weights are far from 100%
+- **Private-company funds such as DXYZ (user CSV import only):** disclosures are usually quarterly, unaudited economic exposure, not tradable positions; give the import its date with `--as-of` and do not describe it as live holdings
+
+### Checklist (holdings)
+- [ ] Holdings come from `fetch_holdings.py` (the issuer's file) or the user's own CSV; nothing filled from aggregators or memory
+- [ ] Both language versions produced; fund name, ticker and count in the title are right, and the subtitle states the weight basis and the holdings date
+- [ ] The date is shown as is; holdings older than 10 days were mentioned to the user
+- [ ] Swaps, cash, T-bills and options are handled as the footnote says; top-N, other and not-ranked totals add up to about 100% (swap funds can differ, which the footnote explains)
+- [ ] No missing weight was treated as zero; no name is truncated beyond recognition
 
 
 ## Institutional templates and Traditional Chinese
