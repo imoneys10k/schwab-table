@@ -182,7 +182,7 @@ Représentez les plus grandes positions d'un ETF (13 par défaut, `--top N` pour
 - **Catégories d'actions :** GOOGL et GOOG restent séparés sauf avec `--merge-classes`.
 - **Dates honnêtes :** la date de situation est le jour d'où viennent les prix de l'émetteur (NEOS et Roundhill datent leurs fichiers du jour de bourse suivant : l'outil affiche le jour de valorisation, le signale en note, et le contrôle hebdomadaire le vérifie avec les cours officiels ; Vanguard publie chaque mois), avec un avertissement au-delà de 10 jours. Les poids sont affichés tels que publiés ; un poids absent s'affiche NA et n'est jamais compté comme zéro.
 - **Conditions d'utilisation :** seuls des fichiers et pages publics sont lus, et chaque chemin est autorisé par le robots.txt du site. Invesco et Destiny interdisent l'accès automatisé : leurs fonds se traitent uniquement par import (`--csv`). Les conditions n'ont été vérifiées que pour Invesco, Destiny et SSGA ; lisez celles des autres émetteurs avant tout usage commercial.
-- **Options :** `--top N`, `--names names.json` (noms en langue locale), `--theme dark`, `--pdf`, `--langs`.
+- **Options :** `--top N`, `--by sector|name` (fonds de milliers de lignes, ex. ETF obligataires), `--names names.json` (noms en langue locale), `--theme dark`, `--pdf`, `--langs`.
 
 ```bash
 python3 fetch_holdings.py QQQ NCLD -o data/                  # data/QQQ_holdings.json, data/NCLD_holdings.json

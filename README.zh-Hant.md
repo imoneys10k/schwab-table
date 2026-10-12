@@ -182,7 +182,7 @@ python3 render_chart.py examples/chart_lines_spec.json out/chart
 - **股份類別：** GOOGL 與 GOOG 預設分開，加 `--merge-classes` 才合併。
 - **日期如實：** 持倉截止日是發行人價格所屬的那一天（NEOS、Roundhill 的檔案標的是下一個交易日，工具改用估值日並在腳註說明，每週的實時檢查會用官方收盤價核對；Vanguard 每月公布），超過 10 天會加警告。權重照披露原樣列示；缺權重顯示 NA，不當成 0。
 - **使用條款：** 只讀取公開的檔案與頁面，且每個路徑都符合該站的 robots.txt。Invesco 與 Destiny 禁止自動化存取，所以這兩家的基金只能匯入（`--csv`）。條款只核對了 Invesco、Destiny 和 SSGA，其他發行人的條款請在商業使用前自行閱讀。
-- **選項：** `--top N`、`--names names.json`（本地語言名稱）、`--theme dark`、`--pdf`、`--langs`。
+- **選項：** `--top N`、`--by sector|name`（幾千行的基金，如債券 ETF）、`--names names.json`（本地語言名稱）、`--theme dark`、`--pdf`、`--langs`。
 
 ```bash
 python3 fetch_holdings.py QQQ NCLD -o data/                  # data/QQQ_holdings.json, data/NCLD_holdings.json

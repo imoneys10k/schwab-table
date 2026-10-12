@@ -8,6 +8,8 @@ Modes
                       (matched by CUSIP/SEDOL), and cash, money-market funds, Treasury bills and options are left out of the
                       ranking and reported on their own line. This is the view Roundhill and similar issuers call "top holdings".
   lines               Rank every line exactly as the issuer lists it, swaps and T-bills included, with no merging.
+--by                 holding (default), name or sector: add the lines of one issuer name, or one sector, together and rank the groups.
+                      A fund with thousands of lines (a bond or small-cap index fund) says little in a top-13 of single lines.
 --merge-classes       Add share classes of one company together (GOOGL + GOOG). Off by default.
 --names               JSON {"NVDA": {"zh": "英伟达"}} to show a local-language name beside the ticker in that language.
 An optional "note": {"en": ..., "zh": ...} key in the data file is printed at the start of the footnote (the examples use it to mark hypothetical funds).
@@ -30,10 +32,18 @@ FONT = ('"Inter","Helvetica Neue",Helvetica,Arial,"Noto Sans CJK TC","Source Han
 MAX_TOP = 50
 STALE_DAYS = 10  # same threshold as fetch_holdings.py; older holdings get an age tag in the subtitle
 EXCLUDED_KINDS = ("cash", "treasury", "option")
+GROUPS = ("holding", "name", "sector")
+DIFFUSE_SHARE = 15.0   # % of the listed weights; below this a top-N of single lines says little about concentration
+DIFFUSE_LINES = 100
 
 S = {
     "en": {
-        "title": "{name} ({sym}) · Top {n} Holdings", "title_sym": "{sym} · Top {n} Holdings",
+        "title": "{name} ({sym}) · Top {n} {unit_title}", "title_sym": "{sym} · Top {n} {unit_title}",
+        "unit_title": {"holding": "Holdings", "name": "Names", "sector": "Sectors"}, "unit": {"name": "names", "sector": "sectors"},
+        "h_group": {"name": "Name", "sector": "Sector"}, "unclassified": "Unclassified", "lines": "lines",
+        "top_g": "Top {n} {unit}", "rest_g": "All other {unit} ({k})",
+        "n_group": "Lines are grouped by {what} as the issuer lists it and their weights added ({lines} lines in {groups} groups). ", "what": {"name": "name", "sector": "sector"},
+        "n_diffuse": "The fund holds {k} lines and the top {n} are only {x:.1f}% of the listed weights, so single lines say little about concentration; grouping by sector or by name is more informative. ",
         "sub": "{basis} · Holdings as of {as_of}{age} · {issuer}", "age": " ({n} days old)", "sub_unknown": "{basis} · Holdings date not stated · {issuer}",
         "h_rank": "#", "h_name": "Holding", "h_weight": "Weight (%)", "h_cum": "Cumul. (%)", "h_sector": "Sector",
         "top": "Top {n} holdings", "rest": "All other holdings ({k})", "excl": "Not ranked: {kinds}", "kind_short": {"cash": "cash", "treasury": "Treasury bills", "option": "options", "other": "other"},
@@ -53,7 +63,12 @@ S = {
         "warn": "Data notes: {w}. ", "lang": "en",
     },
     "zh": {
-        "title": "{name} ({sym}) · 前 {n} 大持仓", "title_sym": "{sym} · 前 {n} 大持仓",
+        "title": "{name} ({sym}) · 前 {n} 大{unit_title}", "title_sym": "{sym} · 前 {n} 大{unit_title}",
+        "unit_title": {"holding": "持仓", "name": "名称", "sector": "行业"}, "unit": {"name": "名称", "sector": "行业"},
+        "h_group": {"name": "名称", "sector": "行业"}, "unclassified": "未分类", "lines": "行",
+        "top_g": "前 {n} 大{unit}合计", "rest_g": "其余{unit}（{k} 项）",
+        "n_group": "按发行人列示的{what}把各行归类并相加权重（{lines} 行归为 {groups} 组）。", "what": {"name": "名称", "sector": "行业"},
+        "n_diffuse": "该基金共 {k} 行，前 {n} 大合计仅占已列示权重的 {x:.1f}%，单行排名说明不了集中度；按行业或名称归类更有信息量。",
         "sub": "{basis} · 持仓截至 {as_of}{age} · {issuer}", "age": "（距数据获取日 {n} 天）", "sub_unknown": "{basis} · 未注明持仓日期 · {issuer}",
         "h_rank": "#", "h_name": "持仓", "h_weight": "权重 (%)", "h_cum": "累计 (%)", "h_sector": "行业",
         "top": "前 {n} 大合计", "rest": "其余持仓（{k} 项）", "excl": "未参与排名：{kinds}", "kind_short": {"cash": "现金", "treasury": "国债", "option": "期权", "other": "其他"},
@@ -89,8 +104,8 @@ def build_rows(data, mode="exposure", merge_classes=False):
     held = data["holdings"]
     notes = {"merged": [], "unmatched": False, "na": 0}
     if mode == "lines":
-        rows = [{"name": h["name"], "ticker": h["ticker"], "sector": h["sector"], "physical": h["weight"], "swap": 0.0, "total": h["weight"]}
-                for h in held]
+        rows = [{"name": h["name"], "ticker": h["ticker"], "sector": h["sector"], "physical": h["weight"], "swap": 0.0, "total": h["weight"],
+                 "base": h.get("base_name") or h["name"], "count": 1} for h in held]
         ranked = [r for r in rows if r["total"] is not None]
         notes["na"] = len(rows) - len(ranked)
         ranked.sort(key=lambda r: (-r["total"], r["name"]))
@@ -104,7 +119,8 @@ def build_rows(data, mode="exposure", merge_classes=False):
     rows = {}
     for key, hs in base.items():
         top = hs[0]
-        rows[key] = {"name": top["name"], "ticker": top["ticker"], "sector": top["sector"], "physical": 0.0, "swap": 0.0, "total": 0.0, "na": False}
+        rows[key] = {"name": top["name"], "ticker": top["ticker"], "sector": top["sector"], "physical": 0.0, "swap": 0.0, "total": 0.0, "na": False,
+                     "base": top.get("base_name") or top["name"], "count": 1}
         for h in hs:
             if h["weight"] is None:
                 rows[key]["na"] = True
@@ -116,7 +132,8 @@ def build_rows(data, mode="exposure", merge_classes=False):
         key = h.get("underlying_id")
         if key not in rows:
             key = f"swap|{key}|{h['name']}"
-            rows.setdefault(key, {"name": h["name"], "ticker": "", "sector": None, "physical": 0.0, "swap": 0.0, "total": 0.0, "na": False})
+            rows.setdefault(key, {"name": h["name"], "ticker": "", "sector": None, "physical": 0.0, "swap": 0.0, "total": 0.0, "na": False,
+                                  "base": h["name"], "count": 1})
             notes["unmatched"] = True
         if h["weight"] is None:
             rows[key]["na"] = True
@@ -134,6 +151,7 @@ def build_rows(data, mode="exposure", merge_classes=False):
             if len(g) > 1:
                 g.sort(key=lambda r: -r["total"])
                 merged = dict(g[0], physical=sum(r["physical"] for r in g), swap=sum(r["swap"] for r in g), total=sum(r["total"] for r in g),
+                              count=sum(r["count"] for r in g),
                               ticker=" / ".join(r["ticker"] for r in g if r["ticker"]), na=any(r["na"] for r in g))
                 notes["merged"].append(g[0]["name"])
                 out.append(merged)
@@ -166,6 +184,19 @@ def decimals(data):
     return 1 if ws and all(abs(w * 10 - round(w * 10)) < 1e-6 for w in ws) else 2
 
 
+def group_rows(rows, by, L):
+    """Add the ranked lines of one issuer name (by='name') or one sector (by='sector') together."""
+    if by == "sector" and not any(r["sector"] for r in rows):
+        raise ValueError("this file has no sector data; use --by holding or --by name")
+    groups = {}
+    for r in rows:
+        label = r["base"] if by == "name" else (r["sector"] or L["unclassified"])
+        g = groups.setdefault(label.lower(), {"name": label, "ticker": "", "sector": None, "physical": 0.0, "swap": 0.0, "total": 0.0, "count": 0, "base": label})
+        for k in ("physical", "swap", "total", "count"):
+            g[k] += r[k]
+    return sorted(groups.values(), key=lambda g: (-g["total"], g["name"]))
+
+
 def fnum(v, dp=2):
     if v is None:
         return "NA"
@@ -173,23 +204,30 @@ def fnum(v, dp=2):
     return f'<span class="sgn">-</span>{t}' if v < 0 else t
 
 
-def display_name(row, lang, names):
+def display_name(row, lang, names, lines_label=None):
     local = (names.get(row["ticker"]) or {}).get(lang) if row["ticker"] else None
     label = escape(local or row["name"])
+    if lines_label and row["count"] > 1:   # a group: say how many lines were added together
+        return label + f' <span class="tk">({row["count"]:,} {lines_label})</span>'
     return label + (f' <span class="tk">({escape(row["ticker"])})</span>' if row["ticker"] else "")
 
 
-def build_html(data, lang, theme="light", top=13, mode="exposure", merge_classes=False, names=None):
+def build_html(data, lang, theme="light", top=13, mode="exposure", merge_classes=False, names=None, by="holding"):
     names = names or {}
     L, T = S[lang], THEMES[theme]
     ranked, excluded, notes = build_rows(data, mode, merge_classes)
     if not ranked:
         raise ValueError("no holdings with a reported weight to rank")
+    if by not in GROUPS:
+        raise ValueError(f"unknown grouping {by!r}; choose from {', '.join(GROUPS)}")
+    n_lines = len(ranked)
+    if by != "holding":
+        ranked = group_rows(ranked, by, L)
     shown = ranked[:top]
     dp = decimals(data)
     n = len(shown)
     scale = max(r["total"] for r in shown) or 1
-    has_sector = any(r["sector"] for r in shown)
+    has_sector = by == "holding" and any(r["sector"] for r in shown)
     has_swap = any(r["swap"] for r in shown)
     cum, body = 0.0, []
     for i, r in enumerate(shown, 1):
@@ -198,14 +236,15 @@ def build_html(data, lang, theme="light", top=13, mode="exposure", merge_classes
         swap = max(r["swap"], 0) / scale * 100
         bar = (f'<div class="bar"><i class="fp" style="width:{phys:.2f}%"></i><i class="fs" style="width:{swap:.2f}%"></i></div>')
         sector = f'<td class="sec">{escape(r["sector"] or "")}</td>' if has_sector else ""
-        body.append(f'<tr><td class="rk">{i}</td><td class="name" title="{escape(r["name"], quote=True)}">{display_name(r, lang, names)}</td><td class="bars">{bar}</td>'
+        body.append(f'<tr><td class="rk">{i}</td><td class="name" title="{escape(r["name"], quote=True)}">{display_name(r, lang, names, L["lines"] if by != "holding" else None)}</td><td class="bars">{bar}</td>'
                     f'<td class="num">{fnum(r["total"], dp)}</td><td class="num cum">{fnum(cum, dp)}</td>{sector}</tr>')
     span = 5 + (1 if has_sector else 0)
     rest = ranked[n:]
     rest_w = sum(r["total"] for r in rest)
-    sums = [(L["top"].format(n=n), cum, None)]
+    unit = L["unit"].get(by)
+    sums = [((L["top"] if by == "holding" else L["top_g"]).format(n=n, unit=unit), cum, None)]
     if rest:
-        sums.append((L["rest"].format(k=len(rest)), rest_w, None))
+        sums.append(((L["rest"] if by == "holding" else L["rest_g"]).format(k=f"{len(rest):,}", unit=unit), rest_w, None))
     excl_total = sum(excluded.values())
     if excluded:
         sums.append((L["excl"].format(kinds=("、" if lang == "zh" else ", ").join(L["kind_short"][k] for k in excluded)), excl_total, None))
@@ -218,7 +257,9 @@ def build_html(data, lang, theme="light", top=13, mode="exposure", merge_classes
     as_of = data.get("as_of")
     sub = (L["sub"] if as_of else L["sub_unknown"]).format(basis=basis, as_of=as_of, issuer=issuer, age=age_tag(data, L))
     name = data.get("name")
-    title = (L["title"].format(name=escape(name), sym=escape(data["symbol"]), n=n) if name else L["title_sym"].format(sym=escape(data["symbol"]), n=n))
+    ut = L["unit_title"][by]
+    title = (L["title"].format(name=escape(name), sym=escape(data["symbol"]), n=n, unit_title=ut) if name
+             else L["title_sym"].format(sym=escape(data["symbol"]), n=n, unit_title=ut))
     sep = "、" if lang == "zh" else ", "
     note = ""
     if mode == "lines":
@@ -236,7 +277,14 @@ def build_html(data, lang, theme="light", top=13, mode="exposure", merge_classes
     note += L["n_total"].format(t=total)
     if data.get("issuer_date") and data.get("as_of") and data["issuer_date"] != data["as_of"]:
         note += L["n_issuer_date"].format(issuer_date=data["issuer_date"], as_of=data["as_of"])
-    if len(ranked) < top:
+    if by != "holding":
+        note += L["n_group"].format(what=L["what"][by], lines=f"{n_lines:,}", groups=f"{len(ranked):,}")
+    elif n_lines >= DIFFUSE_LINES:
+        pool = sum(r["total"] for r in ranked)
+        share = cum / pool * 100 if pool > 0 else 100.0
+        if share < DIFFUSE_SHARE:
+            note += L["n_diffuse"].format(k=f"{n_lines:,}", n=n, x=share)
+    if by == "holding" and len(ranked) < top:
         note += L["n_few"].format(k=len(ranked))
     warnings = [w for w in data.get("warnings", []) if "no reported weight" not in w and "add up to" not in w]
     if warnings:
@@ -282,7 +330,7 @@ tr.first td{{border-top:1px solid {T['border']}}}
 """
     html = (f'<!doctype html><html lang="{L["lang"]}"><head><meta charset="utf-8"><title>{escape(data["symbol"])} top holdings</title><style>{css}</style></head>'
             f'<body><div id="wrap"><div class="box"><div class="band"><div class="t">{title}</div><div class="s">{escape(sub)}</div></div>{legend}'
-            f'<table><colgroup>{cols}</colgroup><thead><tr><th>{L["h_rank"]}</th><th class="l">{L["h_name"]}</th><th></th>'
+            f'<table><colgroup>{cols}</colgroup><thead><tr><th>{L["h_rank"]}</th><th class="l">{L["h_name"] if by == "holding" else L["h_group"][by]}</th><th></th>'
             f'<th>{L["h_weight"]}</th><th>{L["h_cum"]}</th>{head_sector}</tr></thead><tbody>{"".join(body)}</tbody></table></div>'
             f'<div class="foot">{foot}</div></div></body></html>')
     return traditional_html(html) if lang == "zh" else html
@@ -294,6 +342,7 @@ def main():
     ap.add_argument("prefix", help="output prefix, e.g. out/qqq -> out/qqq_en.html / .png")
     ap.add_argument("--top", type=int, default=13, help="how many holdings to show (default 13)")
     ap.add_argument("--mode", choices=("exposure", "lines"), default="exposure", help="see the module docstring")
+    ap.add_argument("--by", choices=GROUPS, default="holding", help="rank single lines (default), or add lines together by issuer name or by sector")
     ap.add_argument("--merge-classes", action="store_true", help="add share classes of one company together")
     ap.add_argument("--names", help='JSON {"NVDA": {"zh": "英伟达"}} for local-language names')
     ap.add_argument("--langs", default="en,zh")
@@ -316,7 +365,7 @@ def main():
     if bad:
         sys.exit(f"error: unsupported language(s): {', '.join(bad)} (available: {', '.join(S)})")
     try:
-        htmls = {l: build_html(data, l, a.theme, a.top, a.mode, a.merge_classes, names) for l in langs}
+        htmls = {l: build_html(data, l, a.theme, a.top, a.mode, a.merge_classes, names, a.by) for l in langs}
     except (ValueError, KeyError) as e:
         sys.exit(f"error: {e}")
     Path(a.prefix).parent.mkdir(parents=True, exist_ok=True)

@@ -40,7 +40,7 @@ from pathlib import Path
 from fetch_prices import CACHE_DIR, UA, FetchError, http_get
 
 CACHE_TTL = 6 * 3600
-CACHE_VERSION = 2  # 2: NEOS / Roundhill as-of dates are now the valuation date, not the file's next-trading-day stamp
+CACHE_VERSION = 3  # 3: bonds keep their base name for grouping; 2: NEOS / Roundhill as-of dates are the pricing day
 STALE_DAYS = 10
 
 # iShares serves a fund's holdings CSV from its numeric product id (the slug in the URL is ignored).
@@ -100,12 +100,14 @@ def clean(s):
     return re.sub(r"\s+", " ", s).strip()
 
 
-def holding(ticker, name, weight, sector=None, kind="equity", ident=None, underlying_id=None, price=None):
+def holding(ticker, name, weight, sector=None, kind="equity", ident=None, underlying_id=None, price=None, base_name=None):
     sector = clean(sector)
     h = {"ticker": clean(ticker) if clean(ticker) not in ("-", "--") else "", "name": clean(name), "weight": weight,
          "sector": None if sector in ("", "-", "--") else sector, "kind": kind, "id": clean(ident) or None}
     if underlying_id:
         h["underlying_id"] = underlying_id
+    if base_name:
+        h["base_name"] = clean(base_name)  # the issuer's own name without what we add for readability (bond coupon and maturity)
     if price is not None:
         h["price"] = price  # the price the issuer used to value the position; lets live_check verify the as-of date
     return h
@@ -227,7 +229,8 @@ def parse_ishares(symbol, text, url):
         if kind == "bond":  # many bonds share a generic name such as "TREASURY NOTE": add coupon and maturity to tell them apart
             coupon, maturity = pct(r.get("Coupon (%)")), clean(r.get("Maturity"))
             label = clean(label) + (f" {coupon:g}%" if coupon is not None else "") + (f" {maturity}" if maturity not in ("", "-") else "")
-        out.append(holding(r.get("Ticker"), label, pct(r["Weight (%)"]), r.get("Sector"), kind, r.get("ISIN") or r.get("CUSIP")))
+        out.append(holding(r.get("Ticker"), label, pct(r["Weight (%)"]), r.get("Sector"), kind, r.get("ISIN") or r.get("CUSIP"),
+                           base_name=r["Name"] if kind == "bond" else None))
     return result(symbol, "ishares", out, as_of, "BlackRock iShares (issuer holdings file)", url, name)
 
 

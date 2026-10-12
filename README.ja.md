@@ -182,7 +182,7 @@ ETF の上位保有銘柄（既定は 13 銘柄、`--top N` で変更）を、�
 - **株式クラス：** GOOGL と GOOG は既定では別々で、`--merge-classes` を付けると合算します。
 - **日付は正直に：** 保有日は運用会社の価格がどの日のものかを示します（NEOS と Roundhill はファイルに翌営業日の日付を付けるため、評価日を表示して注記し、毎週のライブチェックが公式終値で照合します。Vanguard は月次）。10 日より古いと警告を付けます。ウェイトは開示どおりに表示し、欠損は NA で 0 とは扱いません。
 - **利用規約：** 読み取るのは公開されているファイルとページだけで、各パスはそのサイトの robots.txt で許可されています。Invesco と Destiny は自動アクセスを禁じているため、これらのファンドは取り込み専用（`--csv`）です。規約を確認したのは Invesco・Destiny・SSGA だけなので、商用で使う前に他の運用会社の規約も読んでください。
-- **オプション：** `--top N`、`--names names.json`（現地語の名称）、`--theme dark`、`--pdf`、`--langs`。
+- **オプション：** `--top N`、`--by sector|name`（数千行のファンド、例：債券 ETF）、`--names names.json`（現地語の名称）、`--theme dark`、`--pdf`、`--langs`。
 
 ```bash
 python3 fetch_holdings.py QQQ NCLD -o data/                  # data/QQQ_holdings.json, data/NCLD_holdings.json

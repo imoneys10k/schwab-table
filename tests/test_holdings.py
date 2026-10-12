@@ -487,6 +487,58 @@ class PricingDateCheck(unittest.TestCase):
         self.assertIn("skipped", note)
 
 
+class Grouping(unittest.TestCase):
+    """Funds with thousands of lines: rank groups (names or sectors) instead of single lines."""
+
+    def bond_fund(self):
+        rows = [h("", "TREASURY NOTE 4% Feb 2030", 0.40, "bond", "t1", sector="Treasury", base_name="TREASURY NOTE"),
+                h("", "TREASURY NOTE 3.5% Mar 2030", 0.35, "bond", "t2", sector="Treasury", base_name="TREASURY NOTE"),
+                h("", "JPMORGAN CHASE & CO 5% 2031", 0.30, "bond", "j1", sector="Financial Institutions", base_name="JPMORGAN CHASE & CO"),
+                h("", "JPMORGAN CHASE & CO 4% 2033", 0.20, "bond", "j2", sector="Financial Institutions", base_name="JPMORGAN CHASE & CO"),
+                h("", "FNMA 30YR UMBS", 0.50, "bond", "f1", sector="MBS Pass-Through", base_name="FNMA 30YR UMBS"),
+                h("", "Cash", 0.10, "cash", "c")]
+        return fund(rows)
+
+    def test_group_by_name_adds_lines_with_the_same_issuer_name(self):
+        html = rh.build_html(self.bond_fund(), "en", by="name")
+        self.assertIn("Top 3 Names", html)
+        self.assertIn("TREASURY NOTE <span class=\"tk\">(2 lines)</span>", html)
+        self.assertIn("JPMORGAN CHASE &amp; CO <span", html)
+        # group totals: Treasury 0.75, then FNMA and JPMorgan tie at 0.50 and are ordered by name
+        self.assertLess(html.index("TREASURY NOTE"), html.index("FNMA 30YR UMBS"))
+        self.assertLess(html.index("FNMA 30YR UMBS"), html.index("JPMORGAN CHASE"))
+        self.assertIn("(5 lines in 3 groups)", html)
+
+    def test_group_by_sector_and_totals(self):
+        html = rh.build_html(self.bond_fund(), "en", by="sector")
+        self.assertIn("Top 3 Sectors", html)
+        self.assertIn(">0.75<", html)    # Treasury 0.40 + 0.35
+        self.assertIn(">0.50<", html)    # Financial Institutions 0.30 + 0.20, and MBS 0.50
+        self.assertNotIn("only 3 holdings", html)   # the 'few holdings' note is for single-line ranking only
+
+    def test_sector_grouping_needs_sector_data(self):
+        with self.assertRaises(ValueError):
+            rh.build_html(fund([h("A", "A", 5.0), h("B", "B", 4.0)]), "en", by="sector")
+        with self.assertRaises(ValueError):
+            rh.build_html(fund([h("A", "A", 5.0)]), "en", by="color")
+
+    def test_a_diffuse_fund_says_single_lines_tell_little(self):
+        rows = [h(f"T{i}", f"Company {i}", 100.0 / 300) for i in range(300)]
+        html = rh.build_html(fund(rows), "en", top=13)
+        self.assertIn("single lines say little about concentration", html)
+        self.assertNotIn("say little about concentration", rh.build_html(fund(self.rows_concentrated()), "en"))
+
+    def rows_concentrated(self):
+        return [h(f"T{i}", f"Company {i}", w) for i, w in enumerate([20.0, 15.0, 10.0] + [55.0 / 150] * 150)]
+
+    def test_bond_names_keep_their_base_name_in_the_data(self):
+        text = ('iShares Test Bond ETF\nFund Holdings as of,"Oct 09, 2026"\n\n'
+                'Name,Sector,Asset Class,Market Value,Weight (%),Maturity,Coupon (%)\n'
+                '"TREASURY NOTE","Treasury","Fixed Income","1","0.40","Feb 28, 2030","4.00"\n')
+        res = fh.parse_ishares("TST", text, "u")
+        self.assertEqual((res["holdings"][0]["name"], res["holdings"][0]["base_name"]), ("TREASURY NOTE 4% Feb 28, 2030", "TREASURY NOTE"))
+
+
 class LiveCheckLogic(unittest.TestCase):
     """The weekly live check must actually catch the ways an issuer page can break."""
     TODAY = dt.date(2026, 10, 12)

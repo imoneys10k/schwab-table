@@ -182,7 +182,7 @@ Chart an ETF's largest holdings (13 by default, `--top N` changes it) with weigh
 - **Share classes:** GOOGL and GOOG stay separate unless you pass `--merge-classes`.
 - **Honest dates:** the as-of date is the day the issuer's prices are from (NEOS and Roundhill stamp their files with the next trading day; the tool shows the pricing day and says so in the footnote, and the weekly live check verifies it against official closes; Vanguard publishes monthly), with a warning when it is more than 10 days old. Weights are shown as reported; a missing weight is NA, never zero.
 - **Terms of use:** only public files and pages are read, and each path is allowed by the host's robots.txt. Invesco and Destiny forbid automated access, so those funds are import-only (`--csv`). Terms were checked for Invesco, Destiny and SSGA only, so read the others' terms before commercial use.
-- **Options:** `--top N`, `--names names.json` for local-language names, `--theme dark`, `--pdf`, `--langs`.
+- **Options:** `--top N`, `--by sector|name` (for funds with thousands of lines, such as bond ETFs), `--names names.json` for local-language names, `--theme dark`, `--pdf`, `--langs`.
 
 ```bash
 python3 fetch_holdings.py QQQ NCLD -o data/                  # data/QQQ_holdings.json, data/NCLD_holdings.json
