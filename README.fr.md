@@ -2,7 +2,7 @@
 
 <img src="assets/banner.png" alt="schwab-table" width="100%">
 
-**Tableaux façon étude, graphiques de cours et analyses de résultats trimestriels pour votre agent IA.**
+**Tableaux façon étude, graphiques de cours, positions d'ETF et analyses de résultats trimestriels pour votre agent IA.**
 
 [English](README.md) · [繁體中文](README.zh-Hant.md) · [日本語](README.ja.md) · **Français**
 
@@ -212,6 +212,7 @@ python3 quarterly_earnings.py AAPL --period FY2025Q3 -o out/aapl_q3
 - **Rendement de prix seulement pour les sources automatiques.** Les montants de dividendes de Nasdaq ne sont pas ajustés des divisions de titres et les ETF n'en ont pas ; le rendement total demande donc votre propre CSV de cours ajustés.
 - **Yahoo est indiqué comme donnée agrégée**, pas comme cours publiés par la bourse. Les prix des sites des bourses chinoises ne sont pas ajustés ; les outils avertissent des distorsions dues aux opérations sur titres.
 - **Hong Kong et les autres marchés demandent le suffixe de la bourse** (`0700.HK`) ; un code purement numérique est ambigu et refusé.
+- **Les sites qui interdisent l'accès automatisé ne sont pas interrogés.** Invesco (QQQ) et Destiny (DXYZ) l'interdisent dans leurs conditions d'utilisation : ces fonds se traitent uniquement par import (`--csv`). L'outil ne contourne jamais un blocage par automatisation de navigateur.
 - Les détails pour les agents sont dans [SKILL.md](SKILL.md) (chinois traditionnel) et [SKILL.en.md](SKILL.en.md) (anglais).
 
 <details>
@@ -260,7 +261,7 @@ Polices : Inter, Source Sans 3 et Droid Sans sont fournies et intégrées pour l
 
 ## 🧪 Tests et évaluations
 
-`python3 -m unittest discover -s tests -v` exécute des tests à réponses connues pour les rendements, le drawdown, la volatilité, le routage des symboles, la fraîcheur du cache, l'import CSV, les styles de tableau et les calculs de résultats. La CI les exécute sous Ubuntu, macOS et Windows (Python 3.9 et 3.13), régénère les exemples pour vérifier qu'ils n'ont pas changé, lance un test de fumée en direct sur Nasdaq et installe les skills sur les trois systèmes. [evals/](evals/README.md) contient des demandes d'agent réalistes et les premiers résultats. Les README et le site sont générés par `python3 tools/build_docs.py`, et un test échoue s'ils sont périmés.
+`python3 -m unittest discover -s tests -v` exécute des tests à réponses connues pour les rendements, le drawdown, la volatilité, le routage des symboles, la fraîcheur du cache, l'import CSV, l'analyse des positions d'ETF et leurs règles de classement, les styles de tableau et les calculs de résultats. La CI les exécute sous Ubuntu, macOS et Windows (Python 3.9 et 3.13), régénère les exemples pour vérifier qu'ils n'ont pas changé, lance un test de fumée en direct sur Nasdaq et installe les skills sur les trois systèmes. Un workflow hebdomadaire récupère un vrai fonds par émetteur d'ETF et vérifie le résultat, afin de repérer tôt le changement d'une page d'émetteur. [evals/](evals/README.md) contient des demandes d'agent réalistes et les premiers résultats. Les README et le site sont générés par `python3 tools/build_docs.py`, et un test échoue s'ils sont périmés.
 
 ## 📌 Avertissement
 

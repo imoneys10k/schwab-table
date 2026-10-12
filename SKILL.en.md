@@ -279,7 +279,7 @@ The user wants an ETF's largest holdings, its concentration or its heavyweight s
    - Any other fund, or a script error: ask the user to download the holdings CSV from the issuer's site and import it with `fetch_holdings.py SYMBOL --csv file --name "Full fund name" --as-of YYYY-MM-DD`. **Never** fill holdings from Yahoo, aggregator sites or memory
    - If a symbol could not be fetched (exit code 1), **stop and tell the user which one**
    - The holdings date is the pricing day, not today (NEOS and Roundhill stamp files with the next trading day but price them at the previous close; the tool uses the pricing day and says so in the footnote): Vanguard publishes monthly, the others mostly daily (give a user-imported CSV its date with `--as-of`). The script warns above 10 days and the chart subtitle says "(N days old)"; tell the user when you deliver. Vanguard has nothing newer, and SPY/IVV holdings must not stand in for VOO (different funds); if the user wants current weights of the same index, chart SPY or IVV separately and say so
-   - Responses are cached for 6 hours (`--refresh` bypasses the cache)
+   - Responses are cached for 1 hour and the script says when it served the cache (`--refresh` downloads again)
 3. **Render:**
    ```bash
    python3 render_holdings.py data/QQQ_holdings.json out/qqq

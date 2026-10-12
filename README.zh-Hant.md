@@ -2,7 +2,7 @@
 
 <img src="assets/banner.png" alt="schwab-table" width="100%">
 
-**給 AI Agent 用的研報風格表格、走勢圖與季度財報解讀。**
+**給 AI Agent 用的研報風格表格、走勢圖、ETF 持倉與季度財報解讀。**
 
 [English](README.md) · **繁體中文** · [日本語](README.ja.md) · [Français](README.fr.md)
 
@@ -212,6 +212,7 @@ python3 quarterly_earnings.py AAPL --period FY2025Q3 -o out/aapl_q3
 - **自動來源只提供價格回報。** Nasdaq 的股息金額沒有按拆股調整，ETF 也沒有股息，所以總回報需要你自己提供復權收盤價 CSV。
 - **Yahoo 一律標示為聚合資料**，不冒充交易所公布的收盤價。A 股網站價格未復權，工具會提醒公司行動造成的失真。
 - **港股與其他市場要帶交易所後綴**（`0700.HK`）；單純的數字代碼有歧義，會被拒絕。
+- **禁止自動化存取的網站不抓取。** Invesco（QQQ）和 Destiny（DXYZ）的使用條款有此限制，所以這兩家的基金只能匯入（`--csv`）。工具不會用瀏覽器自動化去繞過封鎖。
 - 給 Agent 看的細節在 [SKILL.md](SKILL.md)（繁體中文）與 [SKILL.en.md](SKILL.en.md)（英文）。
 
 <details>
@@ -260,7 +261,7 @@ python3 quarterly_earnings.py AAPL --period FY2025Q3 -o out/aapl_q3
 
 ## 🧪 測試與評測
 
-`python3 -m unittest discover -s tests -v` 會跑回報、回撤、波動率、代碼路由、快取新鮮度、CSV 匯入、表格版式與財報計算的標準答案測試。CI 在 Ubuntu、macOS、Windows（Python 3.9 與 3.13）上執行這些測試，重新產生範例並檢查沒有變動，執行即時的 Nasdaq 冒煙測試，並在三個系統上安裝 skill。[evals/](evals/README.md) 收錄貼近真實使用的 Agent 請求與第一輪結果。README 與網站由 `python3 tools/build_docs.py` 產生，內容過期時測試會失敗。
+`python3 -m unittest discover -s tests -v` 會跑回報、回撤、波動率、代碼路由、快取新鮮度、CSV 匯入、ETF 持倉解析與排名規則、表格版式與財報計算的標準答案測試。CI 在 Ubuntu、macOS、Windows（Python 3.9 與 3.13）上執行這些測試，重新產生範例並檢查沒有變動，執行即時的 Nasdaq 冒煙測試，並在三個系統上安裝 skill。另有每週一次的工作流，對每家 ETF 發行人各取一檔真實基金並檢查結果，發行人頁面改版時能及早發現。[evals/](evals/README.md) 收錄貼近真實使用的 Agent 請求與第一輪結果。README 與網站由 `python3 tools/build_docs.py` 產生，內容過期時測試會失敗。
 
 ## 📌 免責聲明
 

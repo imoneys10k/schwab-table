@@ -2,7 +2,7 @@
 
 <img src="assets/banner.png" alt="schwab-table" width="100%">
 
-**AI エージェントのための、リサーチ風の表・推移チャート・四半期決算レビュー。**
+**AI エージェントのための、リサーチ風の表・推移チャート・ETF 保有銘柄・四半期決算レビュー。**
 
 [English](README.md) · [繁體中文](README.zh-Hant.md) · **日本語** · [Français](README.fr.md)
 
@@ -212,6 +212,7 @@ python3 quarterly_earnings.py AAPL --period FY2025Q3 -o out/aapl_q3
 - **自動取得は価格リターンのみ。** Nasdaq の配当額は株式分割調整がされておらず、ETF には配当データがないため、総リターンには自分で用意した調整後終値の CSV が必要です。
 - **Yahoo は集約データと明記**し、取引所が公表した終値とは扱いません。A 株のウェブサイト価格は調整なしで、コーポレートアクションによる歪みを警告します。
 - **香港などの市場は取引所サフィックスが必要**です（`0700.HK`）。数字だけのコードは曖昧なので拒否されます。
+- **自動アクセスを禁じるサイトは取得しません。** Invesco（QQQ）と Destiny（DXYZ）は利用規約で禁止しているため、これらのファンドは取り込み専用（`--csv`）です。ブラウザ自動化でブロックを回避することはありません。
 - エージェント向けの詳細は [SKILL.md](SKILL.md)（繁体字中国語）と [SKILL.en.md](SKILL.en.md)（英語）にあります。
 
 <details>
@@ -260,7 +261,7 @@ python3 quarterly_earnings.py AAPL --period FY2025Q3 -o out/aapl_q3
 
 ## 🧪 テストと評価
 
-`python3 -m unittest discover -s tests -v` は、リターン・ドローダウン・変動率・銘柄ルーティング・キャッシュの鮮度・CSV 取り込み・表スタイル・決算計算の正解つきテストを実行します。CI は Ubuntu・macOS・Windows（Python 3.9 と 3.13）でこれらを実行し、例を再生成して変化がないか確認し、Nasdaq への実データのスモークテストを行い、3 つの OS でスキルをインストールします。[evals/](evals/README.md) には実際の使い方に近いエージェント依頼と最初の結果があります。README とサイトは `python3 tools/build_docs.py` で生成され、内容が古いとテストが失敗します。
+`python3 -m unittest discover -s tests -v` は、リターン・ドローダウン・変動率・銘柄ルーティング・キャッシュの鮮度・CSV 取り込み・ETF 保有銘柄のパーサーと順位付けルール・表スタイル・決算計算の正解つきテストを実行します。CI は Ubuntu・macOS・Windows（Python 3.9 と 3.13）でこれらを実行し、例を再生成して変化がないか確認し、Nasdaq への実データのスモークテストを行い、3 つの OS でスキルをインストールします。さらに週 1 回のワークフローが ETF 運用会社ごとに実在するファンドを 1 本取得して結果を検査し、運用会社のページ変更を早期に見つけます。[evals/](evals/README.md) には実際の使い方に近いエージェント依頼と最初の結果があります。README とサイトは `python3 tools/build_docs.py` で生成され、内容が古いとテストが失敗します。
 
 ## 📌 免責事項
 

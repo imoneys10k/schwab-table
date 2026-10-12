@@ -290,7 +290,7 @@ spec 格式：
    - 其他基金，或腳本報錯：請用戶從發行人網站下載持倉 CSV，再用 `fetch_holdings.py 代碼 --csv 文件 --name "基金全稱" --as-of YYYY-MM-DD` 匯入。**不得**用 Yahoo、聚合站或模型記憶補持倉
    - 有代碼沒取到時（退出碼 1）：**停下來告訴用戶缺哪隻**，不要自己補
    - 持倉日期是估值日，不是今天（NEOS、Roundhill 的檔案標的是下一個交易日，但裏面是前一個收盤價，工具已改用估值日並在腳註說明）：Vanguard 每月公布，其他多爲每日（用戶自己導入的 CSV 要用 `--as-of` 寫明日期）。超過 10 天腳本會警告，圖的副標題也會寫「（距資料取得日 N 天）」，交付時向用戶說明；Vanguard 沒有更新的官方數據，不要拿 SPY／IVV 的持倉頂替 VOO（是不同的基金），用戶想看最新權重時可另畫 SPY 或 IVV 並說明
-   - 響應緩存 6 小時，`--refresh` 繞過
+   - 響應緩存 1 小時，命中緩存時腳本會註明（`--refresh` 重新下載）
 3. **渲染：**
    ```bash
    python3 render_holdings.py data/QQQ_holdings.json out/qqq

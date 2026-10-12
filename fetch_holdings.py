@@ -5,7 +5,7 @@ Usage:
   python3 fetch_holdings.py SPY VOO IVV QQQ QQQI NCLD DRAM -o data/        # several funds -> data/<SYMBOL>_holdings.json
   python3 fetch_holdings.py XLK --issuer ssga                              # force an issuer adapter
   python3 fetch_holdings.py MYETF --csv my_holdings.csv --name "My ETF"    # import a file you downloaded yourself
-  python3 fetch_holdings.py QQQ --refresh                                  # ignore the 6-hour local cache
+  python3 fetch_holdings.py QQQ --refresh                                  # ignore the 1-hour local cache
 
 Sources (each is the issuer's own public holdings data; nothing is guessed or filled from memory)
   ssga      State Street SPDR funds (SPY, XLK, ...)   daily xlsx file
@@ -39,7 +39,7 @@ from pathlib import Path
 
 from fetch_prices import CACHE_DIR, UA, FetchError, http_get
 
-CACHE_TTL = 6 * 3600
+CACHE_TTL = 3600  # issuers publish once a day at most; an hour keeps repeated runs cheap without hiding a newly published file for long
 CACHE_VERSION = 3  # 3: bonds keep their base name for grouping; 2: NEOS / Roundhill as-of dates are the pricing day
 STALE_DAYS = 10
 
@@ -482,7 +482,8 @@ def cache_file(symbol, issuer):
     return CACHE_DIR / f"holdings_v{CACHE_VERSION}_{symbol}_{issuer or 'auto'}.json"
 
 
-def get_holdings(symbol, issuer=None, refresh=False, now=None):
+def get_holdings(symbol, issuer=None, refresh=False, now=None, info=None):
+    """info, if given, receives {'cached_age_s': seconds} when the answer came from the local cache."""
     symbol = symbol.strip().upper()
     now = now or dt.datetime.now(dt.timezone.utc)
     manual = issuer if issuer in MANUAL else (MANUAL_HINTS.get(symbol) if not issuer else None)
@@ -492,7 +493,10 @@ def get_holdings(symbol, issuer=None, refresh=False, now=None):
     if not refresh:
         try:
             cached = json.loads(cf.read_text(encoding="utf-8"))
-            if time.time() - cached["saved_at"] < CACHE_TTL:
+            age = time.time() - cached["saved_at"]
+            if 0 <= age < CACHE_TTL:
+                if info is not None:
+                    info["cached_age_s"] = age
                 return cached["data"]
         except (OSError, ValueError, KeyError):
             pass
@@ -541,13 +545,14 @@ def main():
     ap.add_argument("--csv", help="import a holdings CSV you downloaded yourself (one symbol only)")
     ap.add_argument("--name", help="fund name to print on the chart (with --csv, or to override)")
     ap.add_argument("--as-of", help="as-of date for --csv data, YYYY-MM-DD")
-    ap.add_argument("--refresh", action="store_true", help="ignore the 6-hour local cache")
+    ap.add_argument("--refresh", action="store_true", help="ignore the 1-hour local cache and download again")
     a = ap.parse_args()
     if a.csv and len(a.symbols) != 1:
         sys.exit("error: --csv takes exactly one symbol")
     failed = 0
     for sym in a.symbols:
         sym = sym.upper()
+        info = {}
         try:
             now = dt.datetime.now(dt.timezone.utc)
             if a.csv:
@@ -564,7 +569,7 @@ def main():
                         sys.exit("error: --as-of must be YYYY-MM-DD")
                 res = finish(res, now)
             else:
-                res = get_holdings(sym, a.issuer, a.refresh, now)
+                res = get_holdings(sym, a.issuer, a.refresh, now, info)
             if a.name:
                 res["name"] = a.name
         except FetchError as e:
@@ -574,7 +579,8 @@ def main():
         path = out_path(sym, a.out, len(a.symbols) > 1)
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(res, ensure_ascii=False, indent=1), encoding="utf-8")
-        print(f"{sym}: {len(res['holdings'])} holdings | {res['issuer']} | as of {res['as_of'] or 'unknown'} -> {path}")
+        cached = f" | from cache, {info['cached_age_s'] / 60:.0f} min old (use --refresh to download again)" if info.get("cached_age_s") is not None else ""
+        print(f"{sym}: {len(res['holdings'])} holdings | {res['issuer']} | as of {res['as_of'] or 'unknown'}{cached} -> {path}")
         for w in res["warnings"]:
             print(f"  warning: {w}", file=sys.stderr)
     sys.exit(1 if failed else 0)

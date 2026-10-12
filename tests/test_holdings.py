@@ -318,7 +318,7 @@ class Routing(unittest.TestCase):
             with self.assertRaises(fh.FetchError):
                 fh.get_holdings("SPY", refresh=True, now=NOW)
 
-    def test_cache_is_used_for_six_hours_and_refresh_bypasses_it(self):
+    def test_cache_is_used_for_an_hour_and_refresh_bypasses_it(self):
         n = []
 
         def counted(symbol, **_):
@@ -330,6 +330,28 @@ class Routing(unittest.TestCase):
             self.assertEqual(len(n), 1)
             fh.get_holdings("SPY", refresh=True, now=NOW)
             self.assertEqual(len(n), 2)
+
+    def test_an_expired_cache_is_downloaded_again_and_a_fresh_one_reports_its_age(self):
+        n = []
+
+        def counted(symbol, **_):
+            n.append(1)
+            return self.ok("ssga")(symbol)
+        with Patch(fh, ADAPTERS=dict(fh.ADAPTERS, ssga=counted)):
+            fh.get_holdings("SPY", now=NOW)
+            info = {}
+            fh.get_holdings("SPY", now=NOW, info=info)
+            self.assertEqual(len(n), 1)
+            self.assertLess(info["cached_age_s"], 5)
+            path = fh.cache_file("SPY", None)
+            saved = json.loads(path.read_text(encoding="utf-8"))
+            saved["saved_at"] -= fh.CACHE_TTL + 60       # an hour and a minute old
+            path.write_text(json.dumps(saved), encoding="utf-8")
+            info = {}
+            fh.get_holdings("SPY", now=NOW, info=info)
+            self.assertEqual(len(n), 2)
+            self.assertEqual(info, {})                    # downloaded again, nothing from the cache
+        self.assertEqual(fh.CACHE_TTL, 3600)
 
     def test_roundhill_walks_back_over_missing_days(self):
         asked = []
