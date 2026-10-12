@@ -11,6 +11,7 @@ Exit code 1 if any check fails. Nothing is written except the local response cac
 """
 import argparse
 import datetime as dt
+import re
 import sys
 import time
 from pathlib import Path
@@ -19,9 +20,12 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 import fetch_holdings as fh  # noqa: E402
+import fetch_prices as fp  # noqa: E402
 import render_holdings as rh  # noqa: E402
 
 # issuer key -> (fund, minimum holdings, maximum age of the as-of date in days, must contain swaps)
+# VERIFY_DATE: issuers whose files carry the price they used; the as-of date is checked against Nasdaq's official closes.
+VERIFY_DATE = {"neos", "roundhill", "tema"}
 CASES = {
     "ssga": ("SPY", 400, 10, False),
     "ishares": ("IVV", 400, 10, False),
@@ -71,6 +75,48 @@ def check_result(res, min_holdings, max_age_days, needs_swaps, today=None):
     return problems
 
 
+def official_closes(symbol):
+    """Nasdaq official closes as {iso date: close} for roughly the last month, or None when they cannot be looked up."""
+    today = dt.datetime.now(dt.timezone.utc).date()
+    try:
+        entry, _ = fp.get_series(symbol, today - dt.timedelta(days=35), today, refresh=False)
+    except Exception:
+        return None
+    return {p[0]: p[1] for p in entry["points"]}
+
+
+def pricing_date_problem(res, series_fn=official_closes):
+    """Compare the prices inside the file with official closes. Returns (problem or None, note).
+    Issuers stamp files with different dates (NEOS and Roundhill use the next trading day), so the as-of date is only trusted
+    when the file's own prices equal the official close of that day for most of the biggest US-listed holdings. A date later
+    than the newest official close cannot be the pricing day at all."""
+    if not res.get("as_of"):
+        return None, "no as-of date to verify"
+    as_of = dt.date.fromisoformat(res["as_of"])
+    picks = [h for h in sorted(res["holdings"], key=lambda x: -(x["weight"] or 0))
+             if h["kind"] == "equity" and h.get("price") and re.fullmatch(r"[A-Z]{1,5}", h["ticker"] or "")][:4]
+    checked = matched = future = 0
+    for h in picks:
+        series = series_fn(h["ticker"])
+        if not series:
+            continue
+        close = series.get(as_of.isoformat())
+        if close:
+            checked += 1
+            matched += abs(h["price"] - close) <= 0.005 * close
+        elif as_of.isoformat() > max(series):
+            future += 1
+    if future >= 2:
+        return (f"as-of date {as_of} is later than the newest official close, so the file's prices cannot be from that day; "
+                f"the issuer's date convention may have changed"), ""
+    if checked < 2:
+        return None, "date check skipped (official closes not available)"
+    if matched * 2 < checked:
+        return (f"as-of date {as_of} does not match the prices in the file: only {matched} of {checked} large holdings equal "
+                f"their official close on that day; the issuer's date convention may have changed"), ""
+    return None, f"as-of date verified against official closes ({matched}/{checked})"
+
+
 def main():
     ap = argparse.ArgumentParser(description="Fetch one real fund per issuer and sanity-check the result.")
     ap.add_argument("--only", help="comma-separated case names to run (default: all)")
@@ -92,10 +138,15 @@ def main():
         try:
             res = fh.get_holdings(symbol, issuer=issuer, refresh=True)
             problems = check_result(res, min_n, max_age, swaps)
+            date_note = ""
+            if issuer in VERIFY_DATE:
+                date_problem, date_note = pricing_date_problem(res)
+                if date_problem:
+                    problems.append(date_problem)
         except fh.FetchError as e:
-            res, problems = None, [f"fetch failed: {e}"]
+            res, problems, date_note = None, [f"fetch failed: {e}"], ""
         status = "ok  " if not problems else "FAIL"
-        detail = f"{len(res['holdings'])} holdings, as of {res['as_of']}" if res else ""
+        detail = (f"{len(res['holdings'])} holdings, as of {res['as_of']}" + (f"; {date_note}" if date_note else "")) if res else ""
         print(f"{status} {name:13} {symbol:5} {detail} ({time.time() - started:.1f}s)")
         for p in problems:
             print(f"       - {p}")

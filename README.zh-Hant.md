@@ -180,7 +180,7 @@ python3 render_chart.py examples/chart_lines_spec.json out/chart
 
 - **掉期敞口一併計算：** NCLD、DRAM 這類基金，股票上的掉期會加到同一檔股票的現貨持倉上（以 CUSIP／SEDOL 對應），與發行人自己的前十大持倉口徑一致，條形圖分兩段顯示。現金、貨幣基金、國債與期權另列一行，不參與排名。`--mode lines` 則照發行人列示的每一行直接排名。
 - **股份類別：** GOOGL 與 GOOG 預設分開，加 `--merge-classes` 才合併。
-- **日期如實：** 持倉截止日是發行人的日期（Vanguard 每月公布），超過 10 天會加警告。權重照披露原樣列示；缺權重顯示 NA，不當成 0。
+- **日期如實：** 持倉截止日是發行人價格所屬的那一天（NEOS、Roundhill 的檔案標的是下一個交易日，工具改用估值日並在腳註說明，每週的實時檢查會用官方收盤價核對；Vanguard 每月公布），超過 10 天會加警告。權重照披露原樣列示；缺權重顯示 NA，不當成 0。
 - **使用條款：** 只讀取公開的檔案與頁面，且每個路徑都符合該站的 robots.txt。Invesco 與 Destiny 禁止自動化存取，所以這兩家的基金只能匯入（`--csv`）。條款只核對了 Invesco、Destiny 和 SSGA，其他發行人的條款請在商業使用前自行閱讀。
 - **選項：** `--top N`、`--names names.json`（本地語言名稱）、`--theme dark`、`--pdf`、`--langs`。
 

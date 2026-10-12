@@ -48,7 +48,7 @@ S = {
         "n_lines": "Every line is ranked as listed by the issuer; swaps, cash and Treasury bills are not combined or removed. ",
         "n_unmatched": "Swaps without a matching physical position are ranked on their own. ",
         "n_na": "{k} holding(s) have no reported weight and are not ranked. ",
-        "n_total": "Listed weights add up to {t:.1f}%. ", "n_few": "The file lists only {k} holdings that can be ranked. ",
+        "n_total": "Listed weights add up to {t:.1f}%. ", "n_issuer_date": "The issuer dates this file {issuer_date} (the next trading day); its weights use the {as_of} closing prices. ", "n_few": "The file lists only {k} holdings that can be ranked. ",
         "kind": {"cash": "cash and money-market funds {w:.{dp}f}%", "treasury": "Treasury bills and notes {w:.{dp}f}%", "option": "options {w:+.{dp}f}%", "other": "other {w:.{dp}f}%"},
         "warn": "Data notes: {w}. ", "lang": "en",
     },
@@ -67,7 +67,7 @@ S = {
         "n_lines": "按发行人列示的每一行直接排名；掉期、现金和国债未合并或剔除。",
         "n_unmatched": "没有对应现货持仓的掉期单独排名。",
         "n_na": "{k} 项持仓未披露权重，不参与排名。",
-        "n_total": "已列示权重合计 {t:.1f}%。", "n_few": "文件中可排名的持仓只有 {k} 项。",
+        "n_total": "已列示权重合计 {t:.1f}%。", "n_issuer_date": "发行人把此文件标注为 {issuer_date}（下一个交易日），其权重按 {as_of} 的收盘价计算。", "n_few": "文件中可排名的持仓只有 {k} 项。",
         "kind": {"cash": "现金及货币基金 {w:.{dp}f}%", "treasury": "国债及票据 {w:.{dp}f}%", "option": "期权 {w:+.{dp}f}%", "other": "其他 {w:.{dp}f}%"},
         "warn": "数据说明：{w}。", "lang": "zh-Hant",
     },
@@ -234,6 +234,8 @@ def build_html(data, lang, theme="light", top=13, mode="exposure", merge_classes
         note += L["n_na"].format(k=notes["na"])
     total = sum(h["weight"] for h in data["holdings"] if h["weight"] is not None)
     note += L["n_total"].format(t=total)
+    if data.get("issuer_date") and data.get("as_of") and data["issuer_date"] != data["as_of"]:
+        note += L["n_issuer_date"].format(issuer_date=data["issuer_date"], as_of=data["as_of"])
     if len(ranked) < top:
         note += L["n_few"].format(k=len(ranked))
     warnings = [w for w in data.get("warnings", []) if "no reported weight" not in w and "add up to" not in w]

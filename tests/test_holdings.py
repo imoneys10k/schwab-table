@@ -149,9 +149,26 @@ class Parsing(unittest.TestCase):
         self.assertEqual(kinds["Cash & Other"], "cash")
         swap = next(x for x in res["holdings"] if x["kind"] == "swap")
         self.assertEqual(swap["underlying_id"], "595112103")
-        self.assertEqual(res["as_of"], "2026-10-12")
+        # stamped Monday 10/12, but the prices in such files are the previous (Friday 10/09) close
+        self.assertEqual((res["as_of"], res["issuer_date"]), ("2026-10-09", "2026-10-12"))
+        res = fh.parse_neos_like("TST", "roundhill", text, "u", "src", valuation_date=dt.date(2026, 10, 9))
+        self.assertEqual((res["as_of"], res["issuer_date"]), ("2026-10-09", "2026-10-12"))
         with self.assertRaises(fh.NotThisIssuer):
             fh.parse_neos_like("NOPE", "roundhill", text, "u", "src")
+
+    def test_prev_weekday_skips_weekends(self):
+        D = dt.date
+        self.assertEqual(fh.prev_weekday(D(2026, 10, 12)), D(2026, 10, 9))   # Monday -> Friday
+        self.assertEqual(fh.prev_weekday(D(2026, 10, 13)), D(2026, 10, 12))
+        self.assertEqual(fh.prev_weekday(D(2026, 10, 10)), D(2026, 10, 9))   # Saturday -> Friday
+
+    def test_prices_are_kept_for_equities_only(self):
+        text = ("Date,Account,StockTicker,Cusip,SecurityName,Shares,Price,MarketValue,Weightings,NetAssets,SharesOutstanding,CreationUnits,MoneyMarketFlag\n"
+                '10/12/2026,TST,AAPL,037833100,Apple Inc,1,"$1,029.50",1,5.00%,1,1,1,\n'
+                '10/12/2026,TST,912797VA2,912797VA2,United States Treasury Bill 12/03/2026,1,99.4,1,12.65%,1,1,1,\n')
+        res = fh.parse_neos_like("TST", "neos", text, "u", "src")
+        self.assertEqual(res["holdings"][0]["price"], 1029.5)
+        self.assertNotIn("price", res["holdings"][1])
 
     def test_swap_names_lose_the_counterparty_suffix(self):
         for raw, want in (("MICRON TECHNOLOGY, INC.-SWAP-GOLD-L", "MICRON TECHNOLOGY, INC."), ("Nebius Group N.V. SWAP NM", "Nebius Group N.V."),
@@ -430,6 +447,44 @@ class Rendering(unittest.TestCase):
     def test_html_is_escaped(self):
         html = rh.build_html(fund([h("A<B", "Evil <script>alert(1)</script> Inc", 5.0)]), "en")
         self.assertNotIn("<script>alert", html)
+
+
+class PricingDateCheck(unittest.TestCase):
+    """live_check verifies the as-of date by comparing the file's own prices with official closes."""
+    CLOSES = {"AAPL": 336.64, "NVDA": 229.28, "MU": 1029.0, "AMD": 150.0}   # official closes of Friday 2026-10-09
+
+    def res(self, as_of="2026-10-09"):
+        rows = [h(t, t, 10.0 - i, price=p) for i, (t, p) in enumerate(self.CLOSES.items())]
+        return fund(rows, as_of=as_of)
+
+    def series(self, sym):
+        return {"2026-10-08": self.CLOSES[sym] * 1.02, "2026-10-09": self.CLOSES[sym]}   # newest close is Friday's
+
+    def test_matching_prices_verify_the_date(self):
+        problem, note = lc.pricing_date_problem(self.res(), self.series)
+        self.assertIsNone(problem)
+        self.assertIn("verified", note)
+
+    def test_the_next_trading_day_stamp_is_caught_before_that_day_has_closed(self):
+        """The bug this guards against: files stamped with the next trading day (Monday) were shown as holdings of that day."""
+        problem, _ = lc.pricing_date_problem(self.res("2026-10-12"), self.series)
+        self.assertIn("later than the newest official close", problem)
+
+    def test_a_date_whose_close_exists_but_differs_is_caught(self):
+        series = lambda sym: {"2026-10-09": self.CLOSES[sym], "2026-10-12": self.CLOSES[sym] * 1.04}
+        problem, _ = lc.pricing_date_problem(self.res("2026-10-12"), series)
+        self.assertIn("does not match the prices in the file", problem)
+
+    def test_missing_closes_skip_the_check_instead_of_failing(self):
+        problem, note = lc.pricing_date_problem(self.res(), lambda sym: None)
+        self.assertIsNone(problem)
+        self.assertIn("skipped", note)
+
+    def test_only_us_tickers_with_prices_are_compared(self):
+        rows = [h("000660 KS", "SK hynix", 9.0, price=1.0), h("", "Cash", 5.0, "cash", "c"), h("MU", "Micron", 4.0)]  # none usable
+        problem, note = lc.pricing_date_problem(fund(rows), lambda sym: {"2026-10-09": 1.0})
+        self.assertIsNone(problem)
+        self.assertIn("skipped", note)
 
 
 class LiveCheckLogic(unittest.TestCase):

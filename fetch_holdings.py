@@ -40,7 +40,7 @@ from pathlib import Path
 from fetch_prices import CACHE_DIR, UA, FetchError, http_get
 
 CACHE_TTL = 6 * 3600
-CACHE_VERSION = 1
+CACHE_VERSION = 2  # 2: NEOS / Roundhill as-of dates are now the valuation date, not the file's next-trading-day stamp
 STALE_DAYS = 10
 
 # iShares serves a fund's holdings CSV from its numeric product id (the slug in the URL is ignored).
@@ -80,17 +80,34 @@ def pct(value):
         return None
 
 
+def num(value):
+    """'$1,029.00' or '1029.000000' -> float; blanks -> None."""
+    try:
+        return float(re.sub(r"[$,\s]", "", str(value if value is not None else "")))
+    except ValueError:
+        return None
+
+
+def prev_weekday(d):
+    d -= dt.timedelta(days=1)
+    while d.weekday() >= 5:
+        d -= dt.timedelta(days=1)
+    return d
+
+
 def clean(s):
     s = htmllib.unescape(str(s or "")).replace("\xa0", " ")
     return re.sub(r"\s+", " ", s).strip()
 
 
-def holding(ticker, name, weight, sector=None, kind="equity", ident=None, underlying_id=None):
+def holding(ticker, name, weight, sector=None, kind="equity", ident=None, underlying_id=None, price=None):
     sector = clean(sector)
     h = {"ticker": clean(ticker) if clean(ticker) not in ("-", "--") else "", "name": clean(name), "weight": weight,
          "sector": None if sector in ("", "-", "--") else sector, "kind": kind, "id": clean(ident) or None}
     if underlying_id:
         h["underlying_id"] = underlying_id
+    if price is not None:
+        h["price"] = price  # the price the issuer used to value the position; lets live_check verify the as-of date
     return h
 
 
@@ -269,8 +286,11 @@ def swap_name(name):
     return clean(n)
 
 
-def parse_neos_like(symbol, issuer, text, url, source):
-    rows = [r for r in csv.DictReader(io.StringIO(text.lstrip("﻿"))) if clean(r.get("Account")).upper() == symbol]
+def parse_neos_like(symbol, issuer, text, url, source, valuation_date=None):
+    """NEOS and Roundhill files. Their 'Date' column is the next trading day (the day the basket takes effect); the prices in the
+    file are the previous close. Checked against official closes: Roundhill's 10-09 file holds the 10-09 closes and is stamped 10-12.
+    So the as-of date is the file's own date when the URL carries one (Roundhill), else the weekday before the stamp (NEOS)."""
+    rows = [r for r in csv.DictReader(io.StringIO(text.lstrip("\ufeff"))) if clean(r.get("Account")).upper() == symbol]
     if not rows:
         raise NotThisIssuer(f"{ISSUER_NAMES[issuer]} has no fund {symbol} in its holdings file")
     out, dates = [], []
@@ -279,10 +299,15 @@ def parse_neos_like(symbol, issuer, text, url, source):
         kind = classify_neos_like(ticker, name, r.get("MoneyMarketFlag") or "", cusip)
         under = ticker.split()[0] if kind == "swap" else None
         out.append(holding("" if kind == "swap" else ticker, swap_name(name) if kind == "swap" else name, pct(r.get("Weightings")),
-                           None, kind, cusip if kind != "swap" else ticker, under))
+                           None, kind, cusip if kind != "swap" else ticker, under, price=num(r.get("Price")) if kind == "equity" else None))
         if parse_date(r.get("Date")):
             dates.append(parse_date(r["Date"]))
-    return result(symbol, issuer, out, max(dates) if dates else None, source, url)
+    stamped = max(dates) if dates else None
+    as_of = valuation_date or (prev_weekday(stamped) if stamped else None)
+    res = result(symbol, issuer, out, as_of, source, url)
+    if stamped and as_of != stamped:
+        res["issuer_date"] = stamped.isoformat()
+    return res
 
 
 def fetch_neos(symbol, **_):
@@ -307,7 +332,7 @@ def fetch_roundhill(symbol, now=None, **_):
             last = e
             continue
         if text.lstrip("﻿").startswith("Date,"):  # a missing day redirects to an HTML 404 page
-            return parse_neos_like(symbol, "roundhill", text, url, "Roundhill Investments (issuer holdings file, all funds)")
+            return parse_neos_like(symbol, "roundhill", text, url, "Roundhill Investments (issuer holdings file, all funds)", valuation_date=d)
     raise FetchError(f"no Roundhill holdings file found for the last 8 days{f' ({last})' if last else ''}")
 
 
@@ -329,9 +354,11 @@ def parse_tema(symbol, text, url):
         else:
             kind = "equity"
         under = re.split(r"-TRS-", ticker, flags=re.I)[0] if kind == "swap" else None
+        shares, value = num(r.get("shares")), num(r.get("market_value"))
+        price = round(value / shares, 4) if kind == "equity" and shares and value else None
         out.append(holding("" if kind in ("swap", "cash") else ticker, swap_name(name) if kind == "swap" else name,
                            None if w is None else round(w * 100, 4), r.get("sector"), kind,
-                           ticker if kind == "swap" else (clean(r.get("cusip")) or ticker), under))
+                           ticker if kind == "swap" else (clean(r.get("cusip")) or ticker), under, price=price))
         if parse_date(r.get("holdings_date")):
             dates.append(parse_date(r["holdings_date"]))
     if not out:
