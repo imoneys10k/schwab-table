@@ -147,6 +147,8 @@ class Parsing(unittest.TestCase):
         self.assertEqual(kinds["First American Government Obligations Fund"], "cash")
         self.assertEqual(kinds["NDX US 11/20/26 C31325"], "option")
         self.assertEqual(kinds["Cash & Other"], "cash")
+        self.assertTrue(res["merge_by_name"])   # Roundhill's own site script adds a company's lines by name
+        self.assertNotIn("merge_by_name", fh.parse_neos_like("TST", "neos", text, "u", "src"))
         swap = next(x for x in res["holdings"] if x["kind"] == "swap")
         self.assertEqual(swap["underlying_id"], "595112103")
         # stamped Monday 10/12, but the prices in such files are the previous (Friday 10/09) close
@@ -373,6 +375,22 @@ class Ranking(unittest.TestCase):
         rows = [h("GOOGL", "Alphabet Inc", 3.1), h("GOOG", "Alphabet Inc", 2.9)]
         merged, _, _ = rh.build_rows(fund(rows), merge_classes=True)
         self.assertEqual(len(merged), 1)
+
+    def test_roundhill_funds_add_other_listings_of_the_same_company(self):
+        """DRAM: Roundhill's site adds SKHY (the US line) and the swap to SK hynix's Korean line. NCLD matches by CUSIP only."""
+        rows = [h("000660 KS", "SK hynix Inc", 16.23, ident="6450267"), h("SKHY", "SK hynix Inc", 0.61, ident="78392B206"),
+                h("", "SK HYNIX INC", 5.57, "swap", "6450267 TRS 1", underlying_id="6450267"),
+                h("005930 KS", "Samsung Electronics Co Ltd", 18.61, ident="6771720"), h("005935 KS", "Samsung Electronics Co Ltd", 0.11, ident="6773812"),
+                h("MU", "Micron Technology Inc", 4.44, ident="595112103")]
+        plain, _, _ = rh.build_rows(fund(rows))
+        self.assertEqual([(r["name"], round(r["total"], 2)) for r in plain[:2]], [("SK hynix Inc", 21.8), ("Samsung Electronics Co Ltd", 18.61)])
+        merged, _, notes = rh.build_rows(fund(rows), merge_classes=True)
+        self.assertEqual([(r["name"], round(r["total"], 2)) for r in merged[:3]],
+                         [("SK hynix Inc", 22.41), ("Samsung Electronics Co Ltd", 18.72), ("Micron Technology Inc", 4.44)])
+        html = rh.build_html(fund(rows, merge_by_name=True), "en")
+        self.assertIn("as Roundhill's own top-holdings view does", html)
+        self.assertIn("000660 KS / SKHY", html)
+        self.assertNotIn("as Roundhill's own", rh.build_html(fund(rows), "en"))
 
     def test_missing_weights_are_not_ranked_and_not_zero(self):
         rows = [h("A", "A", 5.0), h("B", "B", None)]

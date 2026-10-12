@@ -10,7 +10,8 @@ Modes
   lines               Rank every line exactly as the issuer lists it, swaps and T-bills included, with no merging.
 --by                 holding (default), name or sector: add the lines of one issuer name, or one sector, together and rank the groups.
                       A fund with thousands of lines (a bond or small-cap index fund) says little in a top-13 of single lines.
---merge-classes       Add share classes of one company together (GOOGL + GOOG). Off by default.
+--merge-classes       Add share classes of one company together (GOOGL + GOOG). Off by default, except for Roundhill funds, whose own
+                      top-holdings view adds a company's lines by name (its data carries merge_by_name; --mode lines undoes it).
 --names               JSON {"NVDA": {"zh": "英伟达"}} to show a local-language name beside the ticker in that language.
 An optional "note": {"en": ..., "zh": ...} key in the data file is printed at the start of the footnote (the examples use it to mark hypothetical funds).
 Weights are shown exactly as the issuer reports them (percent of net assets unless the file says otherwise);
@@ -52,9 +53,10 @@ S = {
                  "Holdings change daily and can differ from the issuer's website after this date. All corporate names and market data shown above are for "
                  "illustrative purposes only and are not a recommendation, offer to sell, or a solicitation of an offer to buy any security. "
                  "<b>Past performance is no guarantee of future results.</b>"),
-        "n_exposure": "Rankings combine each stock with swaps on the same stock, as the issuer's own top-holdings view does; swap weights are as reported and their notional basis is not independently verified. ",
+        "n_exposure": "Rankings add the swaps on a stock to the shares held in it; swap weights are as reported and their notional basis is not independently verified. ",
         "n_excluded": "Not ranked: {items}. ", "n_negcash": "Negative cash offsets the swap exposure above. ",
         "n_merged": "Share classes of the same company are added together ({names}). ",
+        "n_merged_issuer": "Lines for the same company (other listings, share classes) are added together as Roundhill's own top-holdings view does ({names}). ",
         "n_lines": "Every line is ranked as listed by the issuer; swaps, cash and Treasury bills are not combined or removed. ",
         "n_unmatched": "Swaps without a matching physical position are ranked on their own. ",
         "n_na": "{k} holding(s) have no reported weight and are not ranked. ",
@@ -76,9 +78,10 @@ S = {
         "foot": ("{pre}资料来源：{src}；持仓截至 {as_of}；数据获取于 {got}。权重以发行人披露为准（{basis}）。{notes}"
                  "持仓每日变化，此日期之后可能与发行人网站不同。以上公司名称及市场数据仅作说明用途，不构成任何证券的推荐、出售要约或购买要约邀请。"
                  "<b>过往业绩不代表未来表现。</b>"),
-        "n_exposure": "排名将每只股票与同一股票上的掉期敞口相加，与发行人自己的前十大持仓口径一致；掉期权重按披露原样列示，其名义金额口径未独立核实。",
+        "n_exposure": "排名把一只股票上的掉期敞口加到该股票的现货持仓上；掉期权重按披露原样列示，其名义金额口径未独立核实。",
         "n_excluded": "未参与排名：{items}。", "n_negcash": "负现金用于对冲上述掉期敞口。",
         "n_merged": "同一公司的不同股份类别已合并（{names}）。",
+        "n_merged_issuer": "同一公司的各条线（其他上市线、股份类别）已合并相加，与 Roundhill 自己的前十大持仓一致（{names}）。",
         "n_lines": "按发行人列示的每一行直接排名；掉期、现金和国债未合并或剔除。",
         "n_unmatched": "没有对应现货持仓的掉期单独排名。",
         "n_na": "{k} 项持仓未披露权重，不参与排名。",
@@ -215,7 +218,7 @@ def display_name(row, lang, names, lines_label=None):
 def build_html(data, lang, theme="light", top=13, mode="exposure", merge_classes=False, names=None, by="holding"):
     names = names or {}
     L, T = S[lang], THEMES[theme]
-    ranked, excluded, notes = build_rows(data, mode, merge_classes)
+    ranked, excluded, notes = build_rows(data, mode, merge_classes or bool(data.get("merge_by_name")))
     if not ranked:
         raise ValueError("no holdings with a reported weight to rank")
     if by not in GROUPS:
@@ -270,7 +273,7 @@ def build_html(data, lang, theme="light", top=13, mode="exposure", merge_classes
         items = sep.join(L["kind"][k].format(w=w, dp=dp) for k, w in excluded.items())
         note += L["n_excluded"].format(items=items) + (L["n_negcash"] if excluded.get("cash", 0) < 0 else "")
     if notes["merged"]:
-        note += L["n_merged"].format(names=sep.join(escape(m) for m in notes["merged"][:4]) + ("…" if len(notes["merged"]) > 4 else ""))
+        note += L["n_merged_issuer" if data.get("merge_by_name") and not merge_classes else "n_merged"].format(names=sep.join(escape(m) for m in notes["merged"][:4]) + ("…" if len(notes["merged"]) > 4 else ""))
     if notes["na"]:
         note += L["n_na"].format(k=notes["na"])
     total = sum(h["weight"] for h in data["holdings"] if h["weight"] is not None)

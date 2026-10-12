@@ -310,6 +310,10 @@ def parse_neos_like(symbol, issuer, text, url, source, valuation_date=None):
     res = result(symbol, issuer, out, as_of, source, url)
     if stamped and as_of != stamped:
         res["issuer_date"] = stamped.isoformat()
+    if issuer == "roundhill":
+        # Roundhill's own top-holdings script adds swap and share lines of one company (DRAM: by the first four letters of the name,
+        # so SK hynix and Samsung's second listings are included; NCLD: by CUSIP). The renderer follows by merging lines with equal names.
+        res["merge_by_name"] = True
     return res
 
 
