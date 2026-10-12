@@ -278,7 +278,7 @@ The user wants an ETF's largest holdings, its concentration or its heavyweight s
    - **Invesco (QQQ, QQQM, QQQJ, RSP) and Destiny (DXYZ) are not fetched automatically:** their terms of use forbid automated access to their websites. The script stops with an error that includes the import command; ask the user to download the holdings from the fund page and import them with `--csv`. **Do not** work around this with browser automation, aggregator sites or memory
    - Any other fund, or a script error: ask the user to download the holdings CSV from the issuer's site and import it with `fetch_holdings.py SYMBOL --csv file --name "Full fund name" --as-of YYYY-MM-DD`. **Never** fill holdings from Yahoo, aggregator sites or memory
    - If a symbol could not be fetched (exit code 1), **stop and tell the user which one**
-   - The holdings date is the issuer's, not today's: Vanguard publishes monthly, the others mostly daily (give a user-imported CSV its date with `--as-of`). The script warns above 10 days; the chart shows the date as is, and tell the user when you deliver
+   - The holdings date is the issuer's, not today's: Vanguard publishes monthly, the others mostly daily (give a user-imported CSV its date with `--as-of`). The script warns above 10 days and the chart subtitle says "(N days old)"; tell the user when you deliver. Vanguard has nothing newer, and SPY/IVV holdings must not stand in for VOO (different funds); if the user wants current weights of the same index, chart SPY or IVV separately and say so
    - Responses are cached for 6 hours (`--refresh` bypasses the cache)
 3. **Render:**
    ```bash

@@ -171,7 +171,7 @@ Chart an ETF's largest holdings (13 by default, `--top N` changes it) with weigh
 |---|---|---|
 | State Street SPDR | `SPY`, `XLK` and other SPDR funds | Daily xlsx file |
 | iShares | `IVV`, `IWM`, `AGG` and 12 more (verified product-id list) | `latest-holdings.csv` |
-| Vanguard | `VOO`, `VTI` and other equity ETFs | JSON behind the fund page (published monthly) |
+| Vanguard | `VOO`, `VTI` and other equity ETFs | JSON behind the fund page (published monthly, so it can be weeks old) |
 | NEOS | `QQQI` | CSV behind the fund page |
 | Roundhill | `NCLD`, `DRAM` | Daily CSV covering all Roundhill funds |
 | Tema | `DISK` | Daily CSV linked from the fund page |

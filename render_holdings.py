@@ -15,6 +15,7 @@ Weights are shown exactly as the issuer reports them (percent of net assets unle
 missing weights stay NA and never count as zero.
 """
 import argparse
+import datetime as dt
 import json
 import re
 import sys
@@ -27,12 +28,13 @@ from render_common import THEMES, render_files
 
 FONT = ('"Inter","Helvetica Neue",Helvetica,Arial,"Noto Sans CJK TC","Source Han Sans TC","PingFang TC","Microsoft JhengHei",sans-serif')
 MAX_TOP = 50
+STALE_DAYS = 10  # same threshold as fetch_holdings.py; older holdings get an age tag in the subtitle
 EXCLUDED_KINDS = ("cash", "treasury", "option")
 
 S = {
     "en": {
         "title": "{name} ({sym}) · Top {n} Holdings", "title_sym": "{sym} · Top {n} Holdings",
-        "sub": "{basis} · Holdings as of {as_of} · {issuer}", "sub_unknown": "{basis} · Holdings date not stated · {issuer}",
+        "sub": "{basis} · Holdings as of {as_of}{age} · {issuer}", "age": " ({n} days old)", "sub_unknown": "{basis} · Holdings date not stated · {issuer}",
         "h_rank": "#", "h_name": "Holding", "h_weight": "Weight (%)", "h_cum": "Cumul. (%)", "h_sector": "Sector",
         "top": "Top {n} holdings", "rest": "All other holdings ({k})", "excl": "Not ranked: {kinds}", "kind_short": {"cash": "cash", "treasury": "Treasury bills", "option": "options", "other": "other"},
         "physical": "Shares held", "swap": "Swap exposure", "na": "NA",
@@ -52,7 +54,7 @@ S = {
     },
     "zh": {
         "title": "{name} ({sym}) · 前 {n} 大持仓", "title_sym": "{sym} · 前 {n} 大持仓",
-        "sub": "{basis} · 持仓截至 {as_of} · {issuer}", "sub_unknown": "{basis} · 未注明持仓日期 · {issuer}",
+        "sub": "{basis} · 持仓截至 {as_of}{age} · {issuer}", "age": "（距数据获取日 {n} 天）", "sub_unknown": "{basis} · 未注明持仓日期 · {issuer}",
         "h_rank": "#", "h_name": "持仓", "h_weight": "权重 (%)", "h_cum": "累计 (%)", "h_sector": "行业",
         "top": "前 {n} 大合计", "rest": "其余持仓（{k} 项）", "excl": "未参与排名：{kinds}", "kind_short": {"cash": "现金", "treasury": "国债", "option": "期权", "other": "其他"},
         "physical": "持有股份", "swap": "掉期敞口", "na": "NA",
@@ -149,6 +151,15 @@ def build_rows(data, mode="exposure", merge_classes=False):
     return ranked, excluded, notes
 
 
+def age_tag(data, L):
+    """' (42 days old)' when the holdings date is well before the retrieval date, so a stale chart says so in its subtitle."""
+    try:
+        age = (dt.date.fromisoformat(data["retrieved_at"][:10]) - dt.date.fromisoformat(data["as_of"])).days
+    except (KeyError, TypeError, ValueError):
+        return ""
+    return L["age"].format(n=age) if age > STALE_DAYS else ""
+
+
 def decimals(data):
     """One decimal when every reported weight has at most one (so 14.4 is not shown as 14.40); otherwise two."""
     ws = [h["weight"] for h in data["holdings"] if h["weight"] is not None]
@@ -205,7 +216,7 @@ def build_html(data, lang, theme="light", top=13, mode="exposure", merge_classes
     basis = BASIS[lang].get(data["weight_basis"], data["weight_basis"])
     issuer = ISSUER_ZH.get(data["issuer"], data["issuer"]) if lang == "zh" else data["issuer"]
     as_of = data.get("as_of")
-    sub = (L["sub"] if as_of else L["sub_unknown"]).format(basis=basis, as_of=as_of, issuer=issuer)
+    sub = (L["sub"] if as_of else L["sub_unknown"]).format(basis=basis, as_of=as_of, issuer=issuer, age=age_tag(data, L))
     name = data.get("name")
     title = (L["title"].format(name=escape(name), sym=escape(data["symbol"]), n=n) if name else L["title_sym"].format(sym=escape(data["symbol"]), n=n))
     sep = "、" if lang == "zh" else ", "

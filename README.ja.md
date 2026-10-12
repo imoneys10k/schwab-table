@@ -171,7 +171,7 @@ ETF の上位保有銘柄（既定は 13 銘柄、`--top N` で変更）を、�
 |---|---|---|
 | State Street SPDR | `SPY`、`XLK` など SPDR ファンド | 日次の xlsx ファイル |
 | iShares | `IVV`、`IWM`、`AGG` ほか計 15 本（確認済みの商品 ID リスト） | `latest-holdings.csv` |
-| Vanguard | `VOO`、`VTI` など株式型 ETF | ファンドページの JSON（月次公表） |
+| Vanguard | `VOO`、`VTI` など株式型 ETF | ファンドページの JSON（月次公表のため数週間前のこともあります） |
 | NEOS | `QQQI` | ファンドページの CSV |
 | Roundhill | `NCLD`、`DRAM` | Roundhill 全ファンドをまとめた日次 CSV |
 | Tema | `DISK` | ファンドページからリンクされた日次 CSV |

@@ -171,7 +171,7 @@ python3 render_chart.py examples/chart_lines_spec.json out/chart
 |---|---|---|
 | 道富 SPDR | `SPY`、`XLK` 等 SPDR 基金 | 每日 xlsx 檔 |
 | iShares | `IVV`、`IWM`、`AGG` 等共 15 檔（已核對的產品編號清單） | `latest-holdings.csv` |
-| Vanguard | `VOO`、`VTI` 等股票型 ETF | 基金頁面背後的 JSON（每月公布） |
+| Vanguard | `VOO`、`VTI` 等股票型 ETF | 基金頁面背後的 JSON（每月公布，資料可能已是數週前的） |
 | NEOS | `QQQI` | 基金頁面背後的 CSV |
 | Roundhill | `NCLD`、`DRAM` | 涵蓋全部 Roundhill 基金的每日 CSV |
 | Tema | `DISK` | 基金頁面連結的每日 CSV |

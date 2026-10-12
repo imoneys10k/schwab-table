@@ -171,7 +171,7 @@ Représentez les plus grandes positions d'un ETF (13 par défaut, `--top N` pour
 |---|---|---|
 | State Street SPDR | `SPY`, `XLK` et autres fonds SPDR | Fichier xlsx quotidien |
 | iShares | `IVV`, `IWM`, `AGG` et 12 autres (liste d'identifiants vérifiés) | `latest-holdings.csv` |
-| Vanguard | `VOO`, `VTI` et autres ETF actions | JSON derrière la page du fonds (publié chaque mois) |
+| Vanguard | `VOO`, `VTI` et autres ETF actions | JSON derrière la page du fonds (publié chaque mois, donc parfois vieux de plusieurs semaines) |
 | NEOS | `QQQI` | CSV derrière la page du fonds |
 | Roundhill | `NCLD`, `DRAM` | CSV quotidien couvrant tous les fonds Roundhill |
 | Tema | `DISK` | CSV quotidien lié depuis la page du fonds |

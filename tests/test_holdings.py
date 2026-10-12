@@ -399,6 +399,17 @@ class Rendering(unittest.TestCase):
         self.assertIn("Negative cash offsets", html)
         self.assertNotIn("Swap exposure", rh.build_html(fund([h("A", "A", 5.0)]), "en"))
 
+    def test_old_holdings_say_so_in_the_subtitle(self):
+        old = rh.build_html(fund([h("A", "A", 5.0)], as_of="2026-08-31"), "en")  # retrieved 2026-10-12
+        self.assertIn("Holdings as of 2026-08-31 (42 days old)", old)
+        zh = rh.build_html(fund([h("A", "A", 5.0)], as_of="2026-08-31"), "zh")
+        self.assertIn("2026-08-31（距", zh)
+        self.assertIn("42 天）", zh)
+        fresh = rh.build_html(fund([h("A", "A", 5.0)], as_of="2026-10-09"), "en")
+        self.assertIn("Holdings as of 2026-10-09 ·", fresh)
+        self.assertNotIn("days old", fresh)
+        self.assertNotIn("days old", rh.build_html(fund([h("A", "A", 5.0)], as_of="2026-08-31", retrieved_at=None), "en"))
+
     def test_unknown_as_of_is_shown_not_invented(self):
         html = rh.build_html(fund([h("A", "A", 5.0)], as_of=None), "en")
         self.assertIn("Holdings date not stated", html)
