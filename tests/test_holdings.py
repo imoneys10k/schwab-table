@@ -106,6 +106,20 @@ class Parsing(unittest.TestCase):
         self.assertEqual(res["as_of"], "2026-10-09")
         self.assertEqual([x["kind"] for x in res["holdings"]], ["equity", "cash", "other"])
 
+    def test_ishares_bond_fund_has_no_ticker_column(self):
+        """Regression: AGG and TLT failed with 'no holdings table' because their header starts with Name, not Ticker."""
+        text = ('iShares Core U.S. Aggregate Bond ETF\nFund Holdings as of,"Oct 09, 2026"\n\n'
+                'Name,Sector,Asset Class,Market Value,Weight (%),Par Value,CUSIP,ISIN,Maturity,Coupon (%)\n'
+                '"BLACKROCK CASH CL INST SL AGENCY","Cash and/or Derivatives","Money Market","1","3.05","1","066922519","US0669225197","-","-"\n'
+                '"TREASURY NOTE","Treasury","Fixed Income","1","0.40","1","91282CGQ8","US91282CGQ87","Feb 28, 2030","4.00"\n'
+                '"TREASURY NOTE","Treasury","Fixed Income","1","0.35","1","91282CHB0","US91282CHB09","Mar 31, 2030","3.50"\n')
+        res = fh.parse_ishares("AGG", text, "u")
+        self.assertEqual([x["kind"] for x in res["holdings"]], ["cash", "bond", "bond"])
+        self.assertEqual([x["name"] for x in res["holdings"][1:]], ["TREASURY NOTE 4% Feb 28, 2030", "TREASURY NOTE 3.5% Mar 31, 2030"])
+        ranked, excluded, _ = rh.build_rows(res)
+        self.assertEqual(len(ranked), 2)  # the bonds are ranked, the money-market line is not
+        self.assertEqual(excluded, {"cash": 3.05})
+
     def test_vanguard_joins_pages_and_keeps_missing_weights_as_none(self):
         page1 = {"asOfDate": "2026-08-31T00:00:00-04:00", "fund": {"entity": [{"ticker": "NVDA", "longName": "NVIDIA Corp.", "percentWeight": "8.08", "cusip": "67066G104"}]}}
         page2 = {"asOfDate": "2026-08-31T00:00:00-04:00", "fund": {"entity": [{"ticker": "BF.B", "longName": "Brown-Forman", "percentWeight": ""}]}}

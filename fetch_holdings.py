@@ -186,19 +186,25 @@ ISHARES_KINDS = {"equity": "equity", "money market": "cash", "cash": "cash", "ca
 
 
 def parse_ishares(symbol, text, url):
-    head, _, body = text.lstrip("﻿").partition("\n\n")
+    head, _, body = text.lstrip("\ufeff").partition("\n\n")
     lines = head.splitlines()
     name = clean(lines[0].strip('"')) if lines else None
     m = re.search(r"Fund Holdings as of,\s*\"?([^\"\n]+)", head)
     as_of = parse_date(m.group(1)) if m else None
-    if not body.strip().startswith("Ticker,"):
+    body = body.strip()
+    # equity funds start with "Ticker,Name,..."; bond funds have no ticker column and start with "Name,..."
+    if not (body.startswith("Ticker,") or body.startswith("Name,")):
         raise FetchError("iShares file has no holdings table; the layout changed")
     out = []
-    for r in csv.DictReader(io.StringIO(body.strip())):
+    for r in csv.DictReader(io.StringIO(body)):
         if not r.get("Name") or pct(r.get("Weight (%)")) is None:
             continue
         kind = ISHARES_KINDS.get(clean(r.get("Asset Class")).lower(), "other")
-        out.append(holding(r.get("Ticker"), r["Name"], pct(r["Weight (%)"]), r.get("Sector"), kind, r.get("ISIN") or r.get("CUSIP")))
+        label = r["Name"]
+        if kind == "bond":  # many bonds share a generic name such as "TREASURY NOTE": add coupon and maturity to tell them apart
+            coupon, maturity = pct(r.get("Coupon (%)")), clean(r.get("Maturity"))
+            label = clean(label) + (f" {coupon:g}%" if coupon is not None else "") + (f" {maturity}" if maturity not in ("", "-") else "")
+        out.append(holding(r.get("Ticker"), label, pct(r["Weight (%)"]), r.get("Sector"), kind, r.get("ISIN") or r.get("CUSIP")))
     return result(symbol, "ishares", out, as_of, "BlackRock iShares (issuer holdings file)", url, name)
 
 
