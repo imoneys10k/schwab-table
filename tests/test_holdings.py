@@ -1,0 +1,380 @@
+"""ETF holdings: issuer parsers, routing, cache, and the top-N ranking rules. Offline; standard library only (+ OpenCC for zh output)."""
+import datetime as dt
+import io
+import json
+import sys
+import tempfile
+import unittest
+import zipfile
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+
+import fetch_holdings as fh  # noqa: E402
+import render_holdings as rh  # noqa: E402
+
+UTC = dt.timezone.utc
+NOW = dt.datetime(2026, 10, 12, 12, 0, tzinfo=UTC)
+
+
+class Patch:
+    def __init__(self, module, **attrs):
+        self.module, self.attrs, self.saved = module, attrs, {}
+
+    def __enter__(self):
+        for k, v in self.attrs.items():
+            self.saved[k] = getattr(self.module, k)
+            setattr(self.module, k, v)
+
+    def __exit__(self, *exc):
+        for k, v in self.saved.items():
+            setattr(self.module, k, v)
+
+
+def make_xlsx(rows):
+    """Minimal one-sheet xlsx with shared strings, enough to exercise the SSGA reader."""
+    strings, body = [], []
+    for n, row in enumerate(rows, 1):
+        cells = []
+        for col, v in zip("ABCDEFGH", row):
+            if isinstance(v, str):
+                strings.append(v)
+                cells.append(f'<c r="{col}{n}" t="s"><v>{len(strings) - 1}</v></c>')
+            elif v is not None:
+                cells.append(f'<c r="{col}{n}"><v>{v}</v></c>')
+        body.append(f'<row r="{n}">{"".join(cells)}</row>')
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as z:
+        z.writestr("xl/sharedStrings.xml", "<sst>" + "".join(f"<si><t>{s.replace('&', '&amp;')}</t></si>" for s in strings) + "</sst>")
+        z.writestr("xl/worksheets/sheet1.xml", f"<worksheet><sheetData>{''.join(body)}</sheetData></worksheet>")
+    return buf.getvalue()
+
+
+def h(ticker, name, weight, kind="equity", ident=None, sector=None, **extra):
+    return {"ticker": ticker, "name": name, "weight": weight, "sector": sector, "kind": kind, "id": ident or ticker or name, **extra}
+
+
+def fund(rows, **kw):
+    return {"symbol": "TST", "name": "Test ETF", "issuer": "Test", "issuer_key": "test", "as_of": "2026-10-09", "source": "Test file",
+            "source_url": "", "weight_basis": "% of net assets", "holdings": rows, "warnings": [], "retrieved_at": "2026-10-12T00:00:00+00:00", **kw}
+
+
+class Parsing(unittest.TestCase):
+    def test_pct(self):
+        self.assertEqual(fh.pct("8.07%"), 8.07)
+        self.assertEqual(fh.pct("1,234.5"), 1234.5)
+        self.assertEqual(fh.pct("-0.48%"), -0.48)
+        for blank in ("", "-", "NA", None, "n/a", "abc"):
+            self.assertIsNone(fh.pct(blank))
+
+    def test_parse_date(self):
+        D = dt.date
+        self.assertEqual(fh.parse_date("2026-08-31T00:00:00-04:00"), D(2026, 8, 31))
+        self.assertEqual(fh.parse_date("Oct 09, 2026"), D(2026, 10, 9))
+        self.assertEqual(fh.parse_date("09-Oct-2026"), D(2026, 10, 9))
+        self.assertEqual(fh.parse_date("10/12/2026"), D(2026, 10, 12))
+        self.assertEqual(fh.parse_date("June 30, 2026"), D(2026, 6, 30))
+        self.assertIsNone(fh.parse_date("soon"))
+
+    def test_ssga_reads_rows_and_stops_at_the_disclaimer(self):
+        blob = make_xlsx([["Fund Name:", "SPDR Test ETF"], ["Ticker Symbol:", "TST"], ["Holdings:", "As of 09-Oct-2026"], [],
+                          ["Name", "Ticker", "Identifier", "SEDOL", "Weight", "Sector", "Shares Held", "Local Currency"],
+                          ["NVIDIA CORP", "NVDA", "67066G104", "2379504", "8.24", "-", "2.9E8", "USD"],
+                          ["US DOLLAR", "-", "USD", "-", "0.28", "-", "1", "USD"],
+                          ["Disclaimer text that is long and has no weight"]])
+        res = fh.parse_ssga("TST", blob, "u")
+        self.assertEqual(res["as_of"], "2026-10-09")
+        self.assertEqual(res["name"], "SPDR Test ETF")
+        self.assertEqual([(x["ticker"], x["kind"]) for x in res["holdings"]], [("NVDA", "equity"), ("", "cash")])
+        self.assertIsNone(res["holdings"][0]["sector"])  # '-' is not a sector
+
+    def test_ssga_rejects_a_file_for_another_ticker(self):
+        blob = make_xlsx([["Fund Name:", "X"], ["Ticker Symbol:", "ZZZ"], ["Holdings:", "As of 09-Oct-2026"],
+                          ["Name", "Ticker", "Identifier", "SEDOL", "Weight"], ["A", "A", "1", "2", "1.0"]])
+        with self.assertRaises(fh.FetchError):
+            fh.parse_ssga("TST", blob, "u")
+
+    def test_ishares_kinds_and_header(self):
+        text = ('iShares Core S&P 500 ETF\nFund Holdings as of,"Oct 09, 2026"\nInception Date,"May 15, 2000"\n\n'
+                'Ticker,Name,Sector,Asset Class,Market Value,Weight (%),Notional Value\n'
+                '"NVDA","NVIDIA","Information Technology","Equity","1","8.23","1"\n'
+                '"USD","USD CASH","Cash and/or Derivatives","Cash","1","0.05","1"\n'
+                '"ESZ6","S&P500 EMINI DEC 26","Cash and/or Derivatives","Futures","0","0.00","0"\n')
+        res = fh.parse_ishares("IVV", text, "u")
+        self.assertEqual(res["name"], "iShares Core S&P 500 ETF")
+        self.assertEqual(res["as_of"], "2026-10-09")
+        self.assertEqual([x["kind"] for x in res["holdings"]], ["equity", "cash", "other"])
+
+    def test_vanguard_joins_pages_and_keeps_missing_weights_as_none(self):
+        page1 = {"asOfDate": "2026-08-31T00:00:00-04:00", "fund": {"entity": [{"ticker": "NVDA", "longName": "NVIDIA Corp.", "percentWeight": "8.08", "cusip": "67066G104"}]}}
+        page2 = {"asOfDate": "2026-08-31T00:00:00-04:00", "fund": {"entity": [{"ticker": "BF.B", "longName": "Brown-Forman", "percentWeight": ""}]}}
+        res = fh.parse_vanguard("VOO", [page1, page2], "u")
+        self.assertEqual(res["as_of"], "2026-08-31")
+        self.assertEqual([x["weight"] for x in res["holdings"]], [8.08, None])
+
+    def test_invesco_depositary_receipts_are_equities_not_dropped(self):
+        """Regression: ADRs (ASML, ARM, PDD) were classed as 'other' and silently left out of the ranking."""
+        types = {"Common Stock": "equity", "American Depository Receipt": "equity", "American Depository Receipt - NY": "equity",
+                 "Currency": "cash", "Currency Collateral": "cash", "Synthetic Cash": "cash", "Index Future": "other"}
+        for name, kind in types.items():
+            self.assertEqual(fh.invesco_kind(name), kind, name)
+
+    def test_neos_and_roundhill_csv(self):
+        text = ("Date,Account,StockTicker,Cusip,SecurityName,Shares,Price,MarketValue,Weightings,NetAssets,SharesOutstanding,CreationUnits,MoneyMarketFlag\n"
+                '10/12/2026,TST,MU,595112103,"Micron Technology Inc",1,1,1,4.44%,1,1,1,\n'
+                '10/12/2026,TST,595112103 TRS 052427 GS,595112103 TRS 052427 GS,"MICRON TECHNOLOGY, INC.-SWAP-GOLD-L",1,1,1,10.49%,1,1,1,\n'
+                '10/12/2026,TST,912797VA2,912797VA2,United States Treasury Bill 12/03/2026,1,1,1,12.65%,1,1,1,\n'
+                '10/12/2026,TST,FGXXX,31846V336,First American Government Obligations Fund,1,1,1,13.34%,1,1,1,Y\n'
+                '10/12/2026,TST,NDX   261120C31325000,NDX US 11/20/26 C31325,NDX US 11/20/26 C31325,1,1,1,-0.48%,1,1,1,\n'
+                '10/12/2026,TST,Cash&Other,Cash&Other,Cash & Other,1,1,1,-50.48%,1,1,1,Y\n'
+                '10/12/2026,OTHER,AAPL,037833100,Apple Inc,1,1,1,9.00%,1,1,1,\n')
+        res = fh.parse_neos_like("TST", "roundhill", text, "u", "src")
+        kinds = {x["name"]: x["kind"] for x in res["holdings"]}
+        self.assertEqual(len(res["holdings"]), 6)  # the other fund's row is not mixed in
+        self.assertEqual(kinds["Micron Technology Inc"], "equity")
+        self.assertEqual(kinds["MICRON TECHNOLOGY, INC."], "swap")
+        self.assertEqual(kinds["United States Treasury Bill 12/03/2026"], "treasury")
+        self.assertEqual(kinds["First American Government Obligations Fund"], "cash")
+        self.assertEqual(kinds["NDX US 11/20/26 C31325"], "option")
+        self.assertEqual(kinds["Cash & Other"], "cash")
+        swap = next(x for x in res["holdings"] if x["kind"] == "swap")
+        self.assertEqual(swap["underlying_id"], "595112103")
+        self.assertEqual(res["as_of"], "2026-10-12")
+        with self.assertRaises(fh.NotThisIssuer):
+            fh.parse_neos_like("NOPE", "roundhill", text, "u", "src")
+
+    def test_swap_names_lose_the_counterparty_suffix(self):
+        for raw, want in (("MICRON TECHNOLOGY, INC.-SWAP-GOLD-L", "MICRON TECHNOLOGY, INC."), ("Nebius Group N.V. SWAP NM", "Nebius Group N.V."),
+                          ("SK HYNIX INC-SWAP-GOLD-L", "SK HYNIX INC"), ("EVOLUTION AB (PUBL)-SWAP-NMRA-L", "EVOLUTION AB (PUBL)")):
+            self.assertEqual(fh.swap_name(raw), want)
+
+    def test_destiny_page(self):
+        page = ("<main>Public access As of June 30, 2026 › Current Portfolio Summary of Economic Exposure · 3 companies "
+                "01 Anthropic¹ ↗ Artificial Intelligence 14.4 % 02 SpaceX¹ ↗ Space &amp; Frontier 10.6 % "
+                "03 Beast Industries Consumer &amp; Social 0.9 % – Cash &amp; equivalents Treasury 74.1 % "
+                "Percentages represent economic exposure</main>")
+        res = fh.parse_destiny("DXYZ", page, "u")
+        self.assertEqual(res["as_of"], "2026-06-30")
+        self.assertEqual([(x["name"], x["weight"], x["kind"]) for x in res["holdings"]],
+                         [("Anthropic", 14.4, "equity"), ("SpaceX", 10.6, "equity"), ("Beast Industries", 0.9, "equity"), ("Cash & equivalents", 74.1, "cash")])
+        self.assertEqual(res["holdings"][1]["sector"], "Space & Frontier")
+
+    def test_destiny_layout_change_is_an_error_not_a_partial_chart(self):
+        page = ("As of June 30, 2026 › Current Portfolio Summary of Economic Exposure · 37 companies "
+                "01 Anthropic¹ ↗ Artificial Intelligence 14.4 % Percentages represent")
+        with self.assertRaises(fh.FetchError):
+            fh.parse_destiny("DXYZ", page, "u")
+
+    def test_user_csv_with_preamble(self):
+        text = "Fund,My ETF\nGenerated,today\nName,Ticker,Weight (%)\nApple Inc,AAPL,7.5\nCash,,1.0\nBad,BAD,n/a\n"
+        res = fh.parse_user_csv("MYETF", text, "my.csv", "My ETF")
+        self.assertEqual([x["name"] for x in res["holdings"]], ["Apple Inc", "Cash"])
+        self.assertIn("as-of date unknown", res["warnings"][0])
+        with self.assertRaises(fh.FetchError):
+            fh.parse_user_csv("X", "a,b\n1,2\n", "bad.csv")
+
+
+class Validation(unittest.TestCase):
+    def test_validate_flags_partial_files_and_missing_weights(self):
+        res = fund([h("A", "A", 40.0), h("B", "B", None)])
+        fh.validate(res)
+        self.assertTrue(any("add up to 40.0%" in w for w in res["warnings"]))
+        self.assertTrue(any("no reported weight" in w for w in res["warnings"]))
+
+    def test_validate_rejects_empty_and_weightless_files(self):
+        with self.assertRaises(fh.FetchError):
+            fh.validate(fund([]))
+        with self.assertRaises(fh.FetchError):
+            fh.validate(fund([h("A", "A", None)]))
+
+    def test_stale_holdings_are_warned_about(self):
+        with Patch(fh, fund_name=lambda s: "Fund"):
+            res = fh.finish(fund([h("A", "A", 100.0)], as_of="2026-08-31"), NOW)
+        self.assertTrue(any("42 days" in w for w in res["warnings"]))
+        with Patch(fh, fund_name=lambda s: "Fund"):
+            self.assertFalse(fh.finish(fund([h("A", "A", 100.0)], as_of="2026-10-09"), NOW)["warnings"])
+
+
+class Routing(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.restore = Patch(fh, CACHE_DIR=Path(self.tmp.name), fund_name=lambda s: "Fund")
+        self.restore.__enter__()
+
+    def tearDown(self):
+        self.restore.__exit__()
+        self.tmp.cleanup()
+
+    def ok(self, key):
+        return lambda symbol, **_: fh.result(symbol, key, [h("A", "A", 100.0)], dt.date(2026, 10, 9), "src", "u")
+
+    def test_known_tickers_go_to_their_issuer_only(self):
+        calls = []
+        adapters = {k: (lambda key: lambda symbol, **_: (calls.append(key), self.ok(key)(symbol))[1])(k) for k in fh.ADAPTERS}
+        with Patch(fh, ADAPTERS=adapters):
+            for sym, issuer in (("QQQ", "invesco"), ("VOO", "vanguard"), ("SPY", "ssga"), ("IVV", "ishares"), ("QQQI", "neos"), ("NCLD", "roundhill"), ("DRAM", "roundhill"), ("DXYZ", "destiny")):
+                calls.clear()
+                self.assertEqual(fh.get_holdings(sym, refresh=True, now=NOW)["issuer_key"], issuer)
+                self.assertEqual(calls, [issuer])
+
+    def test_unknown_ticker_is_probed_until_an_issuer_has_it(self):
+        def miss(symbol, **_):
+            raise fh.NotThisIssuer("not here")
+        adapters = {k: miss for k in fh.ADAPTERS}
+        adapters["neos"] = self.ok("neos")
+        with Patch(fh, ADAPTERS=adapters):
+            self.assertEqual(fh.get_holdings("ZZZZ", refresh=True, now=NOW)["issuer_key"], "neos")
+
+    def test_unknown_everywhere_suggests_csv(self):
+        def miss(symbol, **_):
+            raise fh.NotThisIssuer("not here")
+        with Patch(fh, ADAPTERS={k: miss for k in fh.ADAPTERS}):
+            with self.assertRaises(fh.FetchError) as cm:
+                fh.get_holdings("ZZZZ", refresh=True, now=NOW)
+        self.assertIn("--csv", str(cm.exception))
+
+    def test_a_network_failure_on_a_known_issuer_is_not_hidden_by_probing(self):
+        def boom(symbol, **_):
+            raise fh.FetchError("timeout")
+        adapters = {k: self.ok(k) for k in fh.ADAPTERS}
+        adapters["ssga"] = boom
+        with Patch(fh, ADAPTERS=adapters):
+            with self.assertRaises(fh.FetchError):
+                fh.get_holdings("SPY", refresh=True, now=NOW)
+
+    def test_cache_is_used_for_six_hours_and_refresh_bypasses_it(self):
+        n = []
+
+        def counted(symbol, **_):
+            n.append(1)
+            return self.ok("ssga")(symbol)
+        with Patch(fh, ADAPTERS=dict(fh.ADAPTERS, ssga=counted)):
+            fh.get_holdings("SPY", now=NOW)
+            fh.get_holdings("SPY", now=NOW)
+            self.assertEqual(len(n), 1)
+            fh.get_holdings("SPY", refresh=True, now=NOW)
+            self.assertEqual(len(n), 2)
+
+    def test_roundhill_walks_back_over_missing_days(self):
+        asked = []
+        csv_text = "Date,Account,StockTicker,Cusip,SecurityName,Weightings,MoneyMarketFlag\n10/09/2026,TST,AAA,111,Alpha Inc,100%,\n"
+
+        def fake_fetch(url, **_):
+            asked.append(url[-12:-4])
+            return csv_text if url.endswith("10092026.csv") else "<!doctype html><html>404</html>"
+        with Patch(fh, fetch=fake_fetch):
+            res = fh.fetch_roundhill("TST", now=NOW)  # Monday 12 Oct; weekends are skipped
+        self.assertEqual(asked, ["10122026", "10092026"])
+        self.assertEqual(res["holdings"][0]["name"], "Alpha Inc")
+
+
+class Ranking(unittest.TestCase):
+    def test_swaps_are_added_to_the_stock_and_cash_is_left_out(self):
+        rows = [h("MU", "Micron", 4.0, ident="595"), h("SNDK", "Sandisk", 5.0, ident="777"),
+                h("", "MICRON", 10.0, "swap", "595 TRS 1", underlying_id="595"), h("", "MICRON", 6.0, "swap", "595 TRS 2", underlying_id="595"),
+                h("", "CXMT", 5.0, "swap", "CX TRS", underlying_id="CX"),
+                h("", "T-Bill", 40.0, "treasury", "TB"), h("", "Cash", -30.0, "cash", "C")]
+        ranked, excluded, notes = rh.build_rows(fund(rows))
+        self.assertEqual([(r["name"], r["total"]) for r in ranked], [("Micron", 20.0), ("CXMT", 5.0), ("Sandisk", 5.0)])
+        self.assertEqual((ranked[0]["physical"], ranked[0]["swap"]), (4.0, 16.0))
+        self.assertEqual(excluded, {"treasury": 40.0, "cash": -30.0})
+        self.assertTrue(notes["unmatched"])
+
+    def test_lines_mode_ranks_everything_as_listed(self):
+        rows = [h("A", "A", 5.0), h("", "T-Bill", 40.0, "treasury", "TB"), h("", "Swap", 10.0, "swap", "S", underlying_id="A")]
+        ranked, excluded, _ = rh.build_rows(fund(rows), "lines")
+        self.assertEqual([r["name"] for r in ranked], ["T-Bill", "Swap", "A"])
+        self.assertEqual(excluded, {})
+
+    def test_share_classes_merge_only_when_asked(self):
+        rows = [h("GOOGL", "Alphabet Inc Class A", 3.1), h("GOOG", "Alphabet Inc Class C", 2.9), h("TSLA", "Tesla Inc", 3.0)]
+        ranked, _, notes = rh.build_rows(fund(rows))
+        self.assertEqual([r["name"] for r in ranked], ["Alphabet Inc Class A", "Tesla Inc", "Alphabet Inc Class C"])
+        merged, _, notes = rh.build_rows(fund(rows), merge_classes=True)
+        self.assertEqual((merged[0]["ticker"], round(merged[0]["total"], 2)), ("GOOGL / GOOG", 6.0))
+        self.assertEqual(notes["merged"], ["Alphabet Inc Class A"])
+
+    def test_same_name_without_a_class_marker_is_merged_too(self):
+        """NEOS lists both Alphabet lines as 'Alphabet Inc'."""
+        rows = [h("GOOGL", "Alphabet Inc", 3.1), h("GOOG", "Alphabet Inc", 2.9)]
+        merged, _, _ = rh.build_rows(fund(rows), merge_classes=True)
+        self.assertEqual(len(merged), 1)
+
+    def test_missing_weights_are_not_ranked_and_not_zero(self):
+        rows = [h("A", "A", 5.0), h("B", "B", None)]
+        ranked, _, notes = rh.build_rows(fund(rows))
+        self.assertEqual([r["name"] for r in ranked], ["A"])
+        self.assertEqual(notes["na"], 1)
+
+    def test_bond_funds_rank_their_bonds(self):
+        rows = [h("", "UST 2030", 3.0, "bond", "b1"), h("", "UST 2035", 4.0, "bond", "b2"), h("", "Cash", 1.0, "cash", "c")]
+        ranked, excluded, _ = rh.build_rows(fund(rows))
+        self.assertEqual([r["name"] for r in ranked], ["UST 2035", "UST 2030"])
+        self.assertEqual(excluded, {"cash": 1.0})
+
+    def test_ranking_is_deterministic_on_ties(self):
+        rows = [h("B", "Beta", 2.0), h("A", "Alpha", 2.0)]
+        self.assertEqual([r["name"] for r in rh.build_rows(fund(rows))[0]], ["Alpha", "Beta"])
+
+
+class Rendering(unittest.TestCase):
+    def rows(self):
+        return [h(f"T{i}", f"Company {i}", 10.0 - i, sector="Tech") for i in range(15)] + [h("", "Cash", 0.0, "cash", "c")]
+
+    def test_summary_lines_and_cumulative_weights(self):
+        html = rh.build_html(fund(self.rows()), "en", top=13)
+        self.assertIn("Top 13 holdings", html)
+        self.assertIn("All other holdings (2)", html)
+        self.assertIn("Not ranked: cash", html)
+        self.assertIn("Past performance is no guarantee of future results.", html)
+        self.assertIn("Test ETF (TST)", html)
+
+    def test_one_decimal_data_is_not_shown_with_two(self):
+        one = fund([h("A", "A", 14.4), h("B", "B", 10.6)])
+        self.assertIn(">14.4<", rh.build_html(one, "en"))
+        two = fund([h("A", "A", 14.43), h("B", "B", 10.6)])
+        self.assertIn(">14.43<", rh.build_html(two, "en"))
+
+    def test_swap_view_has_legend_and_notice(self):
+        rows = [h("A", "A", 5.0, ident="a"), h("", "A", 9.0, "swap", "a TRS", underlying_id="a"), h("", "Cash", -9.0, "cash", "c")]
+        html = rh.build_html(fund(rows), "en")
+        self.assertIn("Swap exposure", html)
+        self.assertIn("Negative cash offsets", html)
+        self.assertNotIn("Swap exposure", rh.build_html(fund([h("A", "A", 5.0)]), "en"))
+
+    def test_unknown_as_of_is_shown_not_invented(self):
+        html = rh.build_html(fund([h("A", "A", 5.0)], as_of=None), "en")
+        self.assertIn("Holdings date not stated", html)
+
+    def test_names_file_and_note(self):
+        data = fund([h("NVDA", "NVIDIA Corp", 8.0)], note={"en": "Hypothetical example.", "zh": "虚构示例。"})
+        html = rh.build_html(data, "en", names={"NVDA": {"zh": "英伟达"}})
+        self.assertIn("NVIDIA Corp", html)
+        self.assertTrue(html.count("Hypothetical example.") == 1 and "Source: Test file" in html)
+        zh = rh.build_html(data, "zh", names={"NVDA": {"zh": "英伟达"}})
+        self.assertIn("英偉達", zh)  # converted to Traditional Chinese like every other zh output
+        self.assertIn("虛構示例", zh)
+
+    def test_empty_ranking_is_an_error(self):
+        with self.assertRaises(ValueError):
+            rh.build_html(fund([h("A", "A", None)]), "en")
+
+    def test_html_is_escaped(self):
+        html = rh.build_html(fund([h("A<B", "Evil <script>alert(1)</script> Inc", 5.0)]), "en")
+        self.assertNotIn("<script>alert", html)
+
+
+class Examples(unittest.TestCase):
+    def test_example_files_render(self):
+        for name in ("etf_holdings_equity", "etf_holdings_swap"):
+            data = json.loads((ROOT / "examples" / f"{name}.json").read_text(encoding="utf-8"))
+            for lang in ("en", "zh"):
+                html = rh.build_html(data, lang)
+                self.assertIn("Past performance" if lang == "en" else "過往業績", html)
+                saved = (ROOT / "examples" / f"{name}_{lang}.html").read_text(encoding="utf-8")
+                self.assertEqual(html, saved, f"{name}_{lang}.html is stale; run render_holdings.py on the example")
+
+
+if __name__ == "__main__":
+    unittest.main()

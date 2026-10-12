@@ -28,7 +28,8 @@ SKILL_DOC = {"en": "SKILL.en.md", "zh": "SKILL.md", "ja": "SKILL.en.md", "fr": "
 # (image name on the site, source file, example links for the style table)
 GALLERY = ["examples/neural9_en.png", "examples/watchlist_zh.png", "examples/chart_lines_en.png", "examples/chart_multiples_zh.png",
            "examples/morgan_zh.png", "examples/blackstone_zh.png", "examples/ibkr_zh.png",
-           "examples/earnings/aapl_2025q3_zh.png", "examples/earnings/aapl_2025q4_zh.png", "examples/holdings_en.png"]
+           "examples/earnings/aapl_2025q3_zh.png", "examples/earnings/aapl_2025q4_zh.png", "examples/holdings_en.png",
+           "examples/etf_holdings_equity_en.png", "examples/etf_holdings_swap_zh.png"]
 STYLE_EXAMPLES = ["neural9", "holdings", "watchlist", "morgan", "blackstone", "ibkr"]
 
 BADGES = " ".join([
@@ -123,6 +124,11 @@ flowchart LR
     chart_cmds = ("```bash\npython3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 -o data/watch.json\n"
                   "python3 fetch_prices.py 7203.T 0700.HK SAP.DE 600519.SS --start 2026-08-01 --benchmark none -o data/global.json\n"
                   "python3 render_chart.py examples/chart_lines_spec.json out/chart\n```")
+    etf_table = md_table(c["etf_head"], c["etf_rows"])
+    etf_cmds = ("```bash\npython3 fetch_holdings.py QQQ NCLD -o data/                  # data/QQQ_holdings.json, data/NCLD_holdings.json\n"
+                "python3 render_holdings.py data/QQQ_holdings.json out/qqq    # top 13 by default\n"
+                "python3 render_holdings.py data/NCLD_holdings.json out/ncld --top 10 --merge-classes\n"
+                "python3 fetch_holdings.py MYETF --csv my_holdings.csv --name \"My ETF\"   # any other fund\n```")
     earn_cmd = "```bash\npython3 quarterly_earnings.py AAPL --period FY2025Q3 -o out/aapl_q3\n```"
     files = "\n".join(f"- {n}: {d}" for n, d in c["files"])
     manual_cmds = ("```bash\npip install -r requirements.txt && playwright install chromium\n"
@@ -130,6 +136,7 @@ flowchart LR
                    "python3 render_table.py examples/morgan_spec.json out/matrix\n"
                    "python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 -o data/watch.json\n"
                    "python3 render_chart.py examples/chart_lines_spec.json out/chart --theme dark --pdf\n"
+                   "python3 fetch_holdings.py QQQ -o data/ && python3 render_holdings.py data/QQQ_holdings.json out/qqq\n"
                    "python3 csv_to_prices.py 0700.HK=tencent.csv --benchmark HSI=hsi.csv -o data/hk.json\n"
                    "python3 quarterly_earnings.py AAPL --period FY2025Q3 -o out/aapl_q3\n```")
 
@@ -145,6 +152,7 @@ flowchart LR
         f"## 💬 {c['h_using']}\n\n{c['using_intro']}\n\n" + "\n".join(f"- {u}" for u in c["using"]) + "\n",
         f"## 🧩 {c['h_styles']}\n\n{c['styles_intro']}\n\n{styles_table}\n\n{style_cmds}\n\n{c['style_note']}\n",
         f"## 📊 {c['h_charts']}\n\n{c['charts_intro']}\n\n{layout}\n\n{c['layout_auto']}\n\n{route}\n\n" + "\n".join(f"- {b}" for b in c["chart_bullets"]) + f"\n\n{chart_cmds}\n",
+        f"## 🧱 {c['h_etf']}\n\n{c['etf_intro']}\n\n{etf_table}\n\n" + "\n".join(f"- {b}" for b in c["etf_bullets"]) + f"\n\n{etf_cmds}\n",
         f"## 🧾 {c['h_earn']}\n\n{c['earn_intro']}\n\n" + "\n".join(f"- {p}" for p in c["earn_points"]) + f"\n\n{earn_cmd}\n\n{c['earn_links']}\n",
         f"## 🔍 {c['h_rules']}\n\n" + "\n".join(f"- {r}" for r in c["rules"]) + "\n",
         f"<details>\n<summary><b>{c['sum_files']}</b></summary>\n\n{files}\n\n</details>\n",

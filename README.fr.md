@@ -12,12 +12,12 @@
 
 </div>
 
-Deux skills d'agent dans un seul dépôt, conçus pour Claude Code et utilisables avec Codex et d'autres agents de programmation. **schwab-performance-table** transforme une liste d'actions, une capture de positions chez un courtier, des données de prix ou vos propres fichiers CSV en tableaux façon étude (dispositions Schwab, Morgan, Blackstone et IBKR) et en graphiques de cours avec drawdown et échelle logarithmique. **quarterly-earnings-review** vérifie le document trimestriel d'une société et produit un tableau de résultats de style HSBC avec des commentaires sourcés. Tout est produit en anglais et en chinois traditionnel, en PNG et en HTML autonome.
+Deux skills d'agent dans un seul dépôt, conçus pour Claude Code et utilisables avec Codex et d'autres agents de programmation. **schwab-performance-table** transforme une liste d'actions, une capture de positions chez un courtier, des données de prix ou vos propres fichiers CSV en tableaux façon étude (dispositions Schwab, Morgan, Blackstone et IBKR) , en graphiques de cours avec drawdown et échelle logarithmique, et en graphiques des principales positions d'ETF. **quarterly-earnings-review** vérifie le document trimestriel d'une société et produit un tableau de résultats de style HSBC avec des commentaires sourcés. Tout est produit en anglais et en chinois traditionnel, en PNG et en HTML autonome.
 
 ## ✨ Points forts
 
 <table>
-<tr><td width="50%" valign="top"><h3>🎯 Quatre dispositions de rapport</h3><p>Styles Schwab, Morgan, Blackstone et IBKR, avec des schémas de colonnes explicites. Ce sont des modèles indépendants, pas des rapports publiés par ces institutions.</p></td><td width="50%" valign="top"><h3>📊 Tableaux, graphiques, résultats</h3><p>Tableaux de classement, de positions et de liste de suivi ; courbes et petits multiples avec drawdown et échelle logarithmique ; résultats trimestriels de style HSBC.</p></td></tr>
+<tr><td width="50%" valign="top"><h3>🎯 Quatre dispositions de rapport</h3><p>Styles Schwab, Morgan, Blackstone et IBKR, avec des schémas de colonnes explicites. Ce sont des modèles indépendants, pas des rapports publiés par ces institutions.</p></td><td width="50%" valign="top"><h3>📊 Tableaux, graphiques, résultats</h3><p>Tableaux de classement, de positions et de liste de suivi ; courbes et petits multiples avec drawdown et échelle logarithmique ; graphiques des principales positions d'ETF ; résultats trimestriels de style HSBC.</p></td></tr>
 <tr><td width="50%" valign="top"><h3>🌏 Anglais et chinois traditionnel</h3><p>Chaque sortie existe dans les deux langues : PNG en 2x et HTML autonome, avec thème sombre et PDF en option.</p></td><td width="50%" valign="top"><h3>🔒 Sources toujours indiquées</h3><p>Cours des bourses Nasdaq et Shanghai/Shenzhen, données Yahoo clairement identifiées pour les autres marchés, documents SEC et Apple pour les résultats. Une donnée manquante est marquée NA, jamais inventée.</p></td></tr>
 <tr><td width="50%" valign="top"><h3>🤖 Installation en une phrase</h3><p>Collez un message dans Claude Code ou Codex. Fonctionne sous macOS, Linux et Windows et installe les deux skills.</p></td><td width="50%" valign="top"><h3>🧪 Testé</h3><p>Tests unitaires à réponses connues, CI sur trois systèmes, test de fumée sur données réelles et première série d'évaluations d'agent.</p></td></tr>
 </table>
@@ -30,6 +30,7 @@ Deux skills d'agent dans un seul dépôt, conçus pour Claude Code et utilisable
 <tr><td width="50%" align="center"><img src="examples/morgan_zh.png" alt="Matrice façon Morgan"><br><sub><b>Matrice façon Morgan</b> · 繁體中文</sub></td><td width="50%" align="center"><img src="examples/blackstone_zh.png" alt="Performance façon Blackstone"><br><sub><b>Performance façon Blackstone</b> · 繁體中文</sub></td></tr>
 <tr><td width="50%" align="center"><img src="examples/ibkr_zh.png" alt="Positions façon IBKR"><br><sub><b>Positions façon IBKR</b> · 繁體中文</sub></td><td width="50%" align="center"><img src="examples/earnings/aapl_2025q3_zh.png" alt="Résultats HSBC, AAPL T3"><br><sub><b>Résultats HSBC, AAPL T3</b> · 繁體中文</sub></td></tr>
 <tr><td width="50%" align="center"><img src="examples/earnings/aapl_2025q4_zh.png" alt="Résultats HSBC, AAPL T4"><br><sub><b>Résultats HSBC, AAPL T4</b> · 繁體中文</sub></td><td width="50%" align="center"><img src="examples/holdings_en.png" alt="Tableau de positions"><br><sub><b>Tableau de positions</b> · EN</sub></td></tr>
+<tr><td width="50%" align="center"><img src="examples/etf_holdings_equity_en.png" alt="Top 13 des positions d'un ETF"><br><sub><b>Top 13 des positions d'un ETF</b> · EN</sub></td><td width="50%" align="center"><img src="examples/etf_holdings_swap_zh.png" alt="ETF avec exposition par swaps"><br><sub><b>ETF avec exposition par swaps</b> · 繁體中文</sub></td></tr>
 </table>
 
 <sub>Les exemples de résultats utilisent les publications officielles d'Apple et le tableau de classement un graphique public de Charles Schwab. Tout le reste utilise des sociétés fictives et des données synthétiques.</sub>
@@ -41,7 +42,7 @@ flowchart LR
   A["📝 Symboles, capture, CSV<br/>ou symbole + trimestre"] --> B["🤖 Votre agent IA + skills"]
   B --> C["🏛 Prix : Nasdaq, SSE/SZSE,<br/>Yahoo (indiqué), votre CSV"]
   B --> F["📑 Documents : PDF Apple,<br/>données SEC, vos imports"]
-  C --> D["🖨 render_table<br/>render_chart"]
+  C --> D["🖨 render_table<br/>render_chart<br/>render_holdings"]
   F --> G["🖨 quarterly_earnings"]
   D --> E["🖼 PNG + HTML<br/>EN · 繁體中文"]
   G --> E
@@ -110,6 +111,7 @@ Une fois installé, il suffit de demander en langage naturel, par exemple :
 - Présente AAPL, MSFT et NVDA dans une matrice rendement/risque façon Morgan.
 - Trace 7203.T, 0700.HK et 600519.SS depuis le début de l'année.
 - Analyse les résultats AAPL FY2025Q3 dans un tableau de style HSBC.
+- Montre les 13 principales positions de QQQ, VOO et SPY.
 
 ## 🧩 Styles de tableau
 
@@ -161,6 +163,33 @@ python3 fetch_prices.py 7203.T 0700.HK SAP.DE 600519.SS --start 2026-08-01 --ben
 python3 render_chart.py examples/chart_lines_spec.json out/chart
 ```
 
+## 🧱 Principales positions d'un ETF
+
+Représentez les plus grandes positions d'un ETF (13 par défaut, `--top N` pour changer) avec leur poids, le poids cumulé, le secteur et le total du reste. La source est le fichier publié par l'émetteur de chaque fonds, et la date de situation est toujours imprimée sur le graphique.
+
+| Émetteur | Fonds | Récupération |
+|---|---|---|
+| State Street SPDR | `SPY`, `XLK` et autres fonds SPDR | Fichier xlsx quotidien |
+| iShares | `IVV`, `IWM`, `AGG` et 12 autres (liste d'identifiants vérifiés) | `latest-holdings.csv` |
+| Vanguard | `VOO`, `VTI` et autres ETF actions | JSON derrière la page du fonds (publié chaque mois) |
+| Invesco | `QQQ` | JSON derrière la page du fonds, lu via Playwright car le serveur refuse les scripts |
+| NEOS | `QQQI` | CSV derrière la page du fonds |
+| Roundhill | `NCLD`, `DRAM` | CSV quotidien couvrant tous les fonds Roundhill |
+| Destiny | `DXYZ` | Liste trimestrielle sur destiny.xyz (sociétés non cotées) |
+| Autre fonds | un fichier que vous téléchargez | `--csv` avec des colonnes nom, code et poids |
+
+- **Classement avec les swaps :** pour des fonds comme NCLD et DRAM, un swap sur une action s'ajoute à la position en titres de la même action (rapprochement par CUSIP/SEDOL), comme dans la vue « principales positions » de l'émetteur ; la barre montre les deux parts. Liquidités, fonds monétaires, bons du Trésor et options figurent sur une ligne à part, sans être classés. `--mode lines` classe au contraire chaque ligne telle que l'émetteur la liste.
+- **Catégories d'actions :** GOOGL et GOOG restent séparés sauf avec `--merge-classes`.
+- **Dates honnêtes :** la date de situation est celle de l'émetteur (Vanguard publie chaque mois, DXYZ chaque trimestre), avec un avertissement au-delà de 10 jours. Les poids sont affichés tels que publiés ; un poids absent s'affiche NA et n'est jamais compté comme zéro.
+- **Options :** `--top N`, `--names names.json` (noms en langue locale), `--theme dark`, `--pdf`, `--langs`.
+
+```bash
+python3 fetch_holdings.py QQQ NCLD -o data/                  # data/QQQ_holdings.json, data/NCLD_holdings.json
+python3 render_holdings.py data/QQQ_holdings.json out/qqq    # top 13 by default
+python3 render_holdings.py data/NCLD_holdings.json out/ncld --top 10 --merge-classes
+python3 fetch_holdings.py MYETF --csv my_holdings.csv --name "My ETF"   # any other fund
+```
+
 ## 🧾 Analyse des résultats trimestriels
 
 Demandez « Analyse les résultats AAPL FY2025Q3 dans un tableau de style HSBC ». Le skill **quarterly-earnings-review** vérifie les dates de l'exercice et le document d'origine, calcule les valeurs du trimestre, en glissement annuel et par rapport au trimestre précédent, et ajoute des commentaires qui citent leurs sources. La sortie est un PNG + HTML en anglais et en chinois traditionnel, avec les faits bruts et un registre de vérification.
@@ -193,6 +222,7 @@ python3 quarterly_earnings.py AAPL --period FY2025Q3 -o out/aapl_q3
 - `render_table.py`, `institutional_tables.py`, `prices_to_table.py`: Moteur de rendu des tableaux et ses quatre styles ; construit des spécifications Morgan / Blackstone à partir des prix
 - `fetch_prices.py`, `csv_to_prices.py`: Cours de clôture quotidiens de Nasdaq, Shanghai/Shenzhen et Yahoo ; conversion de vos fichiers CSV
 - `render_chart.py`, `render_common.py`: Moteur de rendu des graphiques ; thèmes et sorties PNG / PDF partagés
+- `fetch_holdings.py`, `render_holdings.py`: Positions d'un ETF depuis le fichier de l'émetteur (SPDR, iShares, Vanguard, Invesco, NEOS, Roundhill, Destiny, votre CSV) et rendu du top N
 - `quarterly_earnings.py`, `earnings_core.py`, `earnings_sources.py`, `render_earnings.py`: Commande de résultats, calculs vérifiables, adaptateurs de sources et rendu de style HSBC
 - `localization.py`, `fonts.py`, `fonts/`: Conversion en chinois traditionnel ; polices fournies et intégrées au HTML (licences incluses)
 - `references/`, `EARNINGS.md`: Guide des modèles ; usage et couverture des sources pour les résultats (chinois traditionnel)
@@ -214,6 +244,7 @@ python3 render_table.py examples/neural9_spec.json out/neural9
 python3 render_table.py examples/morgan_spec.json out/matrix
 python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 -o data/watch.json
 python3 render_chart.py examples/chart_lines_spec.json out/chart --theme dark --pdf
+python3 fetch_holdings.py QQQ -o data/ && python3 render_holdings.py data/QQQ_holdings.json out/qqq
 python3 csv_to_prices.py 0700.HK=tencent.csv --benchmark HSI=hsi.csv -o data/hk.json
 python3 quarterly_earnings.py AAPL --period FY2025Q3 -o out/aapl_q3
 ```

@@ -36,8 +36,10 @@ jobs:
           for m in neural9 holdings watchlist; do python3 render_table.py examples/${m}_spec.json examples/$m --no-png >/dev/null; done
           for m in morgan blackstone ibkr; do python3 render_table.py examples/${m}_spec.json examples/$m --no-png >/dev/null; done
           for m in chart_lines chart_multiples; do python3 render_chart.py examples/${m}_spec.json examples/$m --no-png >/dev/null; done
+          python3 examples/make_etf_holdings.py
+          for m in equity swap; do python3 render_holdings.py examples/etf_holdings_$m.json examples/etf_holdings_$m --no-png >/dev/null; done
           for q in 3 4; do python3 quarterly_earnings.py AAPL --period FY2025Q$q --facts examples/earnings/aapl_2025q${q}_facts.json --analysis examples/earnings/aapl_2025q${q}_analysis.json -o examples/earnings/aapl_2025q$q --no-png >/dev/null; done
-          git diff --exit-code -- 'examples/*.html' examples/sample_prices.json
+          git diff --exit-code -- 'examples/*.html' examples/sample_prices.json examples/etf_holdings_equity.json examples/etf_holdings_swap.json
           git diff --exit-code -- 'examples/earnings/*_en.html' 'examples/earnings/*_zh.html'
 
   # Hits Nasdaq's real API. It is allowed to fail (rate limits, outages) but the result is visible on every push.
@@ -62,3 +64,8 @@ jobs:
           PY
           echo '{"data": "p.json"}' > "$RUNNER_TEMP/spec.json"
           python3 render_chart.py "$RUNNER_TEMP/spec.json" "$RUNNER_TEMP/out" --no-png
+      - name: Fetch real ETF holdings from two issuers and render them
+        run: |
+          python3 fetch_holdings.py SPY QQQI -o "$RUNNER_TEMP/holdings/"
+          python3 render_holdings.py "$RUNNER_TEMP/holdings/SPY_holdings.json" "$RUNNER_TEMP/holdings/spy" --no-png
+          python3 render_holdings.py "$RUNNER_TEMP/holdings/QQQI_holdings.json" "$RUNNER_TEMP/holdings/qqqi" --no-png --langs en

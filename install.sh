@@ -114,6 +114,12 @@ else
         die "$REPORT_STYLE smoke test failed"
       fi
     done
+    # ETF holdings were added in 0.7; a pinned older tag does not have the renderer
+    if [ -f "$TARGET/render_holdings.py" ] && ! "$VPY" "$TARGET/render_holdings.py" "$TARGET/examples/etf_holdings_swap.json" "$SMOKE/etf" >/dev/null 2>>"$SMOKE/err"; then
+      cat "$SMOKE/err" >&2
+      rm -rf "$SMOKE"
+      die "ETF holdings smoke test failed"
+    fi
     if ! "$VPY" "$TARGET/quarterly_earnings.py" AAPL --period FY2025Q3 \
         --facts "$TARGET/examples/earnings/aapl_2025q3_facts.json" \
         --analysis "$TARGET/examples/earnings/aapl_2025q3_analysis.json" -o "$SMOKE/earnings" >/dev/null 2>>"$SMOKE/err"; then

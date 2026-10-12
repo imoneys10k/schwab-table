@@ -7,6 +7,13 @@ All notable changes. Versions follow the [releases](https://github.com/imoneys10
 
 ## Unreleased
 
+### Added
+- **ETF top holdings.** `fetch_holdings.py` reads an ETF's holdings from the issuer's own published file and `render_holdings.py` draws the top N (13 by default) as bars plus a table, with weight, cumulative weight, sector, the total of the rest and a footnote that states source, as-of date and rules. English and Traditional Chinese, PNG + HTML, light and dark themes, optional PDF.
+  - Issuers: State Street SPDR (SPY, XLK, ...), iShares (15 funds with verified product ids, e.g. IVV), Vanguard equity ETFs (VOO, ...), Invesco (QQQ, read through Playwright because the host rejects scripts), NEOS (QQQI), Roundhill (NCLD, DRAM, ...), Destiny (DXYZ, quarterly private-company exposure). Any other fund: `--csv` with a file you download.
+  - Swap-aware ranking for funds such as NCLD and DRAM: swaps are added to the shares of the same stock (matched by CUSIP/SEDOL); cash, money-market funds, T-bills and options are listed on a separate line and not ranked. `--mode lines` ranks every line as listed. `--merge-classes` adds share classes together.
+  - Weights are shown as the issuer reports them (no extra decimals), missing weights stay NA, and a warning is printed when the holdings date is more than 10 days old (Vanguard publishes monthly, DXYZ quarterly).
+  - Tests (`tests/test_holdings.py`, offline), fictional examples (`examples/etf_holdings_*`), SKILL.md / SKILL.en.md sections, README and website entries, an installer smoke test, and a live two-issuer check in CI.
+
 ### Changed
 - Docs no longer present the project as Claude-only: the banner, social card and website tag read "AI agent skills", the badge is "Agent Skills", and the intro, flow chart and install notes say the skills are built for Claude Code and usable from Codex and other coding agents.
 

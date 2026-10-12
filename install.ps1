@@ -142,6 +142,9 @@ if ($SkipDeps) {
     foreach ($reportStyle in @("morgan", "blackstone", "ibkr")) {
       Invoke-Checked $vpy @((Join-Path $Target "render_table.py"), (Join-Path $Target ("examples\{0}_spec.json" -f $reportStyle)), (Join-Path $smoke $reportStyle)) | Out-Null
     }
+    if (Test-Path (Join-Path $Target "render_holdings.py")) {  # ETF holdings were added in 0.7; a pinned older tag does not have it
+      Invoke-Checked $vpy @((Join-Path $Target "render_holdings.py"), (Join-Path $Target "examples\etf_holdings_swap.json"), (Join-Path $smoke "etf")) | Out-Null
+    }
     Invoke-Checked $vpy @((Join-Path $Target "quarterly_earnings.py"), "AAPL", "--period", "FY2025Q3", "--facts", (Join-Path $Target "examples\earnings\aapl_2025q3_facts.json"), "--analysis", (Join-Path $Target "examples\earnings\aapl_2025q3_analysis.json"), "-o", (Join-Path $smoke "earnings")) | Out-Null
   } catch { $ok = $false; Write-Host $_.Exception.Message }
   Remove-Item -Recurse -Force $smoke -ErrorAction SilentlyContinue

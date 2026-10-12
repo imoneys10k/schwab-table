@@ -1,0 +1,135 @@
+{
+ "symbol": "EXSW",
+ "name": "Example Swap-Enhanced ETF",
+ "issuer": "Synthetic sample",
+ "issuer_key": "sample",
+ "as_of": "2026-10-02",
+ "source": "Synthetic sample data (not a real fund)",
+ "source_url": "",
+ "weight_basis": "% of net assets",
+ "holdings": [
+  {
+   "ticker": "ACRB",
+   "name": "Acme Robotics Inc",
+   "weight": 8.0,
+   "sector": null,
+   "kind": "equity",
+   "id": "ACRB0001"
+  },
+  {
+   "ticker": "STRK",
+   "name": "Stark Aerospace Corp",
+   "weight": 6.0,
+   "sector": null,
+   "kind": "equity",
+   "id": "STRK0001"
+  },
+  {
+   "ticker": "HOOL",
+   "name": "Hooli Cloud Inc",
+   "weight": 5.0,
+   "sector": null,
+   "kind": "equity",
+   "id": "HOOL0001"
+  },
+  {
+   "ticker": "INSY",
+   "name": "Initech Systems Inc",
+   "weight": 4.0,
+   "sector": null,
+   "kind": "equity",
+   "id": "INSY0001"
+  },
+  {
+   "ticker": "UMBB",
+   "name": "Umbrella Biotech Inc",
+   "weight": 3.0,
+   "sector": null,
+   "kind": "equity",
+   "id": "UMBB0001"
+  },
+  {
+   "ticker": "CYDN",
+   "name": "Cyberdyne Labs Inc",
+   "weight": 2.0,
+   "sector": null,
+   "kind": "equity",
+   "id": "CYDN0001"
+  },
+  {
+   "ticker": "",
+   "name": "Acme Robotics Inc",
+   "weight": 11.0,
+   "sector": null,
+   "kind": "swap",
+   "id": "ACRB0001 TRS 1",
+   "underlying_id": "ACRB0001"
+  },
+  {
+   "ticker": "",
+   "name": "Acme Robotics Inc",
+   "weight": 9.0,
+   "sector": null,
+   "kind": "swap",
+   "id": "ACRB0001 TRS 2",
+   "underlying_id": "ACRB0001"
+  },
+  {
+   "ticker": "",
+   "name": "Stark Aerospace Corp",
+   "weight": 8.0,
+   "sector": null,
+   "kind": "swap",
+   "id": "STRK0001 TRS 1",
+   "underlying_id": "STRK0001"
+  },
+  {
+   "ticker": "",
+   "name": "Stark Aerospace Corp",
+   "weight": 6.0,
+   "sector": null,
+   "kind": "swap",
+   "id": "STRK0001 TRS 2",
+   "underlying_id": "STRK0001"
+  },
+  {
+   "ticker": "",
+   "name": "Wayne Industries Inc",
+   "weight": 12.0,
+   "sector": null,
+   "kind": "swap",
+   "id": "WAYN0001 TRS 1",
+   "underlying_id": "WAYN0001"
+  },
+  {
+   "ticker": "",
+   "name": "United States Treasury Bill 12/03/2026",
+   "weight": 38.0,
+   "sector": null,
+   "kind": "treasury",
+   "id": "TBILL1"
+  },
+  {
+   "ticker": "",
+   "name": "Example Government Money Market Fund",
+   "weight": 6.0,
+   "sector": null,
+   "kind": "cash",
+   "id": "MMF0001"
+  },
+  {
+   "ticker": "",
+   "name": "Cash & Other",
+   "weight": -18.0,
+   "sector": null,
+   "kind": "cash",
+   "id": "Cash&Other"
+  }
+ ],
+ "warnings": [],
+ "retrieved_at": "2026-10-02T00:00:00+00:00",
+ "note": {
+  "en": "Hypothetical example with fictional companies; not a real fund.",
+  "zh": "虚构示例，公司均为虚构，并非真实基金。"
+ }
+}
