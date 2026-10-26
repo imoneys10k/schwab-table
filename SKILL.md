@@ -1,6 +1,6 @@
 ---
 name: schwab-performance-table
-description: 把股票清單、券商持倉截圖或現成的漲跌幅/排名數據，做成 Charles Schwab 研報風格的業績表（排名表、持倉盈虧表、自選股表）；也能畫若干標的（最多 9 只）在任意時間段的走勢圖，含回撤、基準對比、對數刻度（中英雙語 PNG + HTML）。還能把 ETF 的前 N 大持倉（默認 13）做成條形圖加表格，如 QQQ、VOO、SPY、IVV、QQQI、NCLD。只要用戶提到業績表、持倉表、自選股表、走勢圖、漲幅對比、回撤、ETF 前幾大持倉／重倉股，或要做研報風格的股票表格/圖、公衆號或 PPT 裏的股票配圖，就使用這個 skill，即使沒有明確提到 Schwab。
+description: 把股票清單、券商持倉截圖或現成的漲跌幅/排名數據，做成 Charles Schwab 研報風格的業績表（排名表、持倉盈虧表、自選股表）；也能畫若干標的（最多 9 只）在任意時間段的走勢圖，含回撤、基準對比、對數刻度（中英雙語 PNG + HTML），還能做成動態 GIF、MP4 或 iPhone 實況照片（Live Photo）。還能把 ETF 的前 N 大持倉（默認 13）做成條形圖加表格，如 QQQ、VOO、SPY、IVV、QQQI、NCLD。只要用戶提到業績表、持倉表、自選股表、走勢圖、漲幅對比、回撤、ETF 前幾大持倉／重倉股、把走勢圖做成動圖／GIF／視頻／實況圖，或要做研報風格的股票表格/圖、公衆號或 PPT 裏的股票配圖，就使用這個 skill，即使沒有明確提到 Schwab。
 ---
 
 # Schwab 風格股票業績表
@@ -262,6 +262,18 @@ spec 格式：
 ```
 除 `data` 外都是可選項。`start`、`end` 不寫時用數據文件的範圍；`note` 會放在腳註開頭（示例裏用來標註「虛構示例」）。`benchmarks` 選擇並排序數據文件裏的基準；`benchmark_name` 可以寫成 `{"en": ..., "zh": ...}`（用於第一個基準），也可以按代碼分別寫；`colors` 用 `#rrggbb` 覆蓋個別線條的顏色（默認配色已通過色盲可分辨性檢查，改色後自行保證對比度）。命令行參數：`--langs en` 只出一種語言，`--no-png` 只寫 HTML，`--pdf` 另存矢量 PDF，`--scale 3` 提高 PNG 清晰度（默認 2），`--theme dark` 輸出深色主題（表格和圖都支持）。HTML 文件裏鼠標懸停在圖上會顯示當天各條線的數值。
 
+## 動態圖（GIF / MP4 / 實況照片）
+用戶要「動圖」「GIF」「會動的走勢圖」「實況照片 / 實況圖 / Live Photo」「做成視頻」時，用**同一份 spec** 運行：
+```bash
+python3 render_motion.py spec.json out/watch                      # 默認三種都出
+python3 render_motion.py spec.json out/watch --formats live --langs zh
+```
+- **效果：** 線從左到右畫出來，線頭帶光點；線尾標註跟着線頭移動、數值實時跳動；`lines` 版式的光標上方顯示當前日期，彙總表的回報、波動率、最大回撤和最新價按光標所在日實時計算；畫完後淡入到靜態圖。**最後一幀與 `render_chart.py` 的 PNG 逐像素一致**，所以數字口徑不變
+- **輸出：** `gif`（`out/watch_zh.gif`，循環播放，寬 760 px）、`mp4`（`out/watch_zh.mp4`，H.264，1520 px 寬）、`live`（`out/watch_zh_live.jpg` + `out/watch_zh_live.mov`，約 3 秒）。實況照片要**兩個文件一起**AirDrop 到 iPhone，或一起拖進「照片」，纔會合成一張；只發其中一個就是普通圖片 / 視頻。小紅書等支持實況圖的平臺從相冊選這張即可
+- **參數：** `--formats gif,mp4,live`、`--langs`、`--theme dark`、`--draw 3.6`（畫線秒數）、`--hold 1.6`（畫完停留秒數）、`--fps 30`、`--scale 2`、`--gif-width 760`（GIF 越寬文件越大，1.5 MB 左右是常見上限）
+- **依賴：** 需要 **ffmpeg**（macOS `brew install ffmpeg`，Windows `winget install ffmpeg`，Debian/Ubuntu `sudo apt install ffmpeg`）。沒有時腳本會提示，不要改用其他工具硬做
+- 交付前抽看一幀（例如用 ffmpeg 截第 2 秒）確認線頭、標註和表格正常；實況照片的配對標識已寫入，無需 exiftool
+
 ## 自查清單（走勢圖）
 - [ ] 標的不超過 9 只；時間段與用戶要求一致（沒說就是年初至今）
 - [ ] 數據來自 `fetch_prices.py` 的允許接口；Yahoo 來源、各幣種、各標的最後交易日和數據警告均如實顯示；缺失標的已告知用戶
@@ -270,6 +282,7 @@ spec 格式：
 - [ ] 用 ETF 做基準時，腳註寫明它是替代；用對數刻度時，副標題寫明
 - [ ] 彙總表按回報降序，基準行加粗，數字與線尾標註一致
 - [ ] 滬深未復權風險已提示；Yahoo 未被稱爲官方來源；跨幣種漲跌幅註明未換匯；用戶 CSV 如實註明，總回報圖只用於用戶提供的股息調整價
+- [ ] 動態圖：最後一幀與靜態圖一致；實況照片的 `.jpg` 和 `.mov` 一起交付並說明要一起傳到 iPhone
 
 
 ---

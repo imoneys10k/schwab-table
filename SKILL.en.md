@@ -253,6 +253,18 @@ The user wants to see how one or more symbols moved over a period, their cumulat
 ```
 Everything except `data` is optional. Without `start` / `end` the data file's range is used; `note` is put at the start of the footnote (the examples use it to say "Hypothetical example"). `benchmarks` selects and orders the benchmarks in the data file; `benchmark_name` can be `{"en": ..., "zh": ...}` (for the first benchmark) or given per symbol; `colors` overrides individual line colours with `#rrggbb` (the default palette is checked for colour-blind separability, so check contrast yourself if you change it). Command-line options: `--langs en` renders one language, `--no-png` writes HTML only, `--pdf` also saves a vector PDF, `--scale 3` raises the PNG resolution (default 2), `--theme dark` renders a dark theme (tables and charts). In the HTML files, hovering over a chart shows every line's value for that day.
 
+## Animated charts (GIF / MP4 / Live Photo)
+When the user asks for an animated chart, a GIF, a moving chart, a video, or a Live Photo, run **the same spec** through:
+```bash
+python3 render_motion.py spec.json out/watch                      # all three formats
+python3 render_motion.py spec.json out/watch --formats live --langs zh
+```
+- **What it does:** the lines draw from left to right with a glowing head; the line-end labels ride along with live values; in the `lines` layout the current date sits above the cursor and the summary table (return, volatility, max drawdown, last price) is computed as of the cursor; at the end it fades into the static chart. **The last frame is pixel-identical to the `render_chart.py` PNG**, so the numbers do not change
+- **Output:** `gif` (`out/watch_zh.gif`, looping, 760 px wide), `mp4` (`out/watch_zh.mp4`, H.264, 1520 px wide), `live` (`out/watch_zh_live.jpg` + `out/watch_zh_live.mov`, about 3 s). A Live Photo needs **both files together**: AirDrop both to an iPhone or drag both into Photos; either file alone is just a picture or a video. Apps that accept Live Photos (Xiaohongshu, for one) then take it from the photo library
+- **Options:** `--formats gif,mp4,live`, `--langs`, `--theme dark`, `--draw 3.6` (seconds of drawing), `--hold 1.6` (seconds on the finished chart), `--fps 30`, `--scale 2`, `--gif-width 760` (wider GIFs grow quickly; about 1.5 MB is a common limit)
+- **Requires ffmpeg** (macOS `brew install ffmpeg`, Windows `winget install ffmpeg`, Debian/Ubuntu `sudo apt install ffmpeg`). If it is missing the script says so; do not improvise with other tools
+- Before delivering, look at one frame (e.g. ffmpeg at 2 s) to check heads, labels and table; the Live Photo pairing identifier is written by the script itself, no exiftool needed
+
 ## Checklist (charts)
 - [ ] At most 9 symbols; the period matches the request (year to date if none was given)
 - [ ] Data comes from allowed endpoints; Yahoo, currency, last trading dates and warnings are labelled; missing symbols were reported
@@ -261,6 +273,7 @@ Everything except `data` is optional. Without `start` / `end` the data file's ra
 - [ ] When an ETF is the benchmark the footnote says it is a proxy; when a log scale is used the subtitle says so
 - [ ] Summary table sorted by return descending, benchmark row bold, numbers consistent with the line-end labels
 - [ ] A-share unadjusted-price risks and local currencies are disclosed; Yahoo is not called official; total-return charts use user-supplied dividend-adjusted closes
+- [ ] Animated: the last frame matches the static chart; a Live Photo is delivered as its `.jpg` and `.mov` together, with a note to send both to the iPhone
 
 
 ## ETF top-holdings mode

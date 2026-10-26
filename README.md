@@ -31,6 +31,7 @@ Two agent skills in one repository, built for Claude Code and usable from Codex 
 <tr><td width="50%" align="center"><img src="examples/ibkr_zh.png" alt="IBKR-style holdings"><br><sub><b>IBKR-style holdings</b> · 繁體中文</sub></td><td width="50%" align="center"><img src="examples/earnings/aapl_2025q3_zh.png" alt="HSBC quarterly earnings, AAPL Q3"><br><sub><b>HSBC quarterly earnings, AAPL Q3</b> · 繁體中文</sub></td></tr>
 <tr><td width="50%" align="center"><img src="examples/earnings/aapl_2025q4_zh.png" alt="HSBC quarterly earnings, AAPL Q4"><br><sub><b>HSBC quarterly earnings, AAPL Q4</b> · 繁體中文</sub></td><td width="50%" align="center"><img src="examples/holdings_en.png" alt="Holdings table"><br><sub><b>Holdings table</b> · EN</sub></td></tr>
 <tr><td width="50%" align="center"><img src="examples/etf_holdings_equity_en.png" alt="ETF top 13 holdings"><br><sub><b>ETF top 13 holdings</b> · EN</sub></td><td width="50%" align="center"><img src="examples/etf_holdings_swap_zh.png" alt="ETF with swap exposure"><br><sub><b>ETF with swap exposure</b> · 繁體中文</sub></td></tr>
+<tr><td width="50%" align="center"><img src="examples/chart_lines_motion_en.gif" alt="Animated line chart (GIF)"><br><sub><b>Animated line chart (GIF)</b> · EN</sub></td><td width="50%" align="center"><img src="examples/chart_multiples_motion_zh.gif" alt="Animated small multiples (GIF)"><br><sub><b>Animated small multiples (GIF)</b> · 繁體中文</sub></td></tr>
 </table>
 
 <sub>The earnings examples use Apple's official filings and the ranking table a public Charles Schwab chart. Everything else uses fictional companies and synthetic data.</sub>
@@ -156,6 +157,7 @@ Chart up to 9 symbols over any period (default: year to date) with a drawdown pa
 - **Benchmark:** SPY by default (labelled as a proxy for the S&P 500), up to two benchmarks (`--benchmark SPY,COMP`), or `--benchmark none`.
 - **Axis:** one y-axis, indexed to 100 at the start. It switches to a log scale automatically when the range is wide (or set `y_scale`).
 - **Options:** `--theme dark`, `--pdf`, custom line colours, and hover tooltips in the HTML files.
+- **Animated:** `render_motion.py` takes the same spec and draws the chart left to right, with the line-end labels, the table and the date counting along, as a GIF, an MP4 and an Apple Live Photo (a `.jpg` + `.mov` pair to AirDrop to an iPhone). The last frame is the static chart. Needs ffmpeg.
 
 ```bash
 python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 -o data/watch.json
@@ -224,6 +226,7 @@ python3 quarterly_earnings.py AAPL --period FY2025Q3 -o out/aapl_q3
 - `render_table.py`, `institutional_tables.py`, `prices_to_table.py`: Table renderer and its four styles; builds Morgan / Blackstone specs from fetched prices
 - `fetch_prices.py`, `csv_to_prices.py`: Daily closes from Nasdaq, Shanghai/Shenzhen and Yahoo; conversion of your own CSV files
 - `render_chart.py`, `render_common.py`: Chart renderer; shared themes and PNG / PDF output
+- `render_motion.py`: Animated charts: GIF, MP4 and Apple Live Photo (needs ffmpeg)
 - `fetch_holdings.py`, `render_holdings.py`: ETF holdings from the issuer's own file (SPDR, iShares, Vanguard, NEOS, Roundhill, Tema, or your CSV) and the top-N renderer
 - `quarterly_earnings.py`, `earnings_core.py`, `earnings_sources.py`, `render_earnings.py`: Earnings command, audited arithmetic, source adapters and the HSBC-style renderer
 - `localization.py`, `fonts.py`, `fonts/`: Traditional Chinese conversion; bundled fonts embedded in the HTML (licences included)

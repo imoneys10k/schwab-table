@@ -29,7 +29,8 @@ SKILL_DOC = {"en": "SKILL.en.md", "zh": "SKILL.md", "ja": "SKILL.en.md", "fr": "
 GALLERY = ["examples/neural9_en.png", "examples/watchlist_zh.png", "examples/chart_lines_en.png", "examples/chart_multiples_zh.png",
            "examples/morgan_zh.png", "examples/blackstone_zh.png", "examples/ibkr_zh.png",
            "examples/earnings/aapl_2025q3_zh.png", "examples/earnings/aapl_2025q4_zh.png", "examples/holdings_en.png",
-           "examples/etf_holdings_equity_en.png", "examples/etf_holdings_swap_zh.png"]
+           "examples/etf_holdings_equity_en.png", "examples/etf_holdings_swap_zh.png",
+           "examples/chart_lines_motion_en.gif", "examples/chart_multiples_motion_zh.gif"]
 STYLE_EXAMPLES = ["neural9", "holdings", "watchlist", "morgan", "blackstone", "ibkr"]
 
 BADGES = " ".join([
@@ -203,7 +204,7 @@ def site():
     template = (Path(__file__).resolve().parent / "site_template.html").read_text(encoding="utf-8")
     js = json.dumps(site_data(), ensure_ascii=False).replace("</", "<\\/")
     docs_links = " · ".join(f'<a href="{BLOB}{README[l]}">{LANG_NAME[l]}</a>' for l in LANGS)
-    return (template.replace("/*DATA*/", js).replace("/*IMGS*/", json.dumps([Path(g).stem for g in GALLERY]))
+    return (template.replace("/*DATA*/", js).replace("/*IMGS*/", json.dumps([Path(g).name for g in GALLERY]))
             .replace("<!--DOCS_LINKS-->", docs_links))
 
 

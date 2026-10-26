@@ -5,6 +5,14 @@ All notable changes. Versions follow the [releases](https://github.com/imoneys10
 
 
 
+## 0.8.0 (2026-10-26)
+
+### Added
+- **Animated charts.** `render_motion.py` takes a `render_chart.py` spec and writes the chart as a looping GIF, an H.264 MP4 and an Apple Live Photo (`_live.jpg` + `_live.mov`). The lines draw from left to right with a glowing head, the line-end labels ride along with live values, the current date sits above the cursor, and the summary table (return, volatility, max drawdown, last price) is recomputed as of the cursor; the drawdown panel and the small multiples animate the same way. It then fades into the static chart: the last frame is pixel-identical to the `render_chart.py` PNG. Light and dark themes, English and Traditional Chinese, `--draw`, `--hold`, `--fps`, `--scale`, `--gif-width`.
+  - Live Photo pairing is written in plain Python, so it works on macOS, Linux and Windows without exiftool or PyObjC: an Apple MakerNote (tag 17, the content identifier) in the JPEG, laid out exactly as macOS ImageIO writes it, and a QuickTime `moov/meta` `mdta` key `com.apple.quicktime.content.identifier` in the MOV. Both were read back with ImageIO and AVFoundation during development.
+  - Needs ffmpeg; the installers print a hint when it is missing and every other feature works without it.
+  - Tests (`tests/test_motion.py`, offline): the EXIF / MakerNote bytes, the MOV atoms, the frame timeline, and the path and row order the frame script depends on. Two animated examples in the gallery.
+
 ## 0.7.0 (2026-10-12)
 
 ### Added

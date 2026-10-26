@@ -129,7 +129,7 @@ function render(){
   $("cta1").textContent = d.cta1; $("cta2").textContent = d.cta2; $("cta3").textContent = d.cta3;
   $("t_features").textContent = d.t_features; $("t_gallery").textContent = d.t_gallery; $("t_install").textContent = d.t_install;
   $("cards").innerHTML = d.cards.map(function(c){return '<div class="card"><div class="e">'+c[0]+'</div><h3>'+esc(c[1])+'</h3><p>'+esc(c[2])+'</p></div>'}).join("");
-  $("gal").innerHTML = IMGS.map(function(n,i){return '<figure><img src="img/'+n+'.png" alt="'+esc(d.gallery[i][0])+'" loading="lazy"><figcaption><b>'+esc(d.gallery[i][0])+'</b> · '+esc(d.gallery[i][1])+'</figcaption></figure>'}).join("");
+  $("gal").innerHTML = IMGS.map(function(n,i){return '<figure><img src="img/'+n+'" alt="'+esc(d.gallery[i][0])+'" loading="lazy"><figcaption><b>'+esc(d.gallery[i][0])+'</b> · '+esc(d.gallery[i][1])+'</figcaption></figure>'}).join("");
   $("gnote").textContent = d.gallery_note;
   $("t_modes").textContent = d.t_modes;
   $("chips").innerHTML = d.chips.map(function(m){return '<div class="chip"><b>'+esc(m[0])+'</b><span>'+esc(m[1])+'</span></div>'}).join("");
