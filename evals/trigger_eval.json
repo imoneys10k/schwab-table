@@ -78,5 +78,25 @@
  {
   "query": "帮我把这份财报里的现金流数据整理成一个汇总表，导出 Excel",
   "should_trigger": false
+ },
+ {
+  "query": "把 NVDA 和 MU 今年的走势图做成动图，发小红书用",
+  "should_trigger": true
+ },
+ {
+  "query": "make an animated GIF of AAPL vs the S&P 500 this year, research-note style",
+  "should_trigger": true
+ },
+ {
+  "query": "这几只股票的走势做成 iPhone 实况图",
+  "should_trigger": true
+ },
+ {
+  "query": "QQQ 前十大持仓做成一个会动的 GIF",
+  "should_trigger": true
+ },
+ {
+  "query": "turn my watchlist performance table into an animated GIF for a slide",
+  "should_trigger": true
  }
 ]

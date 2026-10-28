@@ -31,6 +31,8 @@ Two agent skills in one repository, built for Claude Code and usable from Codex 
 <tr><td width="50%" align="center"><img src="examples/ibkr_zh.png" alt="IBKR-style holdings"><br><sub><b>IBKR-style holdings</b> · 繁體中文</sub></td><td width="50%" align="center"><img src="examples/earnings/aapl_2025q3_zh.png" alt="HSBC quarterly earnings, AAPL Q3"><br><sub><b>HSBC quarterly earnings, AAPL Q3</b> · 繁體中文</sub></td></tr>
 <tr><td width="50%" align="center"><img src="examples/earnings/aapl_2025q4_zh.png" alt="HSBC quarterly earnings, AAPL Q4"><br><sub><b>HSBC quarterly earnings, AAPL Q4</b> · 繁體中文</sub></td><td width="50%" align="center"><img src="examples/holdings_en.png" alt="Holdings table"><br><sub><b>Holdings table</b> · EN</sub></td></tr>
 <tr><td width="50%" align="center"><img src="examples/etf_holdings_equity_en.png" alt="ETF top 13 holdings"><br><sub><b>ETF top 13 holdings</b> · EN</sub></td><td width="50%" align="center"><img src="examples/etf_holdings_swap_zh.png" alt="ETF with swap exposure"><br><sub><b>ETF with swap exposure</b> · 繁體中文</sub></td></tr>
+<tr><td width="50%" align="center"><img src="examples/chart_lines_motion_en.gif" alt="Animated line chart (GIF)"><br><sub><b>Animated line chart (GIF)</b> · EN</sub></td><td width="50%" align="center"><img src="examples/chart_multiples_motion_zh.gif" alt="Animated small multiples (GIF)"><br><sub><b>Animated small multiples (GIF)</b> · 繁體中文</sub></td></tr>
+<tr><td width="50%" align="center"><img src="examples/etf_holdings_motion_en.gif" alt="Animated ETF holdings (GIF)"><br><sub><b>Animated ETF holdings (GIF)</b> · EN</sub></td><td width="50%" align="center"><img src="examples/watchlist_motion_zh.gif" alt="Animated watchlist table (GIF)"><br><sub><b>Animated watchlist table (GIF)</b> · 繁體中文</sub></td></tr>
 </table>
 
 <sub>The earnings examples use Apple's official filings and the ranking table a public Charles Schwab chart. Everything else uses fictional companies and synthetic data.</sub>
@@ -133,7 +135,7 @@ python3 prices_to_table.py data/prices.json data/matrix.json --style morgan   # 
 python3 render_table.py data/matrix.json out/matrix
 ```
 
-Each template has explicit column schemas; passing a five-column watchlist to a seven- or nine-column report does not invent missing facts. Schwab tables and charts keep light and dark modes; the other templates are calibrated for white paper. See the [template guide](references/institutional-tables.md) for schemas, source samples and font substitutions.
+Each template has explicit column schemas; passing a five-column watchlist to a seven- or nine-column report does not invent missing facts. Schwab tables and charts keep light and dark modes; the other templates are calibrated for white paper. See the [template guide](references/institutional-tables.md) for schemas, source samples and font substitutions. All four layouts can be animated with `render_motion.py` (rows fade in and numbers count up; GIF, MP4 or Live Photo).
 
 ## 📊 Price charts
 
@@ -156,6 +158,7 @@ Chart up to 9 symbols over any period (default: year to date) with a drawdown pa
 - **Benchmark:** SPY by default (labelled as a proxy for the S&P 500), up to two benchmarks (`--benchmark SPY,COMP`), or `--benchmark none`.
 - **Axis:** one y-axis, indexed to 100 at the start. It switches to a log scale automatically when the range is wide (or set `y_scale`).
 - **Options:** `--theme dark`, `--pdf`, custom line colours, and hover tooltips in the HTML files.
+- **Animated:** `render_motion.py` takes the same spec and draws the chart left to right, with the line-end labels, the table and the date counting along, as a GIF, an MP4 and an Apple Live Photo (a `.jpg` + `.mov` pair to AirDrop to an iPhone). The last frame is the static chart. Needs ffmpeg.
 
 ```bash
 python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 -o data/watch.json
@@ -183,6 +186,7 @@ Chart an ETF's largest holdings (13 by default, `--top N` changes it) with weigh
 - **Honest dates:** the as-of date is the day the issuer's prices are from (NEOS and Roundhill stamp their files with the next trading day; the tool shows the pricing day and says so in the footnote, and the weekly live check verifies it against official closes; Vanguard publishes monthly), with a warning when it is more than 10 days old. Weights are shown as reported; a missing weight is NA, never zero.
 - **Terms of use:** only public files and pages are read, and each path is allowed by the host's robots.txt. Invesco and Destiny forbid automated access, so those funds are import-only (`--csv`). Terms were checked for Invesco, Destiny and SSGA only, so read the others' terms before commercial use.
 - **Options:** `--top N`, `--by sector|name` (for funds with thousands of lines, such as bond ETFs), `--names names.json` for local-language names, `--theme dark`, `--pdf`, `--langs`.
+- **Animated:** `render_motion.py` takes the same holdings file and grows the bars one after another, with the weights and the cumulative column counting up, as a GIF, an MP4 or a Live Photo; the last frame is the static chart.
 
 ```bash
 python3 fetch_holdings.py QQQ NCLD -o data/                  # data/QQQ_holdings.json, data/NCLD_holdings.json
@@ -224,6 +228,7 @@ python3 quarterly_earnings.py AAPL --period FY2025Q3 -o out/aapl_q3
 - `render_table.py`, `institutional_tables.py`, `prices_to_table.py`: Table renderer and its four styles; builds Morgan / Blackstone specs from fetched prices
 - `fetch_prices.py`, `csv_to_prices.py`: Daily closes from Nasdaq, Shanghai/Shenzhen and Yahoo; conversion of your own CSV files
 - `render_chart.py`, `render_common.py`: Chart renderer; shared themes and PNG / PDF output
+- `render_motion.py`: Animated charts, tables and ETF holdings: GIF, MP4 and Apple Live Photo (needs ffmpeg)
 - `fetch_holdings.py`, `render_holdings.py`: ETF holdings from the issuer's own file (SPDR, iShares, Vanguard, NEOS, Roundhill, Tema, or your CSV) and the top-N renderer
 - `quarterly_earnings.py`, `earnings_core.py`, `earnings_sources.py`, `render_earnings.py`: Earnings command, audited arithmetic, source adapters and the HSBC-style renderer
 - `localization.py`, `fonts.py`, `fonts/`: Traditional Chinese conversion; bundled fonts embedded in the HTML (licences included)

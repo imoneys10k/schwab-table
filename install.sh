@@ -142,6 +142,9 @@ fi
 if [ "$SKIP_DEPS" -eq 0 ] && [ "$(uname -s)" = "Linux" ] && command -v fc-list >/dev/null 2>&1 && [ -z "$(fc-list :lang=zh 2>/dev/null)" ]; then
   echo "hint: no Chinese font found, so the Chinese version would render as boxes. Install one, e.g. on Debian/Ubuntu: sudo apt install fonts-noto-cjk" >&2
 fi
+if [ "$SKIP_DEPS" -eq 0 ] && ! command -v ffmpeg >/dev/null 2>&1; then
+  echo "hint: ffmpeg not found. Everything works without it except animated charts and tables (render_motion.py: GIF, MP4, Live Photo). Install it with: brew install ffmpeg (macOS) or sudo apt install ffmpeg (Debian/Ubuntu)" >&2
+fi
 
 REGISTER_PY="${VPY:-}"
 if [ -z "$REGISTER_PY" ]; then REGISTER_PY="$(command -v python3 || command -v python || true)"; fi

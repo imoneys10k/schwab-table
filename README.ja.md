@@ -31,6 +31,8 @@
 <tr><td width="50%" align="center"><img src="examples/ibkr_zh.png" alt="IBKR 風の保有明細"><br><sub><b>IBKR 風の保有明細</b> · 繁體中文</sub></td><td width="50%" align="center"><img src="examples/earnings/aapl_2025q3_zh.png" alt="HSBC 風の四半期決算：AAPL 第 3 四半期"><br><sub><b>HSBC 風の四半期決算：AAPL 第 3 四半期</b> · 繁體中文</sub></td></tr>
 <tr><td width="50%" align="center"><img src="examples/earnings/aapl_2025q4_zh.png" alt="HSBC 風の四半期決算：AAPL 第 4 四半期"><br><sub><b>HSBC 風の四半期決算：AAPL 第 4 四半期</b> · 繁體中文</sub></td><td width="50%" align="center"><img src="examples/holdings_en.png" alt="保有銘柄表"><br><sub><b>保有銘柄表</b> · EN</sub></td></tr>
 <tr><td width="50%" align="center"><img src="examples/etf_holdings_equity_en.png" alt="ETF 上位 13 銘柄"><br><sub><b>ETF 上位 13 銘柄</b> · EN</sub></td><td width="50%" align="center"><img src="examples/etf_holdings_swap_zh.png" alt="スワップ・エクスポージャーのある ETF"><br><sub><b>スワップ・エクスポージャーのある ETF</b> · 繁體中文</sub></td></tr>
+<tr><td width="50%" align="center"><img src="examples/chart_lines_motion_en.gif" alt="動く推移チャート（GIF）"><br><sub><b>動く推移チャート（GIF）</b> · EN</sub></td><td width="50%" align="center"><img src="examples/chart_multiples_motion_zh.gif" alt="動くスモールマルチプル（GIF）"><br><sub><b>動くスモールマルチプル（GIF）</b> · 繁體中文</sub></td></tr>
+<tr><td width="50%" align="center"><img src="examples/etf_holdings_motion_en.gif" alt="動く ETF 上位銘柄（GIF）"><br><sub><b>動く ETF 上位銘柄（GIF）</b> · EN</sub></td><td width="50%" align="center"><img src="examples/watchlist_motion_zh.gif" alt="動くウォッチリスト表（GIF）"><br><sub><b>動くウォッチリスト表（GIF）</b> · 繁體中文</sub></td></tr>
 </table>
 
 <sub>決算の例は Apple の公式資料、ランキング表は Charles Schwab の公開チャートを使用しています。それ以外は架空の企業と合成データです。</sub>
@@ -133,7 +135,7 @@ python3 prices_to_table.py data/prices.json data/matrix.json --style morgan   # 
 python3 render_table.py data/matrix.json out/matrix
 ```
 
-各テンプレートは列の構成が明示されています。5 列のウォッチリストを 7 列や 9 列のレイアウトに渡しても、足りない項目を作り出すことはありません。Schwab の表とチャートはライト／ダークの両方に対応し、他のテンプレートは白い紙を基準に調整してあります。列構成、出典サンプル、フォント代替は[テンプレートガイド](references/institutional-tables.md)を参照してください。
+各テンプレートは列の構成が明示されています。5 列のウォッチリストを 7 列や 9 列のレイアウトに渡しても、足りない項目を作り出すことはありません。Schwab の表とチャートはライト／ダークの両方に対応し、他のテンプレートは白い紙を基準に調整してあります。列構成、出典サンプル、フォント代替は[テンプレートガイド](references/institutional-tables.md)を参照してください。4 つのレイアウトはすべて `render_motion.py` でアニメーションにできます（行が順にフェードインし、数値がカウントアップ。GIF、MP4、Live Photo）。
 
 ## 📊 推移チャート
 
@@ -156,6 +158,7 @@ python3 render_table.py data/matrix.json out/matrix
 - **ベンチマーク：** 既定は SPY（S&P 500 の代用と明記）。最大 2 つまで（`--benchmark SPY,COMP`）、`--benchmark none` で非表示。
 - **軸：** Y 軸は 1 本だけで、開始時点を 100 に指数化します。値幅が大きいときは自動で対数目盛に切り替わります（`y_scale` で指定も可能）。
 - **オプション：** `--theme dark`、`--pdf`、線の色の指定、HTML でのマウスオーバー表示。
+- **アニメーション：** `render_motion.py` は同じ spec を使い、線を左から右へ描きながら線端のラベル、サマリー表、日付を動かして、GIF、MP4、Apple の Live Photo（iPhone に AirDrop する `.jpg` と `.mov` の組）を出力します。最後のフレームは静止画と同じです。ffmpeg が必要です。
 
 ```bash
 python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 -o data/watch.json
@@ -183,6 +186,7 @@ ETF の上位保有銘柄（既定は 13 銘柄、`--top N` で変更）を、�
 - **日付は正直に：** 保有日は運用会社の価格がどの日のものかを示します（NEOS と Roundhill はファイルに翌営業日の日付を付けるため、評価日を表示して注記し、毎週のライブチェックが公式終値で照合します。Vanguard は月次）。10 日より古いと警告を付けます。ウェイトは開示どおりに表示し、欠損は NA で 0 とは扱いません。
 - **利用規約：** 読み取るのは公開されているファイルとページだけで、各パスはそのサイトの robots.txt で許可されています。Invesco と Destiny は自動アクセスを禁じているため、これらのファンドは取り込み専用（`--csv`）です。規約を確認したのは Invesco・Destiny・SSGA だけなので、商用で使う前に他の運用会社の規約も読んでください。
 - **オプション：** `--top N`、`--by sector|name`（数千行のファンド、例：債券 ETF）、`--names names.json`（現地語の名称）、`--theme dark`、`--pdf`、`--langs`。
+- **アニメーション：** `render_motion.py` は同じ保有ファイルから、棒を順に伸ばしながらウェイトと累計列をカウントアップし、GIF、MP4、Live Photo を出力します。最後のフレームは静止画と同じです。
 
 ```bash
 python3 fetch_holdings.py QQQ NCLD -o data/                  # data/QQQ_holdings.json, data/NCLD_holdings.json
@@ -224,6 +228,7 @@ python3 quarterly_earnings.py AAPL --period FY2025Q3 -o out/aapl_q3
 - `render_table.py`、`institutional_tables.py`、`prices_to_table.py`: 表のレンダラーと 4 つのスタイル。取得した価格から Morgan / Blackstone の spec を作成
 - `fetch_prices.py`、`csv_to_prices.py`: Nasdaq・上海/深圳・Yahoo の日次終値の取得、自分の CSV の変換
 - `render_chart.py`、`render_common.py`: チャートのレンダラー。共通のテーマと PNG / PDF の出力
+- `render_motion.py`: 動くチャート・表・ETF 保有銘柄：GIF、MP4、Apple の Live Photo（ffmpeg が必要）
 - `fetch_holdings.py`、`render_holdings.py`: 運用会社自身のファイルから ETF の保有銘柄を取得（SPDR・iShares・Vanguard・NEOS・Roundhill・Tema、自分の CSV）し、上位 N 銘柄を描画
 - `quarterly_earnings.py`、`earnings_core.py`、`earnings_sources.py`、`render_earnings.py`: 決算コマンド、検証可能な計算、出典アダプター、HSBC 風レンダラー
 - `localization.py`、`fonts.py`、`fonts/`: 繁体字中国語への変換。HTML に埋め込む同梱フォント（ライセンス付き）

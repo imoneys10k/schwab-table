@@ -22,6 +22,8 @@ python3 -m unittest discover -s tests -v      # no browser needed
    python3 examples/make_sample_prices.py
    for m in neural9 holdings watchlist; do python3 render_table.py examples/${m}_spec.json examples/$m; done
    for m in chart_lines chart_multiples; do python3 render_chart.py examples/${m}_spec.json examples/$m; done
+   python3 render_motion.py examples/chart_lines_spec.json examples/chart_lines_motion --formats gif --langs en          # needs ffmpeg
+   python3 render_motion.py examples/chart_multiples_spec.json examples/chart_multiples_motion --formats gif --langs zh
    python3 examples/make_etf_holdings.py
    for m in equity swap; do python3 render_holdings.py examples/etf_holdings_$m.json examples/etf_holdings_$m; done
    ```

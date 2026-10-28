@@ -5,7 +5,7 @@
 ## When to use
 The user wants to turn a set of stocks into the kind of table found in Schwab research: a light-blue title/header band, thin grey row dividers, and a small-print disclaimer footnote. By default, output **both a Chinese and an English version**, one HTML file each, then render each to PNG with Playwright at 2x.
 
-For a **price chart** (several symbols over a period), jump to "Chart mode" at the end. For an **ETF's largest holdings**, jump to "ETF top-holdings mode".
+For a **price chart** (several symbols over a period), jump to "Chart mode" at the end. For an **ETF's largest holdings**, jump to "ETF top-holdings mode". Any of them can also be animated (GIF, MP4, Live Photo): see "Animated output".
 
 ## Step 1: Identify the mode
 
@@ -155,6 +155,7 @@ Ready-made "YTD %" figures on web pages mostly come from aggregators and are not
 2. Run `python3 render_table.py spec.json {output prefix}` to produce `{prefix}_en.html/.png` and `{prefix}_zh.html/.png`
 3. Open both PNGs and check against the checklist; fix the spec and re-render if anything is off
 4. Deliver both PNGs (and the HTML, for easy editing)
+5. If the user wants an animation, a GIF, a video or a Live Photo, pass the same spec to `render_motion.py`; see "Animated output"
 
 Spec format:
 ```json
@@ -253,6 +254,23 @@ The user wants to see how one or more symbols moved over a period, their cumulat
 ```
 Everything except `data` is optional. Without `start` / `end` the data file's range is used; `note` is put at the start of the footnote (the examples use it to say "Hypothetical example"). `benchmarks` selects and orders the benchmarks in the data file; `benchmark_name` can be `{"en": ..., "zh": ...}` (for the first benchmark) or given per symbol; `colors` overrides individual line colours with `#rrggbb` (the default palette is checked for colour-blind separability, so check contrast yourself if you change it). Command-line options: `--langs en` renders one language, `--no-png` writes HTML only, `--pdf` also saves a vector PDF, `--scale 3` raises the PNG resolution (default 2), `--theme dark` renders a dark theme (tables and charts). In the HTML files, hovering over a chart shows every line's value for that day.
 
+## Animated output (GIF / MP4 / Live Photo)
+When the user asks for an animation, a GIF, a moving chart or table, a video, or a Live Photo, pass **the same input** as for the static image to `render_motion.py`. It recognises a chart spec, a table spec or `fetch_holdings.py` output by its content:
+```bash
+python3 render_motion.py spec.json out/watch                      # price chart, all three formats
+python3 render_motion.py spec.json out/watch --formats live --langs zh
+python3 render_motion.py table_spec.json out/table --formats gif  # table (all four templates; --style as in render_table.py)
+python3 render_motion.py data/QQQ_holdings.json out/qqq --top 13  # ETF holdings, options as in render_holdings.py
+```
+- **Price charts:** the lines draw from left to right with a glowing head; the line-end labels ride along with live values; in the `lines` layout the current date sits above the cursor and the summary table (return, volatility, max drawdown, last price) is computed as of the cursor; at the end it fades into the static chart
+- **Tables:** the title and header come first, then the rows fade in from top to bottom; numbers with decimals (returns, prices, weights) count up from 0, while integers such as ranks and share counts, and text, simply appear
+- **ETF holdings:** rows come in from rank 1 down, each bar grows (swap parts included), the weight counts up and the cumulative column adds up the weights shown so far; the total rows come last
+- **In all three, the last frame is pixel-identical to the static renderer's PNG**, so the numbers do not change
+- **Output:** `gif` (`out/watch_zh.gif`, looping, 760 px wide), `mp4` (`out/watch_zh.mp4`, H.264, 1520 px wide), `live` (`out/watch_zh_live.jpg` + `out/watch_zh_live.mov`, about 3 s). A Live Photo needs **both files together**: AirDrop both to an iPhone or drag both into Photos; either file alone is just a picture or a video. Apps that accept Live Photos (Xiaohongshu, for one) then take it from the photo library
+- **Options:** `--formats gif,mp4,live`, `--langs`, `--theme dark`, `--draw 3.6` (seconds of drawing, or of rows coming in), `--hold 1.6` (seconds on the finished chart), `--fps 30`, `--scale 2`, `--gif-width 760` (the largest GIF width; wider GIFs grow quickly, about 1.5 MB is a common limit; narrower layouts such as Blackstone keep their own width)
+- **Requires ffmpeg** (macOS `brew install ffmpeg`, Windows `winget install ffmpeg`, Debian/Ubuntu `sudo apt install ffmpeg`). If it is missing the script says so; do not improvise with other tools
+- Before delivering, look at one frame (e.g. ffmpeg at 2 s) to check heads, labels, bars and table; the Live Photo pairing identifier is written by the script itself, no exiftool needed
+
 ## Checklist (charts)
 - [ ] At most 9 symbols; the period matches the request (year to date if none was given)
 - [ ] Data comes from allowed endpoints; Yahoo, currency, last trading dates and warnings are labelled; missing symbols were reported
@@ -261,6 +279,7 @@ Everything except `data` is optional. Without `start` / `end` the data file's ra
 - [ ] When an ETF is the benchmark the footnote says it is a proxy; when a log scale is used the subtitle says so
 - [ ] Summary table sorted by return descending, benchmark row bold, numbers consistent with the line-end labels
 - [ ] A-share unadjusted-price risks and local currencies are disclosed; Yahoo is not called official; total-return charts use user-supplied dividend-adjusted closes
+- [ ] Animated: the last frame matches the static chart; a Live Photo is delivered as its `.jpg` and `.mov` together, with a note to send both to the iPhone
 
 
 ## ETF top-holdings mode
@@ -286,6 +305,7 @@ The user wants an ETF's largest holdings, its concentration or its heavyweight s
    ```
    This writes `out/qqq_en.html/.png` and `out/qqq_zh.html/.png`. For local-language names add `--names names.json` (`{"NVDA": {"zh": "英伟达"}}`); other options: `--top N`, `--langs en`, `--no-png`, `--pdf`, `--scale 3`, `--theme dark`
 4. Open both PNGs and go through the checklist. Deliver both PNGs (HTML too) and state the holdings date
+5. If the user wants an animation, a GIF, a video or a Live Photo, pass the same holdings file to `render_motion.py` (`--top`, `--mode`, `--by`, `--merge-classes` and `--names` work as above); see "Animated output"
 
 ### Ranking rules
 - **Default `--mode exposure` (economic exposure):** a swap on a stock is added to the shares held in the same stock, matched by CUSIP/SEDOL (funds such as NCLD and DRAM; Roundhill's own site script adds swap and stock weights the same way, which was checked in its code, but a swap's notional basis is not verified). For Roundhill funds, lines of the same company (other listings, share classes) are also added together, as its site does, so DRAM's SK hynix and Samsung include their second listings; `--mode lines` undoes this), and the bar shows both parts; a swap with no physical position is ranked on its own. Cash, money-market funds, Treasury bills and options are **not ranked**; they appear on one separate line and in the footnote. Negative cash offsets the swap exposure, and the footnote says so
@@ -301,6 +321,7 @@ The user wants an ETF's largest holdings, its concentration or its heavyweight s
 - [ ] The date is shown as is; holdings older than 10 days were mentioned to the user
 - [ ] Swaps, cash, T-bills and options are handled as the footnote says; top-N, other and not-ranked totals add up to about 100% (swap funds can differ, which the footnote explains)
 - [ ] No missing weight was treated as zero; no name is truncated beyond recognition
+- [ ] Animated: the last frame matches the static image; a Live Photo is delivered as its `.jpg` and `.mov` together
 
 
 ## Institutional templates and Traditional Chinese

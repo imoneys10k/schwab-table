@@ -1,6 +1,6 @@
 ---
 name: schwab-performance-table
-description: 把股票清單、券商持倉截圖或現成的漲跌幅/排名數據，做成 Charles Schwab 研報風格的業績表（排名表、持倉盈虧表、自選股表）；也能畫若干標的（最多 9 只）在任意時間段的走勢圖，含回撤、基準對比、對數刻度（中英雙語 PNG + HTML）。還能把 ETF 的前 N 大持倉（默認 13）做成條形圖加表格，如 QQQ、VOO、SPY、IVV、QQQI、NCLD。只要用戶提到業績表、持倉表、自選股表、走勢圖、漲幅對比、回撤、ETF 前幾大持倉／重倉股，或要做研報風格的股票表格/圖、公衆號或 PPT 裏的股票配圖，就使用這個 skill，即使沒有明確提到 Schwab。
+description: 把股票清單、券商持倉截圖或現成的漲跌幅/排名數據，做成 Charles Schwab 研報風格的業績表（排名表、持倉盈虧表、自選股表）；也能畫若干標的（最多 9 只）在任意時間段的走勢圖，含回撤、基準對比、對數刻度（中英雙語 PNG + HTML）。還能把 ETF 的前 N 大持倉（默認 13）做成條形圖加表格，如 QQQ、VOO、SPY、IVV、QQQI、NCLD。表格、走勢圖、持倉圖都能做成動態 GIF、MP4 或 iPhone 實況照片（Live Photo）。只要用戶提到業績表、持倉表、自選股表、走勢圖、漲幅對比、回撤、ETF 前幾大持倉／重倉股、把表格、走勢圖或持倉圖做成動圖／GIF／視頻／實況圖，或要做研報風格的股票表格/圖、公衆號或 PPT 裏的股票配圖，就使用這個 skill，即使沒有明確提到 Schwab。
 ---
 
 # Schwab 風格股票業績表
@@ -15,7 +15,7 @@ Schwab 是原有預設；三個新增模板使用各自的報表結構，不會�
 ## 何時使用
 用戶想把一組股票做成 Schwab 研報裏那種「淺藍標題表頭 + 灰色細分隔線 + 小字免責腳註」的表格。默認同時輸出**中文版和英文版**，每版一個 HTML，再用 Playwright 以 2x 渲染成 PNG。
 
-要畫**走勢圖**（若干標的在某個時間段內的走勢）時，直接看文末的「走勢圖模式」。
+要畫**走勢圖**（若干標的在某個時間段內的走勢）時，直接看文末的「走勢圖模式」。表格、走勢圖和 ETF 持倉圖都能做成動圖（GIF、MP4、實況照片），見「動態圖」一節。
 
 ## 第一步：判斷模式
 
@@ -164,6 +164,7 @@ Schwab 是原有預設；三個新增模板使用各自的報表結構，不會�
 2. 運行 `python3 render_table.py spec.json {輸出前綴}`，生成 `{前綴}_en.html/.png` 和 `{前綴}_zh.html/.png`
 3. 打開兩張 PNG 對照自查清單，有問題改 spec 重渲
 4. 交付兩張 PNG（HTML 一併給，方便改）
+5. 用戶要動圖、GIF、視頻或實況照片時，同一份 spec 交給 `render_motion.py`，見「動態圖」一節
 
 spec 格式：
 ```json
@@ -262,6 +263,23 @@ spec 格式：
 ```
 除 `data` 外都是可選項。`start`、`end` 不寫時用數據文件的範圍；`note` 會放在腳註開頭（示例裏用來標註「虛構示例」）。`benchmarks` 選擇並排序數據文件裏的基準；`benchmark_name` 可以寫成 `{"en": ..., "zh": ...}`（用於第一個基準），也可以按代碼分別寫；`colors` 用 `#rrggbb` 覆蓋個別線條的顏色（默認配色已通過色盲可分辨性檢查，改色後自行保證對比度）。命令行參數：`--langs en` 只出一種語言，`--no-png` 只寫 HTML，`--pdf` 另存矢量 PDF，`--scale 3` 提高 PNG 清晰度（默認 2），`--theme dark` 輸出深色主題（表格和圖都支持）。HTML 文件裏鼠標懸停在圖上會顯示當天各條線的數值。
 
+## 動態圖（GIF / MP4 / 實況照片）
+用戶要「動圖」「GIF」「會動的走勢圖 / 表格」「實況照片 / 實況圖 / Live Photo」「做成視頻」時，把靜態圖用的**同一份輸入**交給 `render_motion.py`，腳本按內容自動識別是走勢圖 spec、業績表 spec 還是 `fetch_holdings.py` 的持倉文件：
+```bash
+python3 render_motion.py spec.json out/watch                      # 走勢圖，默認三種格式都出
+python3 render_motion.py spec.json out/watch --formats live --langs zh
+python3 render_motion.py table_spec.json out/table --formats gif  # 業績表（四種模板都支持，--style 同 render_table.py）
+python3 render_motion.py data/QQQ_holdings.json out/qqq --top 13  # ETF 持倉，選項同 render_holdings.py
+```
+- **走勢圖：** 線從左到右畫出來，線頭帶光點；線尾標註跟着線頭移動、數值實時跳動；`lines` 版式的光標上方顯示當前日期，彙總表的回報、波動率、最大回撤和最新價按光標所在日實時計算；畫完後淡入到靜態圖
+- **業績表：** 標題和表頭先出現，數據行從上到下逐行淡入，帶小數的數字（漲跌幅、價格、權重）從 0 跳到最終值；排名、持股數等整數和文字直接出現
+- **ETF 持倉：** 從第 1 名開始逐行出現，條形依次長出來（掉期部分一起長），權重從 0 跳到最終值，累計列隨已出現的權重一路相加；最後出現合計行
+- **三種都一樣：最後一幀與對應靜態腳本的 PNG 逐像素一致**，所以數字口徑不變
+- **輸出：** `gif`（`out/watch_zh.gif`，循環播放，寬 760 px）、`mp4`（`out/watch_zh.mp4`，H.264，1520 px 寬）、`live`（`out/watch_zh_live.jpg` + `out/watch_zh_live.mov`，約 3 秒）。實況照片要**兩個文件一起**AirDrop 到 iPhone，或一起拖進「照片」，纔會合成一張；只發其中一個就是普通圖片 / 視頻。小紅書等支持實況圖的平臺從相冊選這張即可
+- **參數：** `--formats gif,mp4,live`、`--langs`、`--theme dark`、`--draw 3.6`（畫線或逐行出現的秒數）、`--hold 1.6`（畫完停留秒數）、`--fps 30`、`--scale 2`、`--gif-width 760`（GIF 的最大寬度，越寬文件越大，1.5 MB 左右是常見上限；比它窄的版式如 Blackstone 保持原寬）
+- **依賴：** 需要 **ffmpeg**（macOS `brew install ffmpeg`，Windows `winget install ffmpeg`，Debian/Ubuntu `sudo apt install ffmpeg`）。沒有時腳本會提示，不要改用其他工具硬做
+- 交付前抽看一幀（例如用 ffmpeg 截第 2 秒）確認線頭、標註、條形和表格正常；實況照片的配對標識已寫入，無需 exiftool
+
 ## 自查清單（走勢圖）
 - [ ] 標的不超過 9 只；時間段與用戶要求一致（沒說就是年初至今）
 - [ ] 數據來自 `fetch_prices.py` 的允許接口；Yahoo 來源、各幣種、各標的最後交易日和數據警告均如實顯示；缺失標的已告知用戶
@@ -270,6 +288,7 @@ spec 格式：
 - [ ] 用 ETF 做基準時，腳註寫明它是替代；用對數刻度時，副標題寫明
 - [ ] 彙總表按回報降序，基準行加粗，數字與線尾標註一致
 - [ ] 滬深未復權風險已提示；Yahoo 未被稱爲官方來源；跨幣種漲跌幅註明未換匯；用戶 CSV 如實註明，總回報圖只用於用戶提供的股息調整價
+- [ ] 動態圖：最後一幀與靜態圖一致；實況照片的 `.jpg` 和 `.mov` 一起交付並說明要一起傳到 iPhone
 
 
 ---
@@ -297,6 +316,7 @@ spec 格式：
    ```
    生成 `out/qqq_en.html/.png` 和 `out/qqq_zh.html/.png`。需要本地語言名稱時加 `--names names.json`（`{"NVDA": {"zh": "英偉達"}}`）；其他選項 `--top N`、`--langs en`、`--no-png`、`--pdf`、`--scale 3`、`--theme dark`
 4. 打開兩張 PNG，對照自查清單。交付兩張 PNG（HTML 一併給），並說明持倉截止日
+5. 用戶要動圖、GIF、視頻或實況照片時，同一份持倉文件交給 `render_motion.py`（`--top`、`--mode`、`--by`、`--merge-classes`、`--names` 與上面相同），見「動態圖」一節
 
 ## 排名規則
 - **默認 `--mode exposure`（按經濟敞口）：** 股票上的掉期按 CUSIP／SEDOL 加到同一檔股票的現貨持倉上（NCLD、DRAM 這類基金；Roundhill 官網腳本就是這樣把掉期和現貨權重相加的，已在其代碼裏核對，但掉期的名義金額口徑未核實）。Roundhill 的基金還會把同一公司的各條線（其他上市線、股份類別）一併相加，與其官網一致，所以 DRAM 的 SK hynix、三星已含第二上市線；`--mode lines` 可還原，條形圖分兩段；沒有現貨對應的掉期單獨排名。現金、貨幣基金、國債、期權**不參與排名**，單獨一行列出，腳註寫明；負現金是用來對沖掉期敞口的，腳註也會說明
@@ -312,3 +332,4 @@ spec 格式：
 - [ ] 截止日如實顯示；超過 10 天的持倉已向用戶說明
 - [ ] 掉期、現金、國債、期權的處理與腳註一致；前 N 大合計、其餘合計、不參與排名合計相加接近 100%（掉期基金可偏離，腳註已說明）
 - [ ] 沒有把缺失權重當作 0；名稱沒有被截斷到無法辨認
+- [ ] 動態圖：最後一幀與靜態圖一致；實況照片的 `.jpg` 和 `.mov` 一起交付

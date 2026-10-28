@@ -150,6 +150,9 @@ if ($SkipDeps) {
   Remove-Item -Recurse -Force $smoke -ErrorAction SilentlyContinue
   if (-not $ok) { throw "smoke test failed" }
   Say "Render OK (Schwab, Morgan, Blackstone, IBKR, HSBC earnings, chart)"
+  if (-not (Test-Cmd ffmpeg)) {
+    Write-Host "hint: ffmpeg not found. Everything works without it except animated charts and tables (render_motion.py: GIF, MP4, Live Photo). Install it with: winget install ffmpeg"
+  }
 }
 
 $helper = Join-Path $Target "install_earnings_skill.py"
