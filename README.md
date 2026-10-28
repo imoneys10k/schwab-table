@@ -158,7 +158,7 @@ Chart up to 9 symbols over any period (default: year to date) with a drawdown pa
 - **Benchmark:** SPY by default (labelled as a proxy for the S&P 500), up to two benchmarks (`--benchmark SPY,COMP`), or `--benchmark none`.
 - **Axis:** one y-axis, indexed to 100 at the start. It switches to a log scale automatically when the range is wide (or set `y_scale`).
 - **Options:** `--theme dark`, `--pdf`, custom line colours, and hover tooltips in the HTML files.
-- **Animated:** `render_motion.py` takes the same spec and draws the chart left to right, with the line-end labels, the table and the date counting along, as a GIF, an MP4 and an Apple Live Photo (a `.jpg` + `.mov` pair to AirDrop to an iPhone). The finished frame is the static chart; `--canvas 3:4` or `9:16` fits it to Xiaohongshu, Instagram or Reels. Needs ffmpeg.
+- **Animated:** `render_motion.py` takes the same spec and draws the chart left to right, with the line-end labels, the table and the date counting along, as a GIF, a WebP (about a third smaller), an MP4 and an Apple Live Photo (a `.jpg` + `.mov` pair to AirDrop to an iPhone). The finished frame is the static chart; `--canvas 3:4` or `9:16` fits it to Xiaohongshu, Instagram or Reels. Needs ffmpeg.
 
 ```bash
 python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 -o data/watch.json
@@ -228,7 +228,7 @@ python3 quarterly_earnings.py AAPL --period FY2025Q3 -o out/aapl_q3
 - `render_table.py`, `institutional_tables.py`, `prices_to_table.py`: Table renderer and its four styles; builds Morgan / Blackstone specs from fetched prices
 - `fetch_prices.py`, `csv_to_prices.py`: Daily closes from Nasdaq, Shanghai/Shenzhen and Yahoo; conversion of your own CSV files
 - `render_chart.py`, `render_common.py`: Chart renderer; shared themes and PNG / PDF output
-- `render_motion.py`: Animated charts, tables and ETF holdings: GIF, MP4 and Apple Live Photo (needs ffmpeg)
+- `render_motion.py`: Animated charts, tables and ETF holdings: GIF, WebP, MP4 and Apple Live Photo (needs ffmpeg; WebP also Pillow)
 - `fetch_holdings.py`, `render_holdings.py`: ETF holdings from the issuer's own file (SPDR, iShares, Vanguard, NEOS, Roundhill, Tema, or your CSV) and the top-N renderer
 - `quarterly_earnings.py`, `earnings_core.py`, `earnings_sources.py`, `render_earnings.py`: Earnings command, audited arithmetic, source adapters and the HSBC-style renderer
 - `localization.py`, `fonts.py`, `fonts/`: Traditional Chinese conversion; bundled fonts embedded in the HTML (licences included)

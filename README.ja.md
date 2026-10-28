@@ -158,7 +158,7 @@ python3 render_table.py data/matrix.json out/matrix
 - **ベンチマーク：** 既定は SPY（S&P 500 の代用と明記）。最大 2 つまで（`--benchmark SPY,COMP`）、`--benchmark none` で非表示。
 - **軸：** Y 軸は 1 本だけで、開始時点を 100 に指数化します。値幅が大きいときは自動で対数目盛に切り替わります（`y_scale` で指定も可能）。
 - **オプション：** `--theme dark`、`--pdf`、線の色の指定、HTML でのマウスオーバー表示。
-- **アニメーション：** `render_motion.py` は同じ spec を使い、線を左から右へ描きながら線端のラベル、サマリー表、日付を動かして、GIF、MP4、Apple の Live Photo（iPhone に AirDrop する `.jpg` と `.mov` の組）を出力します。描き終えたフレームは静止画と同じです。`--canvas 3:4` や `9:16` で Instagram やリールの比率に合わせられます。ffmpeg が必要です。
+- **アニメーション：** `render_motion.py` は同じ spec を使い、線を左から右へ描きながら線端のラベル、サマリー表、日付を動かして、GIF、WebP（GIF より約 3 分の 1 小さい）、MP4、Apple の Live Photo（iPhone に AirDrop する `.jpg` と `.mov` の組）を出力します。描き終えたフレームは静止画と同じです。`--canvas 3:4` や `9:16` で Instagram やリールの比率に合わせられます。ffmpeg が必要です。
 
 ```bash
 python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 -o data/watch.json
@@ -228,7 +228,7 @@ python3 quarterly_earnings.py AAPL --period FY2025Q3 -o out/aapl_q3
 - `render_table.py`、`institutional_tables.py`、`prices_to_table.py`: 表のレンダラーと 4 つのスタイル。取得した価格から Morgan / Blackstone の spec を作成
 - `fetch_prices.py`、`csv_to_prices.py`: Nasdaq・上海/深圳・Yahoo の日次終値の取得、自分の CSV の変換
 - `render_chart.py`、`render_common.py`: チャートのレンダラー。共通のテーマと PNG / PDF の出力
-- `render_motion.py`: 動くチャート・表・ETF 保有銘柄：GIF、MP4、Apple の Live Photo（ffmpeg が必要）
+- `render_motion.py`: 動くチャート・表・ETF 保有銘柄：GIF、WebP、MP4、Apple の Live Photo（ffmpeg が必要。WebP には Pillow も）
 - `fetch_holdings.py`、`render_holdings.py`: 運用会社自身のファイルから ETF の保有銘柄を取得（SPDR・iShares・Vanguard・NEOS・Roundhill・Tema、自分の CSV）し、上位 N 銘柄を描画
 - `quarterly_earnings.py`、`earnings_core.py`、`earnings_sources.py`、`render_earnings.py`: 決算コマンド、検証可能な計算、出典アダプター、HSBC 風レンダラー
 - `localization.py`、`fonts.py`、`fonts/`: 繁体字中国語への変換。HTML に埋め込む同梱フォント（ライセンス付き）

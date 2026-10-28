@@ -1,6 +1,6 @@
 """Animated charts and tables that settle on the exact static image.
 
-Usage: python3 render_motion.py INPUT.json OUT_PREFIX [--formats gif,mp4,live] [--langs en,zh] [--theme light|dark]
+Usage: python3 render_motion.py INPUT.json OUT_PREFIX [--formats gif,webp,mp4,live] [--langs en,zh] [--theme light|dark]
                                 [--draw 3.6] [--hold 1.6] [--fps 30] [--scale 2] [--gif-width 760]
        table input:    [--style schwab|morgan|blackstone|ibkr]
        holdings input: [--top 13] [--mode exposure|lines] [--by holding|name|sector] [--merge-classes] [--names names.json]
@@ -11,6 +11,8 @@ INPUT is any of the three inputs the static renderers take, recognised by its co
   holdings     fetch_holdings.py output ("holdings" list)   bars grow one after another, weights and the cumulative column count up
 Per language it writes:
   gif   OUT_PREFIX_{lang}.gif                       looping GIF (chat apps, X, web pages)
+  webp  OUT_PREFIX_{lang}.webp                      the same as an animated WebP: full colour, about a third smaller (web pages,
+                                                    Telegram, Discord; not every chat app plays it). Needs Pillow; not in the default set
   mp4   OUT_PREFIX_{lang}.mp4                       H.264 video (Xiaohongshu, X, slides)
   live  OUT_PREFIX_{lang}_live.jpg + _live.mov      an Apple Live Photo pair: both carry the same content identifier, so AirDropping
                                                     both to an iPhone, or importing both into Photos, gives one Live Photo
@@ -40,7 +42,8 @@ from institutional_tables import STYLES
 from localization import traditional
 from render_common import THEMES, reexec_in_venv
 
-FORMATS = ("gif", "mp4", "live")
+FORMATS = ("gif", "webp", "mp4", "live")
+LOOP_FADE = {"gif": 0.0, "webp": 0.0, "mp4": 0.4}   # default --loop-fade per format
 KINDS = ("chart", "table", "holdings")
 LIVE_KEY = b"com.apple.quicktime.content.identifier"
 STILL_KEY = b"com.apple.quicktime.still-image-time"
@@ -466,19 +469,37 @@ def loop_input(fdir, n, fps, fade):
     """ffmpeg inputs and the start of the filter graph for a looping clip. With a fade, the end cross-fades into the first frame, so
     the loop restarts without a jump."""
     args = ["-framerate", str(fps), "-i", str(fdir / "f%05d.png")]
+    head = f"[0:v]trim=end_frame={n}"   # formats with a shorter fade leave the tail of the shared frames unused
     if fade <= 0:
-        return args, "[0:v]"
+        return args, head + ","
     args += ["-framerate", str(fps), "-loop", "1", "-t", f"{fade + 2 / fps:.4f}", "-i", str(fdir / "f00000.png")]
-    return args, f"[0:v][1:v]xfade=transition=fade:duration={fade:.4f}:offset={n / fps - fade:.4f},"
+    return args, f"{head}[m];[m][1:v]xfade=transition=fade:duration={fade:.4f}:offset={n / fps - fade:.4f},"
+
+
+def small(fdir, n, fps, width, scale, fade, canvas):
+    """ffmpeg inputs and filter graph for a GIF or WebP: at most `width` px wide (narrower pages, such as the Blackstone table, keep
+    their own CSS width), 25 fps at most: GIF frame delays are whole hundredths of a second, so 30 fps cannot be shown evenly."""
+    args, head = loop_input(fdir, n, fps, fade)
+    return args, f"{head}{canvas}fps={min(fps, 25)},scale='min({width},trunc(iw/{scale}))':-1:flags=lanczos"
 
 
 def make_gif(fdir, n, fps, out, width, scale, fade=0.0, canvas=""):
-    """Looping GIF at most `width` px wide (narrower pages, such as the Blackstone table, keep their own CSS width), 25 fps at most:
-    GIF frame delays are whole hundredths of a second, so 30 fps cannot be shown evenly."""
-    args, head = loop_input(fdir, n, fps, fade)
-    graph = (f"{head}{canvas}fps={min(fps, 25)},scale='min({width},trunc(iw/{scale}))':-1:flags=lanczos,split[a][b];"
-             "[a]palettegen=max_colors=256:stats_mode=full[p];[b][p]paletteuse=dither=sierra2_4a:diff_mode=rectangle")
+    args, graph = small(fdir, n, fps, width, scale, fade, canvas)
+    graph += ",split[a][b];[a]palettegen=max_colors=256:stats_mode=full[p];[b][p]paletteuse=dither=sierra2_4a:diff_mode=rectangle"
     ff(*args, "-filter_complex", graph, "-loop", "0", str(out))
+
+
+def make_webp(fdir, n, fps, out, width, scale, fade=0.0, canvas=""):
+    """Animated WebP, sized and timed like the GIF but in full colour and about a third smaller. ffmpeg builds often lack the WebP
+    encoder, so ffmpeg writes an APNG that Pillow re-encodes one frame at a time. Quality 80 keeps text as sharp as the GIF's; with
+    key frames off, each frame stores only what changed, and unchanged frames merge."""
+    from PIL import Image
+    args, graph = small(fdir, n, fps, width, scale, fade, canvas)
+    mid = fdir.parent / f"{Path(out).stem}.apng"
+    ff(*args, "-filter_complex", graph, "-compression_level", "1", "-f", "apng", str(mid))
+    with Image.open(mid) as im:
+        im.save(out, "WEBP", save_all=True, duration=round(1000 / min(fps, 25)), loop=0, quality=80, method=4,
+                allow_mixed=True, kmin=0, kmax=0)
 
 
 def make_video(fdir, n, fps, out, max_side=None, faststart=True, fade=0.0, canvas=""):
@@ -613,7 +634,8 @@ def main():
     ap = argparse.ArgumentParser(description="Render an animated Schwab-style chart or table (GIF / MP4 / Live Photo).")
     ap.add_argument("spec", help="a render_chart.py or render_table.py spec, or fetch_holdings.py output")
     ap.add_argument("prefix")
-    ap.add_argument("--formats", default="gif,mp4,live", help="comma-separated: gif, mp4, live (default: all three)")
+    ap.add_argument("--formats", default="gif,mp4,live", help="comma-separated: gif, webp, mp4, live (default: gif,mp4,live; "
+                    "webp needs Pillow)")
     ap.add_argument("--langs", help="comma-separated (default: en,zh; a table spec: the languages it has)")
     ap.add_argument("--theme", choices=sorted(THEMES), default="light", help="light (default) or dark")
     ap.add_argument("--canvas", choices=CANVASES, help="centre the image on a canvas of this aspect ratio, filled with the page colour "
@@ -621,12 +643,12 @@ def main():
     ap.add_argument("--draw", type=float, help="seconds the lines or rows take to draw (default: 3.6 for charts; for tables and holdings "
                     "2 to 6 by row count; Live Photos use at most 2.4)")
     ap.add_argument("--hold", type=float, default=1.6, help="seconds the finished image stays before the GIF / MP4 loops (default 1.6)")
-    ap.add_argument("--loop-fade", type=float, default=0.4, help="seconds the GIF / MP4 end cross-fades into its first frame, so the "
-                    "loop has no jump (default 0.4; 0 for a hard cut)")
+    ap.add_argument("--loop-fade", type=float, help="seconds the end cross-fades into the first frame, so the loop has no jump "
+                    "(default: 0.4 for the MP4, none for the GIF and WebP, where the fade frames cost about a fifth more file size; 0 for a hard cut)")
     ap.add_argument("--fps", type=int, default=30, help="frames per second of the MP4 (default 30; 60 is smoother and takes about twice "
-                    "as long; GIFs are capped at 25, Live Photos are 30)")
+                    "as long; GIF and WebP are capped at 25, Live Photos are 30)")
     ap.add_argument("--scale", type=float, default=2, help="pixel density of the frames (default 2, 1520 px wide)")
-    ap.add_argument("--gif-width", type=int, default=760, help="largest GIF width in px (default 760; file size grows quickly with width)")
+    ap.add_argument("--gif-width", type=int, default=760, help="largest GIF / WebP width in px (default 760; file size grows quickly with width)")
     g = ap.add_argument_group("table input (as render_table.py)")
     g.add_argument("--style", choices=STYLES, help="report template (default: spec.style, or schwab)")
     g = ap.add_argument_group("holdings input (as render_holdings.py)")
@@ -640,8 +662,16 @@ def main():
     bad = [x for x in fmts if x not in FORMATS]
     if bad or not fmts:
         sys.exit(f"error: --formats takes a comma-separated list of {', '.join(FORMATS)}")
-    if a.draw is not None and a.draw <= 0 or a.hold < 0 or a.loop_fade < 0 or a.fps < 1:
+    if a.draw is not None and a.draw <= 0 or a.hold < 0 or (a.loop_fade or 0) < 0 or a.fps < 1:
         sys.exit("error: --draw and --fps must be positive, --hold and --loop-fade zero or more")
+    if "webp" in fmts:
+        try:
+            from PIL import features
+            ok = features.check("webp")
+        except ImportError:
+            ok = False
+        if not ok:
+            sys.exit("error: WebP output needs Pillow with WebP support: python3 -m pip install pillow")
     if not shutil.which("ffmpeg"):
         sys.exit("error: ffmpeg is not installed (macOS: brew install ffmpeg · Windows: winget install ffmpeg · Debian/Ubuntu: sudo apt install ffmpeg)")
     sp = Path(a.spec)
@@ -672,12 +702,14 @@ def main():
         if [l for l in langs if l not in rh.S]:
             sys.exit(f"error: unsupported language(s) for holdings (available: {', '.join(rh.S)})")
     Path(a.prefix).parent.mkdir(parents=True, exist_ok=True)
-    looped = "gif" in fmts or "mp4" in fmts
+    looped = [f for f in fmts if f in LOOP_FADE]
+    fade = {f: a.loop_fade if a.loop_fade is not None else LOOP_FADE[f] for f in looped}
+    tail = max(fade.values(), default=0)   # the shared frames hold long enough for the longest fade
     with tempfile.TemporaryDirectory() as tmp:
         jobs, plans = [], []
         for lang in langs:   # every language is captured at once, each distinct frame once for all three formats
             html, script, eased, draw = scripts(kind, spec, a, lang, chart, names)
-            loop = segments(a.fps, 0.4, draw, 0.5, a.hold + a.loop_fade, eased)
+            loop = segments(a.fps, 0.4, draw, 0.5, a.hold + tail, eased)
             seq = {"loop": [x for part in loop for x in part] if looped else [], "live": live_timeline(loop, draw) if "live" in fmts else []}
             work = Path(tmp) / lang
             work.mkdir()
@@ -690,11 +722,12 @@ def main():
             canvas = pad(png_size(next(iter(shot.values()))), a.canvas, THEMES[a.theme]["bg"])
             if looped:
                 fdir = sequence(shot, seq["loop"], work / "loop")
-                n = len(seq["loop"])
-                if "gif" in fmts:
-                    tasks.append((make_gif, (fdir, n, a.fps, f"{out}.gif", a.gif_width, a.scale, a.loop_fade, canvas), {}, f"wrote {out}.gif"))
+                n = {f: len(seq["loop"]) - round((tail - x) * a.fps) for f, x in fade.items()}
+                for f, make in (("gif", make_gif), ("webp", make_webp)):
+                    if f in fmts:
+                        tasks.append((make, (fdir, n[f], a.fps, f"{out}.{f}", a.gif_width, a.scale, fade[f], canvas), {}, f"wrote {out}.{f}"))
                 if "mp4" in fmts:
-                    tasks.append((make_video, (fdir, n, a.fps, f"{out}.mp4"), dict(fade=a.loop_fade, canvas=canvas), f"wrote {out}.mp4"))
+                    tasks.append((make_video, (fdir, n["mp4"], a.fps, f"{out}.mp4"), dict(fade=fade["mp4"], canvas=canvas), f"wrote {out}.mp4"))
             if "live" in fmts:
                 fdir = sequence(shot, seq["live"], work / "live")
                 tasks.append((make_live, (fdir, len(seq["live"]), out, canvas), {}, f"wrote {out}_live.jpg + {out}_live.mov (Live Photo)"))

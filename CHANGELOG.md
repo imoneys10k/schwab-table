@@ -5,6 +5,14 @@ All notable changes. Versions follow the [releases](https://github.com/imoneys10
 
 
 
+## 0.8.2 (2026-10-28)
+
+### Added
+- **Animated WebP.** `render_motion.py --formats webp` (or `gif,webp`) writes `OUT_PREFIX_{lang}.webp`, with the GIF's size and timing but in full colour without dithering and about a third smaller (example line chart 1.1 MB against 1.6 MB, ETF holdings 310 KB against 450 KB). Many ffmpeg builds lack the WebP encoder, so ffmpeg hands the frames over as an APNG and Pillow encodes them one at a time (quality 80, no forced key frames, so each frame stores only what changed). It is not in the default set because WeChat and Xiaohongshu may not play it, and it needs Pillow (`python3 -m pip install pillow`).
+
+### Changed
+- **The GIF no longer fades back by default.** The loop fade made GIFs about a fifth larger; it now applies to the MP4 only (0.4 s), and the GIF and WebP cut straight back to the first frame. A `--loop-fade` value given still applies to every format. The four gallery GIFs went from 4.3 MB to 3.1 MB together (example line chart 2.0 MB to 1.6 MB).
+
 ## 0.8.1 (2026-10-28)
 
 ### Added
