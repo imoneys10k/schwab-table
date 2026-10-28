@@ -5,6 +5,19 @@ All notable changes. Versions follow the [releases](https://github.com/imoneys10
 
 
 
+## 0.8.1 (2026-10-28)
+
+### Added
+- **`--canvas` for social formats.** `render_motion.py --canvas 3:4` (also `4:5`, `9:16`, `1:1`, `16:9`) centres the animation on a canvas of that aspect ratio, filled with the page colour, so Xiaohongshu, Instagram, Douyin or Reels do not crop it. The GIF, the MP4 and both halves of the Live Photo get the same canvas.
+- **Live Photo key-photo marker.** The `.mov` now carries the timed-metadata track `com.apple.quicktime.still-image-time` that iPhone videos have, pointing at the last frame (the key photo). It is laid out as AVFoundation's `AVAssetWriter` writes it; AVFoundation reads it back as `-1` at the key-photo time, and macOS Photos (`PHLivePhoto`) still accepts the pair. Live Photos are now about 3.2 s at 30 fps.
+- **The chart's summary table re-sorts as the lines draw.** Rows slide into the order of the return so far; a row passes another only when it leads by 6 % of the current spread (at least 2 points), so close lines do not make the table flicker. It is back in its static order at the end.
+- **Loop fade.** The GIF and MP4 end with a 0.4 s cross-fade back to their first frame, so the loop restarts without a jump (`--loop-fade`, 0 for a hard cut). The fade and the moving table make the example line-chart GIF about 2 MB instead of 1.3 MB; `--gif-width 600` brings it to about 1.5 MB, and `--loop-fade 0` with it to about 1.2 MB.
+
+### Changed
+- **Table timing follows the row count.** Without `--draw`, rows come in over 2 to 6 s depending on how many there are (about 2.2 s for 6 rows, 4.4 s for 16), and each row takes about 0.7 s.
+- **About twice as fast.** All languages are captured at once in one browser, the three formats share one set of screenshots (the Live Photo reuses the loop's frames), and the ffmpeg encodes run side by side. A chart in both languages and all three formats takes about 30 s instead of about 65 s.
+- **`--fps` is documented as the MP4 frame rate.** `--fps 60` is smoother and takes about twice the time and size. GIFs stay at 25 fps at most (GIF frame times are whole hundredths of a second, so 30 fps cannot be shown evenly) and Live Photos at 30.
+
 ## 0.8.0 (2026-10-28)
 
 ### Added

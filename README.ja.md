@@ -158,7 +158,7 @@ python3 render_table.py data/matrix.json out/matrix
 - **ベンチマーク：** 既定は SPY（S&P 500 の代用と明記）。最大 2 つまで（`--benchmark SPY,COMP`）、`--benchmark none` で非表示。
 - **軸：** Y 軸は 1 本だけで、開始時点を 100 に指数化します。値幅が大きいときは自動で対数目盛に切り替わります（`y_scale` で指定も可能）。
 - **オプション：** `--theme dark`、`--pdf`、線の色の指定、HTML でのマウスオーバー表示。
-- **アニメーション：** `render_motion.py` は同じ spec を使い、線を左から右へ描きながら線端のラベル、サマリー表、日付を動かして、GIF、MP4、Apple の Live Photo（iPhone に AirDrop する `.jpg` と `.mov` の組）を出力します。最後のフレームは静止画と同じです。ffmpeg が必要です。
+- **アニメーション：** `render_motion.py` は同じ spec を使い、線を左から右へ描きながら線端のラベル、サマリー表、日付を動かして、GIF、MP4、Apple の Live Photo（iPhone に AirDrop する `.jpg` と `.mov` の組）を出力します。描き終えたフレームは静止画と同じです。`--canvas 3:4` や `9:16` で Instagram やリールの比率に合わせられます。ffmpeg が必要です。
 
 ```bash
 python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 -o data/watch.json

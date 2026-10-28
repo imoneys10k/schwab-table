@@ -158,7 +158,7 @@ python3 render_table.py data/matrix.json out/matrix
 - **基準：** 預設 SPY（標示為標普 500 的替代），最多兩個基準（`--benchmark SPY,COMP`），或用 `--benchmark none` 不畫基準。
 - **縱軸：** 只有一個縱軸，起點為 100。範圍很大時自動改用對數刻度（也可用 `y_scale` 指定）。
 - **選項：** `--theme dark`、`--pdf`、自訂線條顏色，HTML 檔裡還有滑鼠懸停提示。
-- **動態圖：** `render_motion.py` 用同一份 spec，讓走勢線從左到右畫出來，線尾標註、彙總表和日期跟著跳動，輸出 GIF、MP4 和 Apple 實況照片（`.jpg` + `.mov` 一對，AirDrop 到 iPhone 即可）。最後一幀就是靜態圖。需要 ffmpeg。
+- **動態圖：** `render_motion.py` 用同一份 spec，讓走勢線從左到右畫出來，線尾標註、彙總表和日期跟著跳動，輸出 GIF、MP4 和 Apple 實況照片（`.jpg` + `.mov` 一對，AirDrop 到 iPhone 即可）。畫完的那一幀就是靜態圖；加 `--canvas 3:4` 或 `9:16` 可直接適配小紅書、抖音的比例。需要 ffmpeg。
 
 ```bash
 python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 -o data/watch.json

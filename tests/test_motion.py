@@ -93,6 +93,32 @@ class LivePhotoVideo(unittest.TestCase):
         self.assertEqual(struct.unpack(">II", buf[da:da + 8]), (1, 0))             # UTF-8, default locale
         self.assertEqual(buf[da + 8:db], CID.encode())
 
+    def test_still_image_time_track(self):
+        mdat = rm.atom(b"mdat", b"\x01" * 64)
+        mvhd = b"\0" * 12 + struct.pack(">II", 600, 1920) + b"\0" * 76 + struct.pack(">I", 2)   # timescale 600, 3.2 s, next track 2
+        p = self.write(rm.atom(b"ftyp", b"qt  \0\0\0\0qt  "), mdat, rm.atom(b"moov", rm.atom(b"mvhd", mvhd)))
+        rm.stamp_mov(p, CID, still=3.1)
+        buf = Path(p).read_bytes()
+        top = atoms(buf)
+        self.assertEqual([k for k, _, _ in top], [b"ftyp", b"mdat", b"moov", b"mdat"])
+        inner = {k: (a, b) for k, a, b in atoms(buf, top[2][1], top[2][2])}
+        self.assertEqual(struct.unpack(">I", buf[inner[b"mvhd"][1] - 4:inner[b"mvhd"][1]])[0], 3)   # next_track_ID moved on
+        trak = {k: (a, b) for k, a, b in atoms(buf, *inner[b"trak"])}
+        self.assertEqual(struct.unpack(">I", buf[trak[b"tkhd"][0] + 12:trak[b"tkhd"][0] + 16])[0], 2)   # the new track's ID
+        (kind, ea, eb), = atoms(buf, *trak[b"edts"])
+        self.assertEqual(struct.unpack(">IIiIIiI", buf[ea + 4:eb]), (2, 1860, -1, 0x10000, 20, 0, 0x10000))  # empty edit to 3.1 s
+        mdia = {k: (a, b) for k, a, b in atoms(buf, *trak[b"mdia"])}
+        self.assertEqual(buf[mdia[b"hdlr"][0] + 4:mdia[b"hdlr"][0] + 12], b"mhlrmeta")
+        minf = {k: (a, b) for k, a, b in atoms(buf, *mdia[b"minf"])}
+        stbl = {k: (a, b) for k, a, b in atoms(buf, *minf[b"stbl"])}
+        stsd = buf[stbl[b"stsd"][0]:stbl[b"stsd"][1]]
+        self.assertIn(b"mebx", stsd)
+        self.assertIn(b"keydmdta" + rm.STILL_KEY, stsd)
+        self.assertTrue(stsd.endswith(b"dtyp" + struct.pack(">II", 0, 65)))                        # signed int8
+        offset = struct.unpack(">I", buf[stbl[b"stco"][1] - 4:stbl[b"stco"][1]])[0]
+        self.assertEqual(offset, top[3][1])                                                          # points into the last mdat
+        self.assertEqual(buf[offset:offset + 9], struct.pack(">II", 9, 1) + b"\xff")
+
     def test_refuses_a_file_whose_moov_is_not_last(self):
         p = self.write(rm.atom(b"ftyp", b"qt  "), rm.atom(b"moov", b""), rm.atom(b"mdat", b"x"))
         with self.assertRaises(ValueError):
@@ -111,9 +137,41 @@ class Timeline(unittest.TestCase):
         settle = [s for f, s in fr if f == 1.0]
         self.assertEqual(settle, sorted(settle))
 
+    def test_live_photo_reuses_the_loop_states(self):
+        loop = rm.segments(60, 0.4, 3.6, 0.5, 2.0)
+        live = rm.live_timeline(loop, 3.6)
+        flat = {x for part in loop for x in part}
+        self.assertTrue(set(live) <= flat)                       # nothing to capture twice
+        self.assertAlmostEqual(len(live) / rm.LIVE_FPS, 3.2, delta=0.05)
+        self.assertEqual(live[0], (0.0, 0.0))
+        self.assertEqual(live[-1], (1.0, 1.0))                   # the key photo is the finished image
+        self.assertEqual(rm.thin([1, 2, 3, 4, 5, 6, 7], 3), [1, 4, 7])
+        self.assertEqual(rm.thin([1, 2], 5), [1, 2])
+
+    def test_table_timing_follows_row_count(self):
+        self.assertEqual(rm.table_draw(3), 2.0)
+        self.assertAlmostEqual(rm.table_draw(16), 4.42)
+        self.assertEqual(rm.table_draw(60), 6.0)
+        self.assertAlmostEqual(rm.row_span(3.5), 0.2)
+        self.assertEqual(rm.row_span(1.0), 0.6)
+
     def test_tables_draw_linearly(self):
         draw = [f for f, s in rm.timeline(10, 0, 1.0, 0.1, 0, eased=False) if s == 0]
         self.assertEqual(draw, [i / 9 for i in range(10)])   # each row eases on its own; the overall clock is linear
+
+
+class Canvas(unittest.TestCase):
+    def test_pad_to_aspect_ratio(self):
+        self.assertEqual(rm.pad((1520, 984), None, "#fff"), "")
+        self.assertEqual(rm.pad((1520, 984), "3:4", "#fff"), "pad=1520:2028:(ow-iw)/2:(oh-ih)/2:color=0xffffff,")      # taller
+        self.assertEqual(rm.pad((1520, 984), "16:9", "#1a1a19"), "pad=1750:984:(ow-iw)/2:(oh-ih)/2:color=0x1a1a19,")   # wider
+        self.assertEqual(rm.pad((1568, 634), "9:16", "#fff"), "pad=1568:2788:(ow-iw)/2:(oh-ih)/2:color=0xffffff,")
+
+    def test_loop_fade_input(self):
+        args, head = rm.loop_input(Path("x"), 180, 30, 0.4)
+        self.assertIn("-loop", args)
+        self.assertIn("xfade=transition=fade:duration=0.4000:offset=5.6000", head)
+        self.assertEqual(rm.loop_input(Path("x"), 180, 30, 0)[1], "[0:v]")
 
 
 class InputKind(unittest.TestCase):

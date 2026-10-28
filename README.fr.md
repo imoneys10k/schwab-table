@@ -158,7 +158,7 @@ Jusqu'à 9 valeurs sur une période au choix (par défaut : depuis le début de 
 - **Référence :** SPY par défaut (indiqué comme substitut du S&P 500), jusqu'à deux références (`--benchmark SPY,COMP`), ou `--benchmark none`.
 - **Axe :** un seul axe vertical, indexé à 100 au départ. Il passe automatiquement en échelle logarithmique quand l'écart est grand (ou fixez `y_scale`).
 - **Options :** `--theme dark`, `--pdf`, couleurs de courbes personnalisées et infobulles au survol dans les fichiers HTML.
-- **Animé :** `render_motion.py` reprend la même spec et trace le graphique de gauche à droite, étiquettes, tableau et date suivant le tracé, en GIF, en MP4 et en Live Photo Apple (une paire `.jpg` + `.mov` à envoyer par AirDrop sur un iPhone). La dernière image est le graphique statique. Nécessite ffmpeg.
+- **Animé :** `render_motion.py` reprend la même spec et trace le graphique de gauche à droite, étiquettes, tableau et date suivant le tracé, en GIF, en MP4 et en Live Photo Apple (une paire `.jpg` + `.mov` à envoyer par AirDrop sur un iPhone). La dernière image du tracé est le graphique statique ; `--canvas 3:4` ou `9:16` l'adapte à Instagram ou aux Reels. Nécessite ffmpeg.
 
 ```bash
 python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 -o data/watch.json

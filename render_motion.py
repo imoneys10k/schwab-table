@@ -21,12 +21,15 @@ import argparse
 import asyncio
 import json
 import math
+import re
+import os
 import shutil
 import struct
 import subprocess
 import sys
 import tempfile
 import uuid
+from concurrent.futures import ThreadPoolExecutor
 from html import escape
 from pathlib import Path
 
@@ -40,6 +43,10 @@ from render_common import THEMES, reexec_in_venv
 FORMATS = ("gif", "mp4", "live")
 KINDS = ("chart", "table", "holdings")
 LIVE_KEY = b"com.apple.quicktime.content.identifier"
+STILL_KEY = b"com.apple.quicktime.still-image-time"
+STILL_SAMPLE = struct.pack(">II", 9, 1) + b"\xff"   # one item: size 9, local key 1, int8 -1 (what iPhone and AVFoundation write)
+LIVE_FPS = 30                                        # iPhone Live Photos are 30 fps; a higher --fps only changes the GIF / MP4
+CANVASES = ("1:1", "4:5", "3:4", "9:16", "16:9")
 
 # window.__frame(f, settle): f = how much of the period is drawn (0..1); settle = 0..1 cross-fade from the moving overlay
 # (head dots, travelling labels, cursor, live table values) to the untouched static chart.
@@ -156,9 +163,41 @@ if (D.mode === 'lines') {
 
 const rows = [...box.querySelectorAll('tbody tr')].map((tr, i) => {
   const td = [...tr.querySelectorAll('td')];
-  return {sym: D.rowOrder[i], td, orig: td.map(t => t.innerHTML)};
+  return {sym: D.rowOrder[i], td, orig: td.map(t => t.innerHTML), style: td.map(t => t.getAttribute('style'))};
 });
-const kOf = sym => { const h = heads.find(h => h.sym === sym); return Math.min(h.p.k, D.series[sym].idx.length - 1); };
+const slot = rows.map(r => r.td[0].getBoundingClientRect().top);   // where each rank sits in the static table
+// data index of a series at draw fraction f; a series without its own moving head (a benchmark in the small multiples) follows the
+// first head's share of the period
+const kAt = (sym, f) => {
+  const h = heads.find(h => h.sym === sym), n = D.series[sym].idx.length - 1;
+  if (h) return Math.min(at(h.v, f).k, n);
+  const h0 = heads[0];
+  return Math.min(at(h0.v, f).k / Math.max(D.series[h0.sym].idx.length - 1, 1) * n, n);
+};
+const kOf = sym => kAt(sym, heads[0].f);
+// The summary table stays sorted by the return so far. Replayed over the whole draw once, on returns averaged over the last
+// SMOOTH of the draw: a row passes the one above it only when it leads by PASS of the current spread (at least 2 points), so
+// lines running close together do not make the rows flicker; at the end the order is the static one. Each pass becomes an eased
+// slide of SLIDE of the draw's running time (f is eased, so time is recovered from it) that starts when it happens.
+const SMOOTH = 0.05, PASS = 0.06, SLIDE = 0.05;
+const clock = f => Math.acos(1 - 2 * Math.min(Math.max(f, 0), 1)) / Math.PI;   // inverse of the draw's cosine easing
+const slides = (() => {
+  let order = rows.map((_, i) => i);
+  const out = [], at = o => { const r = []; o.forEach((i, pos) => { r[i] = pos; }); return r; };
+  const ret = (r, t) => [0, 1, 2, 3, 4].reduce((a, j) => a + lerp(D.series[r.sym].idx, kAt(r.sym, Math.max(t - SMOOTH * j / 4, 0))), 0) / 5;
+  for (let s = 1; s <= 300; s++) {
+    const t = s / 300, v = rows.map(r => ret(r, t)), gap = Math.max(2, PASS * (Math.max(...v) - Math.min(...v)));
+    const before = at(order);
+    if (t === 1) order = rows.map((_, i) => i);
+    else for (let pass = 0; pass < order.length; pass++)
+      for (let q = 0; q + 1 < order.length; q++)
+        if (v[order[q + 1]] - v[order[q]] > gap) order.splice(q, 2, order[q + 1], order[q]);
+    const after = at(order);
+    if (after.some((x, i) => x !== before[i])) out.push({c: clock(t), d: after.map((x, i) => x - before[i])});
+  }
+  return out;
+})();
+const rankAt = (i, f) => slides.reduce((r, e) => r + e.d[i] * (0.5 - 0.5 * Math.cos(Math.PI * Math.min(Math.max((clock(f) - e.c) / SLIDE, 0), 1))), i);
 
 window.__frame = (f, settle) => {
   const done = f >= 1 && settle >= 1;
@@ -166,6 +205,7 @@ window.__frame = (f, settle) => {
   statics.forEach(n => n.style.opacity = f >= 1 ? settle : 0);
   layers.forEach(l => l.style.opacity = f >= 1 ? 1 - settle : 1);
   heads.forEach(h => {
+    h.f = f;
     h.p = at(h.v, f);
     for (const c of [h.halo, h.dot]) { c.setAttribute('cx', h.p.x); c.setAttribute('cy', h.p.y); }
   });
@@ -200,12 +240,22 @@ window.__frame = (f, settle) => {
     });
   }
   rows.forEach(r => {
-    if (done) { r.td.forEach((td, j) => { td.innerHTML = r.orig[j]; }); return; }
+    if (done) {
+      r.td.forEach((td, j) => { td.innerHTML = r.orig[j]; r.style[j] === null ? td.removeAttribute('style') : td.setAttribute('style', r.style[j]); });
+      return;
+    }
     const s = D.series[r.sym], k = kOf(r.sym), i = Math.floor(k);
     r.td[1].innerHTML = sg(lerp(s.idx, k) - 100);
     r.td[2].innerHTML = s.volRun[i].toFixed(1);
     r.td[3].innerHTML = sg(s.mddRun[i]);
     if (!s.na) r.td[4].innerHTML = s.prefix + money(lerp(s.close, k));
+  });
+  if (done) return;
+  rows.forEach((r, i) => {
+    let rank = rankAt(i, f);
+    if (f >= 1) rank += (i - rank) * settle;
+    const lo = Math.min(Math.floor(rank), slot.length - 1), y = slot[lo] + (rank - lo) * ((slot[lo + 1] ?? slot[lo]) - slot[lo]);
+    r.td.forEach(td => { td.style.transform = `translateY(${(y - slot[i]).toFixed(2)}px)`; td.style.background = D.bg; });
   });
 };
 // keep the static header texts of the small multiples to restore them exactly on the last frame
@@ -301,7 +351,7 @@ def motion_data(spec, d, series, benches, base, end, start, lang, theme="light")
         "order": [s.sym for s in (series if mode == "lines" else sorted(series, key=lambda s: -s.ret))],
         "pathOrder": [s.sym for s in benches[::-1] + series[::-1]],          # layout_lines draws benchmarks first, both reversed
         "rowOrder": [s.sym for s in sorted(c.allk, key=lambda s: -s.ret)],    # summary table: return, descending
-        "ink": c.T["ink"], "axis": c.T["axis"], "ring": c.T["ring"],
+        "ink": c.T["ink"], "axis": c.T["axis"], "ring": c.T["ring"], "bg": c.T["bg"],
     }
 
 
@@ -309,37 +359,84 @@ def ease(t):
     return 0.5 - 0.5 * math.cos(math.pi * min(max(t, 0.0), 1.0))
 
 
-def timeline(fps, intro, draw, settle, hold, eased=True):
-    """[(f, settle)] per frame: the empty axes, a draw (eased for charts; linear for tables, whose rows ease one by one),
-    a cross-fade to the static chart, a hold."""
+def segments(fps, intro, draw, settle, hold, eased=True):
+    """The four parts of a timeline as lists of (f, settle) states: the empty start, a draw (eased for charts; linear for tables,
+    whose rows ease one by one), a cross-fade to the static image, a hold."""
     n, m = max(round(draw * fps), 2), max(round(settle * fps), 1)
-    return ([(0.0, 0.0)] * round(intro * fps) + [((ease if eased else float)(i / (n - 1)), 0.0) for i in range(n)]
-            + [(1.0, (i + 1) / m) for i in range(m)] + [(1.0, 1.0)] * round(hold * fps))
+    return ([(0.0, 0.0)] * round(intro * fps), [((ease if eased else float)(i / (n - 1)), 0.0) for i in range(n)],
+            [(1.0, (i + 1) / m) for i in range(m)], [(1.0, 1.0)] * round(hold * fps))
 
 
-async def capture(html, script, frames, outdir, scale):
+def timeline(fps, intro, draw, settle, hold, eased=True):
+    """[(f, settle)] per frame."""
+    return [x for part in segments(fps, intro, draw, settle, hold, eased) for x in part]
+
+
+def thin(states, n):
+    """n states picked evenly from `states` (all of them if there are fewer), first and last included."""
+    if n >= len(states):
+        return list(states)
+    return [states[round(i * (len(states) - 1) / max(n - 1, 1))] for i in range(n)]
+
+
+def live_timeline(loop, draw):
+    """About 3 s at LIVE_FPS, made only of states the loop already has, so no frame is captured twice: the draw is thinned to at
+    most 2.4 s and the cross-fade to 0.3 s, and the last frame (the key photo) is the finished image."""
+    _, d, st, _ = loop
+    return ([(0.0, 0.0)] * round(0.2 * LIVE_FPS) + thin(d, round(min(draw, 2.4) * LIVE_FPS)) + thin(st, round(0.3 * LIVE_FPS))
+            + [(1.0, 1.0)] * round(0.3 * LIVE_FPS))
+
+
+def table_draw(rows):
+    """Seconds for a table's rows to come in, by row count: 6 rows take about 2.2 s, 16 rows 4.4 s, 30 rows or more 6 s."""
+    return min(max(0.9 + 0.22 * rows, 2.0), 6.0)
+
+
+def row_span(draw):
+    """Share of the draw one row takes to come in: about 0.7 s, between 12 % and 60 %."""
+    return min(max(0.7 / draw, 0.12), 0.6)
+
+
+async def capture_all(jobs, scale):
+    """jobs = [(html, script, states, outdir)]. One browser with a page per job, all running at once; each distinct state is
+    captured once. Returns {state: png path} per job."""
     try:
         from playwright.async_api import async_playwright
     except ImportError:
         reexec_in_venv()
         sys.exit("error: playwright is not installed. Run: pip install playwright && playwright install chromium")
-    async with async_playwright() as p:
-        b = await p.chromium.launch()
+
+    async def run(b, html, script, states, outdir):
         pg = await b.new_page(device_scale_factor=scale, viewport={"width": 800, "height": 700})
         await pg.set_content(html)
         await pg.evaluate("document.fonts.ready")
         await pg.add_script_tag(content=script)
-        wrap = pg.locator("#wrap")  # captured exactly like render_common, so the last frame equals the static PNG
-        last = None
-        for i, fs in enumerate(frames):
-            out = outdir / f"f{i:05d}.png"
-            if fs == last:
-                shutil.copyfile(outdir / f"f{i - 1:05d}.png", out)
-                continue
-            await pg.evaluate("([f, s]) => window.__frame(f, s)", list(fs))
-            await wrap.screenshot(path=str(out))
-            last = fs
-        await b.close()
+        wrap = pg.locator("#wrap")  # captured exactly like render_common, so the finished frame equals the static PNG
+        shots = {}
+        for st in dict.fromkeys(states):
+            await pg.evaluate("([f, s]) => window.__frame(f, s)", list(st))
+            shots[st] = outdir / f"s{len(shots):05d}.png"
+            await wrap.screenshot(path=str(shots[st]))
+        await pg.close()
+        return shots
+
+    async with async_playwright() as p:
+        b = await p.chromium.launch()
+        try:
+            return await asyncio.gather(*(run(b, *job) for job in jobs))
+        finally:
+            await b.close()
+
+
+def sequence(shots, states, d):
+    """d/f00000.png ... in timeline order, as hard links to the captured states (copies where links are not possible)."""
+    d.mkdir()
+    for i, st in enumerate(states):
+        try:
+            os.link(shots[st], d / f"f{i:05d}.png")
+        except OSError:
+            shutil.copyfile(shots[st], d / f"f{i:05d}.png")
+    return d
 
 
 def ff(*args):
@@ -348,18 +445,48 @@ def ff(*args):
         sys.exit("error: ffmpeg failed: " + r.stderr[-800:])
 
 
-def make_gif(fdir, fps, out, width, scale):
-    """Looping GIF at most `width` px wide; narrower pages (the Blackstone table) keep their own CSS width."""
-    vf = (f"fps={min(fps, 25)},scale='min({width},trunc(iw/{scale}))':-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=256:stats_mode=full[p];"
-          "[b][p]paletteuse=dither=sierra2_4a:diff_mode=rectangle")
-    ff("-framerate", str(fps), "-i", str(fdir / "f%05d.png"), "-vf", vf, "-loop", "0", str(out))
+def png_size(path):
+    with open(path, "rb") as f:
+        return struct.unpack(">II", f.read(24)[16:24])
 
 
-def make_video(fdir, fps, out, max_side=None, faststart=True):
+def pad(size, canvas, bg):
+    """ffmpeg filter (with a trailing comma) that centres the frame on a canvas of aspect ratio `canvas` ("3:4"), filled with the
+    page colour; empty when no canvas is asked for."""
+    if not canvas:
+        return ""
+    (w, h), (a, b) = size, map(int, canvas.split(":"))
+    cw, ch = (w, math.ceil(w * b / a)) if w * b >= h * a else (math.ceil(h * a / b), h)
+    c = bg.lstrip("#")
+    c = "".join(x * 2 for x in c) if len(c) == 3 else c
+    return f"pad={cw + cw % 2}:{ch + ch % 2}:(ow-iw)/2:(oh-ih)/2:color=0x{c},"
+
+
+def loop_input(fdir, n, fps, fade):
+    """ffmpeg inputs and the start of the filter graph for a looping clip. With a fade, the end cross-fades into the first frame, so
+    the loop restarts without a jump."""
+    args = ["-framerate", str(fps), "-i", str(fdir / "f%05d.png")]
+    if fade <= 0:
+        return args, "[0:v]"
+    args += ["-framerate", str(fps), "-loop", "1", "-t", f"{fade + 2 / fps:.4f}", "-i", str(fdir / "f00000.png")]
+    return args, f"[0:v][1:v]xfade=transition=fade:duration={fade:.4f}:offset={n / fps - fade:.4f},"
+
+
+def make_gif(fdir, n, fps, out, width, scale, fade=0.0, canvas=""):
+    """Looping GIF at most `width` px wide (narrower pages, such as the Blackstone table, keep their own CSS width), 25 fps at most:
+    GIF frame delays are whole hundredths of a second, so 30 fps cannot be shown evenly."""
+    args, head = loop_input(fdir, n, fps, fade)
+    graph = (f"{head}{canvas}fps={min(fps, 25)},scale='min({width},trunc(iw/{scale}))':-1:flags=lanczos,split[a][b];"
+             "[a]palettegen=max_colors=256:stats_mode=full[p];[b][p]paletteuse=dither=sierra2_4a:diff_mode=rectangle")
+    ff(*args, "-filter_complex", graph, "-loop", "0", str(out))
+
+
+def make_video(fdir, n, fps, out, max_side=None, faststart=True, fade=0.0, canvas=""):
+    args, head = loop_input(fdir, n, fps, fade)
     sc = "scale=trunc(iw/2)*2:trunc(ih/2)*2"
     if max_side:
         sc = f"scale='if(gt(ih,iw),-2,min({max_side},iw))':'if(gt(ih,iw),min({max_side},ih),-2)':flags=lanczos,{sc}"
-    ff("-framerate", str(fps), "-i", str(fdir / "f%05d.png"), "-vf", sc + ",format=yuv420p", "-c:v", "libx264", "-preset", "slow",
+    ff(*args, "-filter_complex", f"{head}{canvas}{sc},format=yuv420p", "-c:v", "libx264", "-preset", "slow",
        "-crf", "16", "-tune", "animation", *(["-movflags", "+faststart"] if faststart else []), str(out))
 
 
@@ -389,9 +516,37 @@ def atom(kind, body):
     return struct.pack(">I", 8 + len(body)) + kind + body
 
 
-def stamp_mov(path, cid):
-    """Add a QuickTime moov/meta (mdta keys) with com.apple.quicktime.content.identifier. moov must be the last atom
-    (written without +faststart) so mdat does not move and no chunk offsets need patching."""
+def pascal(text):
+    return bytes([len(text)]) + text.encode("ascii")
+
+
+def still_track(track_id, timescale, duration, still, offset):
+    """A timed-metadata track holding one sample, com.apple.quicktime.still-image-time = -1, at `still` (movie time units): it
+    marks which moment of the video the key photo shows. The atoms are laid out as AVFoundation's AVAssetWriter writes them."""
+    frame = max(1, round(timescale / LIVE_FPS))
+    still = max(0, min(still, duration - frame))
+    ident = (0x10000, 0, 0, 0, 0x10000, 0, 0, 0, 0x40000000)
+    tkhd = b"\x00\x00\x00\x0f" + struct.pack(">IIIII", 0, 0, track_id, 0, duration) + b"\0" * 8 + struct.pack(">hhhH", 0, 0, 0, 0) \
+        + struct.pack(">9I", *ident) + struct.pack(">II", 0, 0)
+    edits = ([(still, -1)] if still else []) + [(frame, 0)]                       # an empty edit places the sample at `still`
+    elst = b"\0" * 4 + struct.pack(">I", len(edits)) + b"".join(struct.pack(">IiI", d, t, 0x10000) for d, t in edits)
+    mdhd = b"\0" * 4 + struct.pack(">IIIIHH", 0, 0, timescale, frame, 0x55C4, 0)
+    keys = atom(struct.pack(">I", 1), atom(b"keyd", b"mdta" + STILL_KEY) + atom(b"dtyp", struct.pack(">II", 0, 65)))  # 65 = signed int8
+    stbl = (atom(b"stsd", b"\0" * 4 + struct.pack(">I", 1) + atom(b"mebx", b"\0" * 6 + struct.pack(">H", 1) + atom(b"keys", keys)))
+            + atom(b"stts", b"\0" * 4 + struct.pack(">III", 1, 1, frame)) + atom(b"stsc", b"\0" * 4 + struct.pack(">IIII", 1, 1, 1, 1))
+            + atom(b"stsz", b"\0" * 4 + struct.pack(">II", len(STILL_SAMPLE), 1)) + atom(b"stco", b"\0" * 4 + struct.pack(">II", 1, offset)))
+    minf = (atom(b"gmhd", atom(b"gmin", b"\0" * 4 + struct.pack(">HHHHhH", 0x40, 0x8000, 0x8000, 0x8000, 0, 0)))
+            + atom(b"hdlr", b"\0" * 4 + b"dhlr" + b"alis" + b"appl" + struct.pack(">II", 0, 0) + pascal("Core Media Data Handler"))
+            + atom(b"dinf", atom(b"dref", b"\0" * 4 + struct.pack(">I", 1) + atom(b"alis", b"\0\0\0\x01"))) + atom(b"stbl", stbl))
+    mdia = (atom(b"mdhd", mdhd) + atom(b"hdlr", b"\0" * 4 + b"mhlr" + b"meta" + b"appl" + struct.pack(">II", 1, 0) + pascal("Core Media Metadata"))
+            + atom(b"minf", minf))
+    return atom(b"trak", atom(b"tkhd", tkhd) + atom(b"edts", atom(b"elst", elst)) + atom(b"mdia", mdia))
+
+
+def stamp_mov(path, cid, still=None):
+    """Add a QuickTime moov/meta (mdta keys) with com.apple.quicktime.content.identifier and, if `still` (seconds) is given, the
+    still-image-time track. moov must be the last atom (written without +faststart) so the video's mdat does not move and no chunk
+    offsets need patching; the still sample goes in a small mdat after moov."""
     data = bytearray(Path(path).read_bytes())
     pos, moov = 0, None
     while pos + 8 <= len(data):
@@ -408,27 +563,41 @@ def stamp_mov(path, cid):
                 atom(b"hdlr", b"\0" * 8 + b"mdta" + b"\0" * 13)
                 + atom(b"keys", b"\0" * 4 + struct.pack(">I", 1) + struct.pack(">I", 8 + len(LIVE_KEY)) + b"mdta" + LIVE_KEY)
                 + atom(b"ilst", atom(struct.pack(">I", 1), atom(b"data", struct.pack(">II", 1, 0) + cid.encode("ascii")))))
-    data[moov[0]:moov[0] + 4] = struct.pack(">I", moov[1] + len(meta))
-    Path(path).write_bytes(bytes(data) + meta)
+    extra, tail = meta, b""
+    if still is not None:
+        mvhd = data.find(b"mvhd", moov[0], moov[0] + moov[1]) - 4
+        size, v = struct.unpack(">I", data[mvhd:mvhd + 4])[0], data[mvhd + 8]
+        timescale, duration = struct.unpack(">II", data[mvhd + 20:mvhd + 28]) if v == 0 else struct.unpack(">IQ", data[mvhd + 28:mvhd + 40])
+        track_id = struct.unpack(">I", data[mvhd + size - 4:mvhd + size])[0]
+        data[mvhd + size - 4:mvhd + size] = struct.pack(">I", track_id + 1)        # mvhd next_track_ID
+        at = round(still * timescale)
+        trak = still_track(track_id, timescale, duration, at, 0)
+        offset = moov[0] + moov[1] + len(meta) + len(trak) + 8                      # the sample, inside the mdat after moov
+        extra, tail = meta + still_track(track_id, timescale, duration, at, offset), atom(b"mdat", STILL_SAMPLE)
+    data[moov[0]:moov[0] + 4] = struct.pack(">I", moov[1] + len(extra))
+    Path(path).write_bytes(bytes(data) + extra + tail)
 
 
-def make_live(fdir, n_frames, fps, out_prefix):
+def make_live(fdir, n_frames, out_prefix, canvas=""):
+    """The Live Photo pair from frames f00000..: a MOV at LIVE_FPS and a JPEG key photo (the last frame), sharing a content
+    identifier; the MOV marks the last frame as the still-image time."""
     cid = str(uuid.uuid4()).upper()
     mov, jpg = Path(f"{out_prefix}_live.mov"), Path(f"{out_prefix}_live.jpg")
-    make_video(fdir, fps, mov, max_side=1920, faststart=False)
-    stamp_mov(mov, cid)
-    ff("-i", str(fdir / f"f{n_frames - 1:05d}.png"), "-q:v", "1", "-pix_fmt", "yuvj444p", str(jpg))  # key photo = the finished chart
+    make_video(fdir, n_frames, LIVE_FPS, mov, max_side=1920, faststart=False, canvas=canvas)
+    stamp_mov(mov, cid, still=(n_frames - 1) / LIVE_FPS)
+    ff("-i", str(fdir / f"f{n_frames - 1:05d}.png"), "-vf", canvas.rstrip(",") or "null", "-q:v", "1", "-pix_fmt", "yuvj444p", str(jpg))
     jpg.write_bytes(insert_exif(jpg.read_bytes(), live_exif(cid)))
     return jpg, mov, cid
 
 
 def scripts(kind, spec, a, lang, chart=None, names=None):
-    """(html, frame script, eased draw?) for one language. Exits with a message on bad input."""
+    """(html, frame script, eased draw?, draw seconds) for one language. Tables and holdings get a draw time from their row count
+    unless --draw is given. Exits with a message on bad input."""
     if kind == "chart":
         d, series, benches, base, end, start, _ = chart
         html = rc.build_html(spec, d, series, benches, base, end, start, lang, a.theme)
         data = motion_data(spec, d, series, benches, base, end, start, lang, a.theme)
-        return html, FRAME_JS.replace("__DATA__", json.dumps(data, ensure_ascii=False)), True
+        return html, FRAME_JS.replace("__DATA__", json.dumps(data, ensure_ascii=False)), True, a.draw or 3.6
     try:
         if kind == "table":
             html = rt.build_html(spec, lang, a.theme, a.style)
@@ -436,7 +605,8 @@ def scripts(kind, spec, a, lang, chart=None, names=None):
             html = rh.build_html(spec, lang, a.theme, a.top, a.mode, a.merge_classes, names, a.by)
     except (ValueError, KeyError, RuntimeError) as e:
         sys.exit(f"error: {e}")
-    return html, ROWS_JS.replace("__SPAN__", "0.4"), False
+    draw = a.draw or table_draw(sum(t.count("<tr") for t in re.findall(r"<tbody>(.*?)</tbody>", html, re.S)))
+    return html, ROWS_JS.replace("__SPAN__", f"{row_span(draw):.4f}"), False, draw
 
 
 def main():
@@ -446,9 +616,15 @@ def main():
     ap.add_argument("--formats", default="gif,mp4,live", help="comma-separated: gif, mp4, live (default: all three)")
     ap.add_argument("--langs", help="comma-separated (default: en,zh; a table spec: the languages it has)")
     ap.add_argument("--theme", choices=sorted(THEMES), default="light", help="light (default) or dark")
-    ap.add_argument("--draw", type=float, default=3.6, help="seconds the lines or rows take to draw (default 3.6; Live Photos use at most 2.4)")
-    ap.add_argument("--hold", type=float, default=1.6, help="seconds the finished image stays before the GIF / MP4 ends (default 1.6)")
-    ap.add_argument("--fps", type=int, default=30, help="frames per second (default 30; GIFs are capped at 25)")
+    ap.add_argument("--canvas", choices=CANVASES, help="centre the image on a canvas of this aspect ratio, filled with the page colour "
+                    "(3:4 or 4:5 for Xiaohongshu and Instagram, 9:16 for Reels, TikTok and Douyin; default: the image's own size)")
+    ap.add_argument("--draw", type=float, help="seconds the lines or rows take to draw (default: 3.6 for charts; for tables and holdings "
+                    "2 to 6 by row count; Live Photos use at most 2.4)")
+    ap.add_argument("--hold", type=float, default=1.6, help="seconds the finished image stays before the GIF / MP4 loops (default 1.6)")
+    ap.add_argument("--loop-fade", type=float, default=0.4, help="seconds the GIF / MP4 end cross-fades into its first frame, so the "
+                    "loop has no jump (default 0.4; 0 for a hard cut)")
+    ap.add_argument("--fps", type=int, default=30, help="frames per second of the MP4 (default 30; 60 is smoother and takes about twice "
+                    "as long; GIFs are capped at 25, Live Photos are 30)")
     ap.add_argument("--scale", type=float, default=2, help="pixel density of the frames (default 2, 1520 px wide)")
     ap.add_argument("--gif-width", type=int, default=760, help="largest GIF width in px (default 760; file size grows quickly with width)")
     g = ap.add_argument_group("table input (as render_table.py)")
@@ -464,6 +640,8 @@ def main():
     bad = [x for x in fmts if x not in FORMATS]
     if bad or not fmts:
         sys.exit(f"error: --formats takes a comma-separated list of {', '.join(FORMATS)}")
+    if a.draw is not None and a.draw <= 0 or a.hold < 0 or a.loop_fade < 0 or a.fps < 1:
+        sys.exit("error: --draw and --fps must be positive, --hold and --loop-fade zero or more")
     if not shutil.which("ffmpeg"):
         sys.exit("error: ffmpeg is not installed (macOS: brew install ffmpeg · Windows: winget install ffmpeg · Debian/Ubuntu: sudo apt install ffmpeg)")
     sp = Path(a.spec)
@@ -494,27 +672,36 @@ def main():
         if [l for l in langs if l not in rh.S]:
             sys.exit(f"error: unsupported language(s) for holdings (available: {', '.join(rh.S)})")
     Path(a.prefix).parent.mkdir(parents=True, exist_ok=True)
-    for lang in langs:
-        html, script, eased = scripts(kind, spec, a, lang, chart, names)
-        out = f"{a.prefix}_{lang}"
-        with tempfile.TemporaryDirectory() as tmp:
-            if "gif" in fmts or "mp4" in fmts:
-                fdir = Path(tmp) / "loop"
-                fdir.mkdir()
-                asyncio.run(capture(html, script, timeline(a.fps, 0.4, a.draw, 0.5, a.hold, eased), fdir, a.scale))
+    looped = "gif" in fmts or "mp4" in fmts
+    with tempfile.TemporaryDirectory() as tmp:
+        jobs, plans = [], []
+        for lang in langs:   # every language is captured at once, each distinct frame once for all three formats
+            html, script, eased, draw = scripts(kind, spec, a, lang, chart, names)
+            loop = segments(a.fps, 0.4, draw, 0.5, a.hold + a.loop_fade, eased)
+            seq = {"loop": [x for part in loop for x in part] if looped else [], "live": live_timeline(loop, draw) if "live" in fmts else []}
+            work = Path(tmp) / lang
+            work.mkdir()
+            jobs.append((html, script, seq["loop"] + seq["live"], work))
+            plans.append((lang, seq, work))
+        shots = asyncio.run(capture_all(jobs, a.scale))
+        tasks = []
+        for (lang, seq, work), shot in zip(plans, shots):
+            out = f"{a.prefix}_{lang}"
+            canvas = pad(png_size(next(iter(shot.values()))), a.canvas, THEMES[a.theme]["bg"])
+            if looped:
+                fdir = sequence(shot, seq["loop"], work / "loop")
+                n = len(seq["loop"])
                 if "gif" in fmts:
-                    make_gif(fdir, a.fps, f"{out}.gif", a.gif_width, a.scale)
-                    print(f"wrote {out}.gif")
+                    tasks.append((make_gif, (fdir, n, a.fps, f"{out}.gif", a.gif_width, a.scale, a.loop_fade, canvas), {}, f"wrote {out}.gif"))
                 if "mp4" in fmts:
-                    make_video(fdir, a.fps, f"{out}.mp4")
-                    print(f"wrote {out}.mp4")
+                    tasks.append((make_video, (fdir, n, a.fps, f"{out}.mp4"), dict(fade=a.loop_fade, canvas=canvas), f"wrote {out}.mp4"))
             if "live" in fmts:
-                fdir = Path(tmp) / "live"
-                fdir.mkdir()
-                frames = timeline(a.fps, 0.2, min(a.draw, 2.4), 0.3, 0.3, eased)  # about 3 s, ending on the key photo
-                asyncio.run(capture(html, script, frames, fdir, a.scale))
-                jpg, mov, cid = make_live(fdir, len(frames), a.fps, out)
-                print(f"wrote {jpg} + {mov} (Live Photo, content identifier {cid})")
+                fdir = sequence(shot, seq["live"], work / "live")
+                tasks.append((make_live, (fdir, len(seq["live"]), out, canvas), {}, f"wrote {out}_live.jpg + {out}_live.mov (Live Photo)"))
+        with ThreadPoolExecutor(max_workers=min(4, len(tasks))) as pool:   # ffmpeg encodes run side by side too
+            for fut, msg in [(pool.submit(fn, *args, **kw), msg) for fn, args, kw, msg in tasks]:
+                fut.result()
+                print(msg)
     if kind == "chart":
         print("base date:", base, "| end:", end, "| " + ", ".join(f"{s.sym} {rc.f1(s.ret, True)}%" for s in series + benches))
 
