@@ -32,6 +32,7 @@ Deux skills d'agent dans un seul dépôt, conçus pour Claude Code et utilisable
 <tr><td width="50%" align="center"><img src="examples/earnings/aapl_2025q4_zh.png" alt="Résultats HSBC, AAPL T4"><br><sub><b>Résultats HSBC, AAPL T4</b> · 繁體中文</sub></td><td width="50%" align="center"><img src="examples/holdings_en.png" alt="Tableau de positions"><br><sub><b>Tableau de positions</b> · EN</sub></td></tr>
 <tr><td width="50%" align="center"><img src="examples/etf_holdings_equity_en.png" alt="Top 13 des positions d'un ETF"><br><sub><b>Top 13 des positions d'un ETF</b> · EN</sub></td><td width="50%" align="center"><img src="examples/etf_holdings_swap_zh.png" alt="ETF avec exposition par swaps"><br><sub><b>ETF avec exposition par swaps</b> · 繁體中文</sub></td></tr>
 <tr><td width="50%" align="center"><img src="examples/chart_lines_motion_en.gif" alt="Graphique animé (GIF)"><br><sub><b>Graphique animé (GIF)</b> · EN</sub></td><td width="50%" align="center"><img src="examples/chart_multiples_motion_zh.gif" alt="Petits multiples animés (GIF)"><br><sub><b>Petits multiples animés (GIF)</b> · 繁體中文</sub></td></tr>
+<tr><td width="50%" align="center"><img src="examples/etf_holdings_motion_en.gif" alt="Positions d'ETF animées (GIF)"><br><sub><b>Positions d'ETF animées (GIF)</b> · EN</sub></td><td width="50%" align="center"><img src="examples/watchlist_motion_zh.gif" alt="Tableau de suivi animé (GIF)"><br><sub><b>Tableau de suivi animé (GIF)</b> · 繁體中文</sub></td></tr>
 </table>
 
 <sub>Les exemples de résultats utilisent les publications officielles d'Apple et le tableau de classement un graphique public de Charles Schwab. Tout le reste utilise des sociétés fictives et des données synthétiques.</sub>
@@ -134,7 +135,7 @@ python3 prices_to_table.py data/prices.json data/matrix.json --style morgan   # 
 python3 render_table.py data/matrix.json out/matrix
 ```
 
-Chaque modèle a des schémas de colonnes explicites ; passer un tableau de suivi à cinq colonnes à une disposition de sept ou neuf colonnes n'invente pas les données manquantes. Les tableaux et graphiques Schwab gardent les modes clair et sombre ; les autres modèles sont calibrés pour du papier blanc. Schémas, échantillons de sources et substitutions de polices : voir le [guide des modèles](references/institutional-tables.md).
+Chaque modèle a des schémas de colonnes explicites ; passer un tableau de suivi à cinq colonnes à une disposition de sept ou neuf colonnes n'invente pas les données manquantes. Les tableaux et graphiques Schwab gardent les modes clair et sombre ; les autres modèles sont calibrés pour du papier blanc. Schémas, échantillons de sources et substitutions de polices : voir le [guide des modèles](references/institutional-tables.md). Les quatre dispositions peuvent être animées avec `render_motion.py` (lignes en fondu, chiffres qui défilent ; GIF, MP4 ou Live Photo).
 
 ## 📊 Graphiques de cours
 
@@ -185,6 +186,7 @@ Représentez les plus grandes positions d'un ETF (13 par défaut, `--top N` pour
 - **Dates honnêtes :** la date de situation est le jour d'où viennent les prix de l'émetteur (NEOS et Roundhill datent leurs fichiers du jour de bourse suivant : l'outil affiche le jour de valorisation, le signale en note, et le contrôle hebdomadaire le vérifie avec les cours officiels ; Vanguard publie chaque mois), avec un avertissement au-delà de 10 jours. Les poids sont affichés tels que publiés ; un poids absent s'affiche NA et n'est jamais compté comme zéro.
 - **Conditions d'utilisation :** seuls des fichiers et pages publics sont lus, et chaque chemin est autorisé par le robots.txt du site. Invesco et Destiny interdisent l'accès automatisé : leurs fonds se traitent uniquement par import (`--csv`). Les conditions n'ont été vérifiées que pour Invesco, Destiny et SSGA ; lisez celles des autres émetteurs avant tout usage commercial.
 - **Options :** `--top N`, `--by sector|name` (fonds de milliers de lignes, ex. ETF obligataires), `--names names.json` (noms en langue locale), `--theme dark`, `--pdf`, `--langs`.
+- **Animé :** `render_motion.py` reprend le même fichier de positions et fait pousser les barres l'une après l'autre, poids et cumul défilant, en GIF, en MP4 ou en Live Photo ; la dernière image est le graphique statique.
 
 ```bash
 python3 fetch_holdings.py QQQ NCLD -o data/                  # data/QQQ_holdings.json, data/NCLD_holdings.json
@@ -226,7 +228,7 @@ python3 quarterly_earnings.py AAPL --period FY2025Q3 -o out/aapl_q3
 - `render_table.py`, `institutional_tables.py`, `prices_to_table.py`: Moteur de rendu des tableaux et ses quatre styles ; construit des spécifications Morgan / Blackstone à partir des prix
 - `fetch_prices.py`, `csv_to_prices.py`: Cours de clôture quotidiens de Nasdaq, Shanghai/Shenzhen et Yahoo ; conversion de vos fichiers CSV
 - `render_chart.py`, `render_common.py`: Moteur de rendu des graphiques ; thèmes et sorties PNG / PDF partagés
-- `render_motion.py`: Graphiques animés : GIF, MP4 et Live Photo Apple (nécessite ffmpeg)
+- `render_motion.py`: Graphiques, tableaux et positions d'ETF animés : GIF, MP4 et Live Photo Apple (nécessite ffmpeg)
 - `fetch_holdings.py`, `render_holdings.py`: Positions d'un ETF depuis le fichier de l'émetteur (SPDR, iShares, Vanguard, NEOS, Roundhill, Tema, votre CSV) et rendu du top N
 - `quarterly_earnings.py`, `earnings_core.py`, `earnings_sources.py`, `render_earnings.py`: Commande de résultats, calculs vérifiables, adaptateurs de sources et rendu de style HSBC
 - `localization.py`, `fonts.py`, `fonts/`: Conversion en chinois traditionnel ; polices fournies et intégrées au HTML (licences incluses)

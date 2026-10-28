@@ -30,7 +30,8 @@ GALLERY = ["examples/neural9_en.png", "examples/watchlist_zh.png", "examples/cha
            "examples/morgan_zh.png", "examples/blackstone_zh.png", "examples/ibkr_zh.png",
            "examples/earnings/aapl_2025q3_zh.png", "examples/earnings/aapl_2025q4_zh.png", "examples/holdings_en.png",
            "examples/etf_holdings_equity_en.png", "examples/etf_holdings_swap_zh.png",
-           "examples/chart_lines_motion_en.gif", "examples/chart_multiples_motion_zh.gif"]
+           "examples/chart_lines_motion_en.gif", "examples/chart_multiples_motion_zh.gif",
+           "examples/etf_holdings_motion_en.gif", "examples/watchlist_motion_zh.gif"]
 STYLE_EXAMPLES = ["neural9", "holdings", "watchlist", "morgan", "blackstone", "ibkr"]
 
 BADGES = " ".join([

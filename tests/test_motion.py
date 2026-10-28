@@ -11,7 +11,9 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 import render_chart as rc  # noqa: E402
+import render_holdings as rh  # noqa: E402
 import render_motion as rm  # noqa: E402
+import render_table as rt  # noqa: E402
 
 CID = "3ED4251C-446C-40D2-8FD1-4700273D9310"
 
@@ -109,6 +111,25 @@ class Timeline(unittest.TestCase):
         settle = [s for f, s in fr if f == 1.0]
         self.assertEqual(settle, sorted(settle))
 
+    def test_tables_draw_linearly(self):
+        draw = [f for f, s in rm.timeline(10, 0, 1.0, 0.1, 0, eased=False) if s == 0]
+        self.assertEqual(draw, [i / 9 for i in range(10)])   # each row eases on its own; the overall clock is linear
+
+
+class InputKind(unittest.TestCase):
+    def kind(self, name):
+        return rm.detect_kind(json.loads((ROOT / "examples" / name).read_text(encoding="utf-8")))
+
+    def test_every_example_input_is_recognised(self):
+        self.assertEqual(self.kind("chart_lines_spec.json"), "chart")
+        self.assertEqual(self.kind("chart_multiples_spec.json"), "chart")
+        for t in ("watchlist", "neural9", "holdings", "morgan", "ibkr", "blackstone"):
+            self.assertEqual(self.kind(f"{t}_spec.json"), "table", t)
+        self.assertEqual(self.kind("etf_holdings_swap.json"), "holdings")
+        self.assertEqual(self.kind("etf_holdings_equity.json"), "holdings")
+        self.assertIsNone(rm.detect_kind({"rows": []}))
+        self.assertIsNone(rm.detect_kind([]))
+
 
 class FrameScriptContract(unittest.TestCase):
     """The frame script finds lines and rows by position, so the order must match what render_chart.py emits."""
@@ -140,6 +161,37 @@ class FrameScriptContract(unittest.TestCase):
         self.assertEqual(data["mode"], "multiples")
         headers = re.findall(r'font-weight="700"[^>]*>([^<]+)</text>', re.search(r'<svg id="sm".*?</svg>', html).group(0))
         self.assertEqual(headers, data["order"])
+
+
+class RowScriptContract(unittest.TestCase):
+    """The row script animates every tbody row, numbers with a decimal point, .bar widths and the .cum column."""
+    NUM = re.compile(r"^([^\d(\-]*)(\(?)(-?)(\d[\d,]*\.(\d+))(\)?)(%?)$")   # same pattern as ROWS_JS
+
+    def test_pattern_matches_rows_js(self):
+        self.assertIn("/" + self.NUM.pattern + "/", rm.ROWS_JS)
+
+    def test_number_formats(self):
+        for text, parts in [("12.8", ("", "", "", "12.8", "")), ("-3.0", ("", "", "-", "3.0", "")), ("1,234.56", ("", "", "", "1,234.56", "")),
+                            ("(5.2)%", ("", "(", "", "5.2", "%")), ("USD 99.89", ("USD ", "", "", "99.89", ""))]:
+            m = self.NUM.match(text)
+            self.assertIsNotNone(m, text)
+            self.assertEqual((m[1], m[2], m[3], m[4], m[7]), parts)
+        for text in ("12", "1,250", "NA", "2026-10-02", "Acme (ACRB)", ""):   # ranks, share counts and text are not counted up
+            self.assertIsNone(self.NUM.match(text), text)
+
+    def test_holdings_markup(self):
+        data = json.loads((ROOT / "examples" / "etf_holdings_swap.json").read_text(encoding="utf-8"))
+        html = rh.build_html(data, "en")
+        body = re.search(r"<tbody>(.*)</tbody>", html).group(1)
+        for row in re.findall(r"<tr>(.*?)</tr>", body):
+            self.assertRegex(row, r'<td class="num">[\d.]+</td><td class="num cum">[\d.]+</td>')   # weight, then the running total
+            self.assertRegex(row, r'<i class="fp" style="width:[\d.]+%"></i><i class="fs" style="width:[\d.]+%"></i>')
+
+    def test_table_markup(self):
+        spec = json.loads((ROOT / "examples" / "watchlist_spec.json").read_text(encoding="utf-8"))
+        html = rt.build_html(spec, "en")
+        rows = re.findall(r"<tr class=\"[^\"]*\">(.*?)</tr>", re.search(r"<tbody>(.*)</tbody>", html, re.S).group(1))
+        self.assertEqual(len(rows), len(spec["rows"]))
 
 
 if __name__ == "__main__":

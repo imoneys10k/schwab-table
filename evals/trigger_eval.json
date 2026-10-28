@@ -90,5 +90,13 @@
  {
   "query": "这几只股票的走势做成 iPhone 实况图",
   "should_trigger": true
+ },
+ {
+  "query": "QQQ 前十大持仓做成一个会动的 GIF",
+  "should_trigger": true
+ },
+ {
+  "query": "turn my watchlist performance table into an animated GIF for a slide",
+  "should_trigger": true
  }
 ]

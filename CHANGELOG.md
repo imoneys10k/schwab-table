@@ -5,13 +5,14 @@ All notable changes. Versions follow the [releases](https://github.com/imoneys10
 
 
 
-## 0.8.0 (2026-10-26)
+## 0.8.0 (2026-10-28)
 
 ### Added
 - **Animated charts.** `render_motion.py` takes a `render_chart.py` spec and writes the chart as a looping GIF, an H.264 MP4 and an Apple Live Photo (`_live.jpg` + `_live.mov`). The lines draw from left to right with a glowing head, the line-end labels ride along with live values, the current date sits above the cursor, and the summary table (return, volatility, max drawdown, last price) is recomputed as of the cursor; the drawdown panel and the small multiples animate the same way. It then fades into the static chart: the last frame is pixel-identical to the `render_chart.py` PNG. Light and dark themes, English and Traditional Chinese, `--draw`, `--hold`, `--fps`, `--scale`, `--gif-width`.
-  - Live Photo pairing is written in plain Python, so it works on macOS, Linux and Windows without exiftool or PyObjC: an Apple MakerNote (tag 17, the content identifier) in the JPEG, laid out exactly as macOS ImageIO writes it, and a QuickTime `moov/meta` `mdta` key `com.apple.quicktime.content.identifier` in the MOV. Both were read back with ImageIO and AVFoundation during development.
+  - Live Photo pairing is written in plain Python, so it works on macOS, Linux and Windows without exiftool or PyObjC: an Apple MakerNote (tag 17, the content identifier) in the JPEG, laid out exactly as macOS ImageIO writes it, and a QuickTime `moov/meta` `mdta` key `com.apple.quicktime.content.identifier` in the MOV. Both were read back with ImageIO and AVFoundation, and macOS Photos (`PHLivePhoto`) accepts the pair as a Live Photo while rejecting the same pair with mismatched identifiers.
+- **Animated tables and ETF holdings.** `render_motion.py` also takes a `render_table.py` spec (all four templates: Schwab, Morgan, Blackstone, IBKR) or `fetch_holdings.py` output, recognised by its content. Table rows fade in from top to bottom and every number with a decimal point counts up from 0 in its own format (Blackstone's `(5.2)%` included), while ranks, share counts and text simply appear. Holdings bars grow one after another from rank 1, swap parts included, with the weight counting up and the cumulative column adding up the weights shown so far. `--style` and the holdings options (`--top`, `--mode`, `--by`, `--merge-classes`, `--names`) work as in the static renderers. The last frame is pixel-identical to the static PNG; checked for every table template, light and dark, and the holdings modes, in both languages. GIFs keep a narrow layout's own width instead of being stretched to 760 px.
   - Needs ffmpeg; the installers print a hint when it is missing and every other feature works without it.
-  - Tests (`tests/test_motion.py`, offline): the EXIF / MakerNote bytes, the MOV atoms, the frame timeline, and the path and row order the frame script depends on. Two animated examples in the gallery.
+  - Tests (`tests/test_motion.py`, offline): the EXIF / MakerNote bytes, the MOV atoms, the frame timeline, and the path and row order the frame script depends on, input detection, the number pattern the row script counts up, and the holdings and table markup it relies on. Four animated examples in the gallery.
 
 ## 0.7.0 (2026-10-12)
 

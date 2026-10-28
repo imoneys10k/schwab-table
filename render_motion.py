@@ -1,14 +1,20 @@
-"""Animated price charts: the chart from render_chart.py draws itself left to right, then settles on the exact static image.
+"""Animated charts and tables that settle on the exact static image.
 
-Usage: python3 render_motion.py spec.json OUT_PREFIX [--formats gif,mp4,live] [--langs en,zh] [--theme light|dark]
+Usage: python3 render_motion.py INPUT.json OUT_PREFIX [--formats gif,mp4,live] [--langs en,zh] [--theme light|dark]
                                 [--draw 3.6] [--hold 1.6] [--fps 30] [--scale 2] [--gif-width 760]
+       table input:    [--style schwab|morgan|blackstone|ibkr]
+       holdings input: [--top 13] [--mode exposure|lines] [--by holding|name|sector] [--merge-classes] [--names names.json]
 
-Takes the same spec as render_chart.py. Per language it writes:
+INPUT is any of the three inputs the static renderers take, recognised by its content:
+  price chart  render_chart.py spec ("data" key)            the lines draw left to right; labels, table and date follow the cursor
+  table        render_table.py spec ("langs" + "rows")      rows come in one after another and their numbers count up
+  holdings     fetch_holdings.py output ("holdings" list)   bars grow one after another, weights and the cumulative column count up
+Per language it writes:
   gif   OUT_PREFIX_{lang}.gif                       looping GIF (chat apps, X, web pages)
   mp4   OUT_PREFIX_{lang}.mp4                       H.264 video (Xiaohongshu, X, slides)
   live  OUT_PREFIX_{lang}_live.jpg + _live.mov      an Apple Live Photo pair: both carry the same content identifier, so AirDropping
                                                     both to an iPhone, or importing both into Photos, gives one Live Photo
-The last frame is pixel-identical to render_chart.py's PNG. Needs Playwright + Chromium (like the other renderers) and ffmpeg.
+The last frame is pixel-identical to the PNG of the matching static renderer. Needs Playwright + Chromium (like the other renderers) and ffmpeg.
 The Live Photo metadata is written here in plain Python (no exiftool, works on any OS).
 """
 import argparse
@@ -25,10 +31,14 @@ from html import escape
 from pathlib import Path
 
 import render_chart as rc
+import render_holdings as rh
+import render_table as rt
+from institutional_tables import STYLES
 from localization import traditional
 from render_common import THEMES, reexec_in_venv
 
 FORMATS = ("gif", "mp4", "live")
+KINDS = ("chart", "table", "holdings")
 LIVE_KEY = b"com.apple.quicktime.content.identifier"
 
 # window.__frame(f, settle): f = how much of the period is drawn (0..1); settle = 0..1 cross-fade from the moving overlay
@@ -203,6 +213,72 @@ if (D.mode !== 'lines') Object.values(D.series).forEach(s => { if (s.retEl) s.re
 })();
 """
 
+# Tables and holdings: window.__frame(f) with f = 0..1 (linear); row i runs from start[i] to start[i] + SPAN, each with its own easing.
+# A row fades and rises in, its bars grow, and every number with a decimal point counts up from 0 in the row's own format;
+# integers (ranks, share counts) and text just appear. Holdings' cumulative column is the running sum of the weights shown so far.
+ROWS_JS = r"""
+(() => {
+const SPAN = __SPAN__;
+const wrap = document.getElementById('wrap');
+const NUM = /^([^\d(\-]*)(\(?)(-?)(\d[\d,]*\.(\d+))(\)?)(%?)$/;
+const clamp = t => Math.min(Math.max(t, 0), 1);
+const out3 = t => 1 - Math.pow(1 - t, 3);
+const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+const show = (v, c) => {
+  const a = Math.abs(v).toLocaleString('en-US', {minimumFractionDigits: c.dp, maximumFractionDigits: c.dp, useGrouping: c.comma});
+  const neg = v < 0 && /[1-9]/.test(a);   // no "-0.0" while counting
+  const n = !neg ? a : c.paren ? '(' + a + ')' : (c.sgn ? '<span class="sgn">-</span>' : '-') + a;
+  return esc(c.pre) + n + c.pct;
+};
+const trs = [...wrap.querySelectorAll('tbody tr')];
+const rows = trs.map((tr, i) => ({
+  start: trs.length > 1 ? i * (1 - SPAN) / (trs.length - 1) : 0,
+  tds: [...tr.children].map(td => ({td, style: td.getAttribute('style')})),
+  bars: [...tr.querySelectorAll('.bar i')].map(b => ({b, w: parseFloat(b.style.width) || 0, style: b.getAttribute('style')})),
+  nums: [...tr.children].flatMap(td => {
+    const m = td.textContent.trim().match(NUM);
+    if (!m) return [];
+    const v = parseFloat(m[4].replace(/,/g, ''));
+    return [{td, html: td.innerHTML, v: m[2] || m[3] ? -v : v, pre: m[1], paren: !!m[2], dp: m[5].length, pct: m[7],
+             comma: m[4].includes(','), sgn: !!td.querySelector('.sgn'), cum: td.classList.contains('cum')}];
+  }),
+}));
+window.__frame = f => {
+  let run = 0;
+  rows.forEach(r => {
+    if (f >= 1) {   // exactly the static markup
+      r.tds.forEach(o => o.style === null ? o.td.removeAttribute('style') : o.td.setAttribute('style', o.style));
+      r.bars.forEach(o => o.b.setAttribute('style', o.style));
+      r.nums.forEach(c => { c.td.innerHTML = c.html; });
+      return;
+    }
+    const p = clamp((f - r.start) / SPAN), e = out3(p), a = clamp(p * 2.5);
+    r.tds.forEach(o => { o.td.style.opacity = a; o.td.style.transform = `translateY(${((1 - out3(a)) * 8).toFixed(2)}px)`; });
+    r.bars.forEach(o => { o.b.style.width = (o.w * e).toFixed(3) + '%'; });
+    let shown = 0;
+    r.nums.forEach(c => {
+      const v = c.cum ? run + shown : c.v * e;
+      if (!c.cum) shown = v;
+      c.td.innerHTML = show(v, c);
+    });
+    if (r.nums.some(c => c.cum)) run += shown;
+  });
+};
+})();
+"""
+
+
+def detect_kind(spec):
+    """chart, table or holdings, from the input's own keys."""
+    if isinstance(spec, dict):
+        if isinstance(spec.get("holdings"), list):
+            return "holdings"
+        if "rows" in spec and "langs" in spec:
+            return "table"
+        if "data" in spec:
+            return "chart"
+    return None
+
 
 def layout_of(spec, series):
     mode = spec.get("layout", "auto")
@@ -233,14 +309,15 @@ def ease(t):
     return 0.5 - 0.5 * math.cos(math.pi * min(max(t, 0.0), 1.0))
 
 
-def timeline(fps, intro, draw, settle, hold):
-    """[(f, settle)] per frame: the empty axes, an eased draw, a cross-fade to the static chart, a hold."""
+def timeline(fps, intro, draw, settle, hold, eased=True):
+    """[(f, settle)] per frame: the empty axes, a draw (eased for charts; linear for tables, whose rows ease one by one),
+    a cross-fade to the static chart, a hold."""
     n, m = max(round(draw * fps), 2), max(round(settle * fps), 1)
-    return ([(0.0, 0.0)] * round(intro * fps) + [(ease(i / (n - 1)), 0.0) for i in range(n)]
+    return ([(0.0, 0.0)] * round(intro * fps) + [((ease if eased else float)(i / (n - 1)), 0.0) for i in range(n)]
             + [(1.0, (i + 1) / m) for i in range(m)] + [(1.0, 1.0)] * round(hold * fps))
 
 
-async def capture(html, data, frames, outdir, scale):
+async def capture(html, script, frames, outdir, scale):
     try:
         from playwright.async_api import async_playwright
     except ImportError:
@@ -251,7 +328,7 @@ async def capture(html, data, frames, outdir, scale):
         pg = await b.new_page(device_scale_factor=scale, viewport={"width": 800, "height": 700})
         await pg.set_content(html)
         await pg.evaluate("document.fonts.ready")
-        await pg.add_script_tag(content=FRAME_JS.replace("__DATA__", json.dumps(data, ensure_ascii=False)))
+        await pg.add_script_tag(content=script)
         wrap = pg.locator("#wrap")  # captured exactly like render_common, so the last frame equals the static PNG
         last = None
         for i, fs in enumerate(frames):
@@ -271,8 +348,9 @@ def ff(*args):
         sys.exit("error: ffmpeg failed: " + r.stderr[-800:])
 
 
-def make_gif(fdir, fps, out, width):
-    vf = (f"fps={min(fps, 25)},scale={width}:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=256:stats_mode=full[p];"
+def make_gif(fdir, fps, out, width, scale):
+    """Looping GIF at most `width` px wide; narrower pages (the Blackstone table) keep their own CSS width."""
+    vf = (f"fps={min(fps, 25)},scale='min({width},trunc(iw/{scale}))':-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=256:stats_mode=full[p];"
           "[b][p]paletteuse=dither=sierra2_4a:diff_mode=rectangle")
     ff("-framerate", str(fps), "-i", str(fdir / "f%05d.png"), "-vf", vf, "-loop", "0", str(out))
 
@@ -344,18 +422,43 @@ def make_live(fdir, n_frames, fps, out_prefix):
     return jpg, mov, cid
 
 
+def scripts(kind, spec, a, lang, chart=None, names=None):
+    """(html, frame script, eased draw?) for one language. Exits with a message on bad input."""
+    if kind == "chart":
+        d, series, benches, base, end, start, _ = chart
+        html = rc.build_html(spec, d, series, benches, base, end, start, lang, a.theme)
+        data = motion_data(spec, d, series, benches, base, end, start, lang, a.theme)
+        return html, FRAME_JS.replace("__DATA__", json.dumps(data, ensure_ascii=False)), True
+    try:
+        if kind == "table":
+            html = rt.build_html(spec, lang, a.theme, a.style)
+        else:
+            html = rh.build_html(spec, lang, a.theme, a.top, a.mode, a.merge_classes, names, a.by)
+    except (ValueError, KeyError, RuntimeError) as e:
+        sys.exit(f"error: {e}")
+    return html, ROWS_JS.replace("__SPAN__", "0.4"), False
+
+
 def main():
-    ap = argparse.ArgumentParser(description="Render an animated Schwab-style price chart (GIF / MP4 / Live Photo).")
-    ap.add_argument("spec")
+    ap = argparse.ArgumentParser(description="Render an animated Schwab-style chart or table (GIF / MP4 / Live Photo).")
+    ap.add_argument("spec", help="a render_chart.py or render_table.py spec, or fetch_holdings.py output")
     ap.add_argument("prefix")
     ap.add_argument("--formats", default="gif,mp4,live", help="comma-separated: gif, mp4, live (default: all three)")
-    ap.add_argument("--langs", default="en,zh")
+    ap.add_argument("--langs", help="comma-separated (default: en,zh; a table spec: the languages it has)")
     ap.add_argument("--theme", choices=sorted(THEMES), default="light", help="light (default) or dark")
-    ap.add_argument("--draw", type=float, default=3.6, help="seconds the lines take to draw (default 3.6; Live Photos use at most 2.4)")
-    ap.add_argument("--hold", type=float, default=1.6, help="seconds the finished chart stays before the GIF / MP4 ends (default 1.6)")
+    ap.add_argument("--draw", type=float, default=3.6, help="seconds the lines or rows take to draw (default 3.6; Live Photos use at most 2.4)")
+    ap.add_argument("--hold", type=float, default=1.6, help="seconds the finished image stays before the GIF / MP4 ends (default 1.6)")
     ap.add_argument("--fps", type=int, default=30, help="frames per second (default 30; GIFs are capped at 25)")
     ap.add_argument("--scale", type=float, default=2, help="pixel density of the frames (default 2, 1520 px wide)")
-    ap.add_argument("--gif-width", type=int, default=760, help="GIF width in px (default 760; file size grows quickly with width)")
+    ap.add_argument("--gif-width", type=int, default=760, help="largest GIF width in px (default 760; file size grows quickly with width)")
+    g = ap.add_argument_group("table input (as render_table.py)")
+    g.add_argument("--style", choices=STYLES, help="report template (default: spec.style, or schwab)")
+    g = ap.add_argument_group("holdings input (as render_holdings.py)")
+    g.add_argument("--top", type=int, default=13, help="how many holdings to show (default 13)")
+    g.add_argument("--mode", choices=("exposure", "lines"), default="exposure")
+    g.add_argument("--by", choices=rh.GROUPS, default="holding")
+    g.add_argument("--merge-classes", action="store_true")
+    g.add_argument("--names", help='JSON {"NVDA": {"zh": "英伟达"}} for local-language names')
     a = ap.parse_args()
     fmts = [x.strip() for x in a.formats.split(",") if x.strip()]
     bad = [x for x in fmts if x not in FORMATS]
@@ -364,24 +467,43 @@ def main():
     if not shutil.which("ffmpeg"):
         sys.exit("error: ffmpeg is not installed (macOS: brew install ffmpeg · Windows: winget install ffmpeg · Debian/Ubuntu: sudo apt install ffmpeg)")
     sp = Path(a.spec)
-    spec = json.loads(sp.read_text(encoding="utf-8"))
-    d, series, benches, base, end, start, warnings = rc.load(spec, sp.parent)
-    for w in warnings:
-        print("warning:", w, file=sys.stderr)
-    if layout_of(spec, series) == "lines" and len(series) > rc.MAX_LINES:
-        sys.exit(f"error: lines layout supports at most {rc.MAX_LINES} symbols; use layout=multiples")
+    try:
+        spec = json.loads(sp.read_text(encoding="utf-8"))
+        names = json.loads(Path(a.names).read_text(encoding="utf-8")) if a.names else {}
+    except (OSError, ValueError) as e:
+        sys.exit(f"error: cannot read input: {e}")
+    kind = detect_kind(spec)
+    if not kind:
+        sys.exit(f"error: {sp} is not a chart spec (\"data\"), a table spec (\"langs\" + \"rows\") or fetch_holdings.py output (\"holdings\")")
+    chart = None
+    wanted = [x.strip() for x in a.langs.split(",")] if a.langs else None
+    if kind == "chart":
+        chart = rc.load(spec, sp.parent)
+        d, series, benches, base, end, start, warnings = chart
+        for w in warnings:
+            print("warning:", w, file=sys.stderr)
+        if layout_of(spec, series) == "lines" and len(series) > rc.MAX_LINES:
+            sys.exit(f"error: lines layout supports at most {rc.MAX_LINES} symbols; use layout=multiples")
+        langs = wanted or ["en", "zh"]
+    elif kind == "table":
+        langs = rt.pick_langs(spec, wanted)
+    else:
+        if not 1 <= a.top <= rh.MAX_TOP:
+            sys.exit(f"error: --top must be between 1 and {rh.MAX_TOP}")
+        langs = wanted or ["en", "zh"]
+        if [l for l in langs if l not in rh.S]:
+            sys.exit(f"error: unsupported language(s) for holdings (available: {', '.join(rh.S)})")
     Path(a.prefix).parent.mkdir(parents=True, exist_ok=True)
-    for lang in [x.strip() for x in a.langs.split(",")]:
-        html = rc.build_html(spec, d, series, benches, base, end, start, lang, a.theme)
-        data = motion_data(spec, d, series, benches, base, end, start, lang, a.theme)
+    for lang in langs:
+        html, script, eased = scripts(kind, spec, a, lang, chart, names)
         out = f"{a.prefix}_{lang}"
         with tempfile.TemporaryDirectory() as tmp:
             if "gif" in fmts or "mp4" in fmts:
                 fdir = Path(tmp) / "loop"
                 fdir.mkdir()
-                asyncio.run(capture(html, data, timeline(a.fps, 0.4, a.draw, 0.5, a.hold), fdir, a.scale))
+                asyncio.run(capture(html, script, timeline(a.fps, 0.4, a.draw, 0.5, a.hold, eased), fdir, a.scale))
                 if "gif" in fmts:
-                    make_gif(fdir, a.fps, f"{out}.gif", a.gif_width)
+                    make_gif(fdir, a.fps, f"{out}.gif", a.gif_width, a.scale)
                     print(f"wrote {out}.gif")
                 if "mp4" in fmts:
                     make_video(fdir, a.fps, f"{out}.mp4")
@@ -389,11 +511,12 @@ def main():
             if "live" in fmts:
                 fdir = Path(tmp) / "live"
                 fdir.mkdir()
-                frames = timeline(a.fps, 0.2, min(a.draw, 2.4), 0.3, 0.3)  # about 3 s, ending on the key photo
-                asyncio.run(capture(html, data, frames, fdir, a.scale))
+                frames = timeline(a.fps, 0.2, min(a.draw, 2.4), 0.3, 0.3, eased)  # about 3 s, ending on the key photo
+                asyncio.run(capture(html, script, frames, fdir, a.scale))
                 jpg, mov, cid = make_live(fdir, len(frames), a.fps, out)
                 print(f"wrote {jpg} + {mov} (Live Photo, content identifier {cid})")
-    print("base date:", base, "| end:", end, "| " + ", ".join(f"{s.sym} {rc.f1(s.ret, True)}%" for s in series + benches))
+    if kind == "chart":
+        print("base date:", base, "| end:", end, "| " + ", ".join(f"{s.sym} {rc.f1(s.ret, True)}%" for s in series + benches))
 
 
 if __name__ == "__main__":
