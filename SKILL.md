@@ -15,7 +15,7 @@ Schwab 是原有預設；三個新增模板使用各自的報表結構，不會�
 ## 何時使用
 用戶想把一組股票做成 Schwab 研報裏那種「淺藍標題表頭 + 灰色細分隔線 + 小字免責腳註」的表格。默認同時輸出**中文版和英文版**，每版一個 HTML，再用 Playwright 以 2x 渲染成 PNG。
 
-要畫**走勢圖**（若干標的在某個時間段內的走勢）時，直接看文末的「走勢圖模式」。表格、走勢圖和 ETF 持倉圖都能做成動圖（GIF、MP4、實況照片），見「動態圖」一節。
+要畫**走勢圖**（若干標的在某個時間段內的走勢）時，直接看文末的「走勢圖模式」。表格、走勢圖和 ETF 持倉圖都能做成動圖（GIF、WebP、MP4、實況照片），見「動態圖」一節。
 
 ## 第一步：判斷模式
 
@@ -263,10 +263,10 @@ spec 格式：
 ```
 除 `data` 外都是可選項。`start`、`end` 不寫時用數據文件的範圍；`note` 會放在腳註開頭（示例裏用來標註「虛構示例」）。`benchmarks` 選擇並排序數據文件裏的基準；`benchmark_name` 可以寫成 `{"en": ..., "zh": ...}`（用於第一個基準），也可以按代碼分別寫；`colors` 用 `#rrggbb` 覆蓋個別線條的顏色（默認配色已通過色盲可分辨性檢查，改色後自行保證對比度）。命令行參數：`--langs en` 只出一種語言，`--no-png` 只寫 HTML，`--pdf` 另存矢量 PDF，`--scale 3` 提高 PNG 清晰度（默認 2），`--theme dark` 輸出深色主題（表格和圖都支持）。HTML 文件裏鼠標懸停在圖上會顯示當天各條線的數值。
 
-## 動態圖（GIF / MP4 / 實況照片）
-用戶要「動圖」「GIF」「會動的走勢圖 / 表格」「實況照片 / 實況圖 / Live Photo」「做成視頻」時，把靜態圖用的**同一份輸入**交給 `render_motion.py`，腳本按內容自動識別是走勢圖 spec、業績表 spec 還是 `fetch_holdings.py` 的持倉文件：
+## 動態圖（GIF / WebP / MP4 / 實況照片）
+用戶要「動圖」「GIF」「WebP」「會動的走勢圖 / 表格」「實況照片 / 實況圖 / Live Photo」「做成視頻」時，把靜態圖用的**同一份輸入**交給 `render_motion.py`，腳本按內容自動識別是走勢圖 spec、業績表 spec 還是 `fetch_holdings.py` 的持倉文件：
 ```bash
-python3 render_motion.py spec.json out/watch                      # 走勢圖，默認三種格式都出
+python3 render_motion.py spec.json out/watch                      # 走勢圖，默認出 GIF、MP4、實況照片
 python3 render_motion.py spec.json out/watch --formats live --langs zh
 python3 render_motion.py table_spec.json out/table --formats gif  # 業績表（四種模板都支持，--style 同 render_table.py）
 python3 render_motion.py data/QQQ_holdings.json out/qqq --top 13  # ETF 持倉，選項同 render_holdings.py
@@ -274,10 +274,10 @@ python3 render_motion.py data/QQQ_holdings.json out/qqq --top 13  # ETF 持倉�
 - **走勢圖：** 線從左到右畫出來，線頭帶光點；線尾標註跟着線頭移動、數值實時跳動；`lines` 版式的光標上方顯示當前日期，彙總表的回報、波動率、最大回撤和最新價按光標所在日實時計算，行的順序也跟着回報實時調整（一隻領先另一隻超過當時差距的 6%、至少 2 個百分點才換位，避免貼得很近的兩條線讓表格來回跳）；畫完後淡入到靜態圖
 - **業績表：** 標題和表頭先出現，數據行從上到下逐行淡入（總時長按行數自動定，6 行約 2.2 秒、16 行約 4.4 秒，最長 6 秒），帶小數的數字（漲跌幅、價格、權重）從 0 跳到最終值；排名、持股數等整數和文字直接出現
 - **ETF 持倉：** 從第 1 名開始逐行出現，條形依次長出來（掉期部分一起長），權重從 0 跳到最終值，累計列隨已出現的權重一路相加；最後出現合計行
-- **三種都一樣：畫完停住的那一幀（也就是實況照片的封面）與對應靜態腳本的 PNG 逐像素一致**，所以數字口徑不變。GIF 和 MP4 結尾用 0.4 秒淡回第一幀，循環播放時不會突然跳回
-- **輸出：** `gif`（`out/watch_zh.gif`，循環播放，寬 760 px）、`mp4`（`out/watch_zh.mp4`，H.264，1520 px 寬）、`live`（`out/watch_zh_live.jpg` + `out/watch_zh_live.mov`，約 3.2 秒、30 幀，影片裏標明了封面所在的時間點，和 iPhone 拍的一樣）。實況照片要**兩個文件一起**AirDrop 到 iPhone，或一起拖進「照片」，纔會合成一張；只發其中一個就是普通圖片 / 視頻。小紅書等支持實況圖的平臺從相冊選這張即可
-- **參數：** `--formats gif,mp4,live`、`--langs`、`--theme dark`、`--canvas 3:4`（把圖居中放到指定比例的畫布上，空白用頁面底色填充：小紅書、Instagram 用 `3:4` 或 `4:5`，抖音、視頻號、Reels 用 `9:16`，另有 `1:1`、`16:9`；不加就是原尺寸）、`--draw`（畫線或逐行出現的秒數，走勢圖默認 3.6，表格按行數自動定）、`--hold 1.6`（畫完停留秒數）、`--loop-fade 0.4`（結尾淡回第一幀的秒數，0 表示直接跳回）、`--fps 30`（MP4 的幀率；`60` 更順滑，生成時間和文件大小約翻倍；GIF 最高 25 幀，因爲 GIF 的幀時長只能以 1/100 秒爲單位，實況照片固定 30 幀）、`--scale 2`、`--gif-width 760`（GIF 的最大寬度；比它窄的版式如 Blackstone 保持原寬。示例走勢圖的 GIF 約 2 MB，平臺限制更嚴時用 `--gif-width 600`（約 1.5 MB），再加 `--loop-fade 0` 約 1.2 MB）
-- **速度：** 中英兩版同時生成，三種格式共用一次截圖，走勢圖兩種語言全出約 30 秒
+- **三種都一樣：畫完停住的那一幀（也就是實況照片的封面）與對應靜態腳本的 PNG 逐像素一致**，所以數字口徑不變。MP4 結尾用 0.4 秒淡回第一幀，循環播放時不會突然跳回；GIF 和 WebP 默認直接跳回，因爲淡出的幀會讓文件大兩成左右
+- **輸出：** `gif`（`out/watch_zh.gif`，循環播放，寬 760 px）、`webp`（`out/watch_zh.webp`，和 GIF 同尺寸同時長的動態 WebP，全綵色、無抖點，比 GIF 小約三分之一；網頁、Telegram、Discord 能直接播，微信和小紅書不一定支持，所以不在默認格式裏，要加 `--formats webp` 或 `--formats gif,webp`，需要 Pillow：`python3 -m pip install pillow`）、`mp4`（`out/watch_zh.mp4`，H.264，1520 px 寬）、`live`（`out/watch_zh_live.jpg` + `out/watch_zh_live.mov`，約 3.2 秒、30 幀，影片裏標明了封面所在的時間點，和 iPhone 拍的一樣）。實況照片要**兩個文件一起**AirDrop 到 iPhone，或一起拖進「照片」，纔會合成一張；只發其中一個就是普通圖片 / 視頻。小紅書等支持實況圖的平臺從相冊選這張即可
+- **參數：** `--formats gif,webp,mp4,live`、`--langs`、`--theme dark`、`--canvas 3:4`（把圖居中放到指定比例的畫布上，空白用頁面底色填充：小紅書、Instagram 用 `3:4` 或 `4:5`，抖音、視頻號、Reels 用 `9:16`，另有 `1:1`、`16:9`；不加就是原尺寸）、`--draw`（畫線或逐行出現的秒數，走勢圖默認 3.6，表格按行數自動定）、`--hold 1.6`（畫完停留秒數）、`--loop-fade`（結尾淡回第一幀的秒數；默認 MP4 是 0.4，GIF 和 WebP 不淡出；指定後所有格式都用這個值，0 表示直接跳回）、`--fps 30`（MP4 的幀率；`60` 更順滑，生成時間和文件大小約翻倍；GIF 和 WebP 最高 25 幀，因爲 GIF 的幀時長只能以 1/100 秒爲單位，實況照片固定 30 幀）、`--scale 2`、`--gif-width 760`（GIF 和 WebP 的最大寬度；比它窄的版式如 Blackstone 保持原寬。示例走勢圖的 GIF 約 1.6 MB、WebP 約 1.1 MB；平臺限制更嚴時改用 WebP，或把 `--gif-width` 調到 600）
+- **速度：** 中英兩版同時生成，所有格式共用一次截圖，走勢圖兩種語言全出約 30 秒
 - **依賴：** 需要 **ffmpeg**（macOS `brew install ffmpeg`，Windows `winget install ffmpeg`，Debian/Ubuntu `sudo apt install ffmpeg`）。沒有時腳本會提示，不要改用其他工具硬做
 - 交付前抽看一幀（例如用 ffmpeg 截第 2 秒）確認線頭、標註、條形和表格正常；實況照片的配對標識已寫入，無需 exiftool
 

@@ -158,7 +158,7 @@ python3 render_table.py data/matrix.json out/matrix
 - **基準：** 預設 SPY（標示為標普 500 的替代），最多兩個基準（`--benchmark SPY,COMP`），或用 `--benchmark none` 不畫基準。
 - **縱軸：** 只有一個縱軸，起點為 100。範圍很大時自動改用對數刻度（也可用 `y_scale` 指定）。
 - **選項：** `--theme dark`、`--pdf`、自訂線條顏色，HTML 檔裡還有滑鼠懸停提示。
-- **動態圖：** `render_motion.py` 用同一份 spec，讓走勢線從左到右畫出來，線尾標註、彙總表和日期跟著跳動，輸出 GIF、MP4 和 Apple 實況照片（`.jpg` + `.mov` 一對，AirDrop 到 iPhone 即可）。畫完的那一幀就是靜態圖；加 `--canvas 3:4` 或 `9:16` 可直接適配小紅書、抖音的比例。需要 ffmpeg。
+- **動態圖：** `render_motion.py` 用同一份 spec，讓走勢線從左到右畫出來，線尾標註、彙總表和日期跟著跳動，輸出 GIF、WebP（比 GIF 小約三分之一）、MP4 和 Apple 實況照片（`.jpg` + `.mov` 一對，AirDrop 到 iPhone 即可）。畫完的那一幀就是靜態圖；加 `--canvas 3:4` 或 `9:16` 可直接適配小紅書、抖音的比例。需要 ffmpeg。
 
 ```bash
 python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 -o data/watch.json
@@ -228,7 +228,7 @@ python3 quarterly_earnings.py AAPL --period FY2025Q3 -o out/aapl_q3
 - `render_table.py`、`institutional_tables.py`、`prices_to_table.py`: 表格渲染器與四種版式；用抓下來的價格產生摩根士丹利／黑石規格
 - `fetch_prices.py`、`csv_to_prices.py`: 取得 Nasdaq、上海／深圳與 Yahoo 的日收盤價；轉換你自己的 CSV
 - `render_chart.py`、`render_common.py`: 走勢圖渲染器；共用的主題與 PNG / PDF 輸出
-- `render_motion.py`: 動態走勢圖、業績表與 ETF 持倉：GIF、MP4 與 Apple 實況照片（需要 ffmpeg）
+- `render_motion.py`: 動態走勢圖、業績表與 ETF 持倉：GIF、WebP、MP4 與 Apple 實況照片（需要 ffmpeg；WebP 另需 Pillow）
 - `fetch_holdings.py`、`render_holdings.py`: 從發行人自己的檔案取得 ETF 持倉（SPDR、iShares、Vanguard、NEOS、Roundhill、Tema，或你的 CSV），並渲染前 N 大圖
 - `quarterly_earnings.py`、`earnings_core.py`、`earnings_sources.py`、`render_earnings.py`: 財報指令、可核對的計算、來源轉接器與 HSBC 版式渲染器
 - `localization.py`、`fonts.py`、`fonts/`: 繁體中文轉換；嵌入 HTML 的隨附字型（含授權）

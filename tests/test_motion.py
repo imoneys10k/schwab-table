@@ -1,6 +1,7 @@
 """Animated charts: Live Photo metadata, frame timeline and the element order the frame script relies on. No browser or ffmpeg needed."""
 import json
 import re
+import shutil
 import struct
 import sys
 import tempfile
@@ -171,7 +172,37 @@ class Canvas(unittest.TestCase):
         args, head = rm.loop_input(Path("x"), 180, 30, 0.4)
         self.assertIn("-loop", args)
         self.assertIn("xfade=transition=fade:duration=0.4000:offset=5.6000", head)
-        self.assertEqual(rm.loop_input(Path("x"), 180, 30, 0)[1], "[0:v]")
+        self.assertTrue(head.startswith("[0:v]trim=end_frame=180[m];[m][1:v]xfade"))
+        args, head = rm.loop_input(Path("x"), 168, 30, 0)   # a GIF without fade stops 0.4 s before the MP4's shared frames end
+        self.assertEqual(head, "[0:v]trim=end_frame=168,")
+        self.assertNotIn("-loop", args)
+
+    def test_loop_fade_defaults(self):
+        self.assertEqual(rm.LOOP_FADE, {"gif": 0.0, "webp": 0.0, "mp4": 0.4})
+
+
+try:
+    from PIL import Image, features
+    HAS_WEBP = features.check("webp")
+except ImportError:
+    HAS_WEBP = False
+
+
+@unittest.skipUnless(HAS_WEBP and shutil.which("ffmpeg"), "needs Pillow with WebP and ffmpeg")
+class WebP(unittest.TestCase):
+    def test_animated_webp(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            fdir = Path(tmp) / "loop"
+            fdir.mkdir()
+            for i, c in enumerate(["#ffffff"] * 3 + ["#336699"] * 3):   # unchanged frames merge into one longer frame
+                Image.new("RGB", (40, 20), c).save(fdir / f"f{i:05d}.png")
+            out = Path(tmp) / "x_en.webp"
+            rm.make_webp(fdir, 6, 25, out, 760, 2, canvas=rm.pad((40, 20), "1:1", "#fff"))
+            with Image.open(out) as im:
+                self.assertEqual(im.format, "WEBP")
+                self.assertTrue(im.is_animated)
+                self.assertEqual(im.size, (20, 20))   # half size (scale 2), padded square
+                self.assertEqual(im.n_frames, 2)
 
 
 class InputKind(unittest.TestCase):

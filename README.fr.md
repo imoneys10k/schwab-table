@@ -158,7 +158,7 @@ Jusqu'à 9 valeurs sur une période au choix (par défaut : depuis le début de 
 - **Référence :** SPY par défaut (indiqué comme substitut du S&P 500), jusqu'à deux références (`--benchmark SPY,COMP`), ou `--benchmark none`.
 - **Axe :** un seul axe vertical, indexé à 100 au départ. Il passe automatiquement en échelle logarithmique quand l'écart est grand (ou fixez `y_scale`).
 - **Options :** `--theme dark`, `--pdf`, couleurs de courbes personnalisées et infobulles au survol dans les fichiers HTML.
-- **Animé :** `render_motion.py` reprend la même spec et trace le graphique de gauche à droite, étiquettes, tableau et date suivant le tracé, en GIF, en MP4 et en Live Photo Apple (une paire `.jpg` + `.mov` à envoyer par AirDrop sur un iPhone). La dernière image du tracé est le graphique statique ; `--canvas 3:4` ou `9:16` l'adapte à Instagram ou aux Reels. Nécessite ffmpeg.
+- **Animé :** `render_motion.py` reprend la même spec et trace le graphique de gauche à droite, étiquettes, tableau et date suivant le tracé, en GIF, en WebP (environ un tiers plus léger), en MP4 et en Live Photo Apple (une paire `.jpg` + `.mov` à envoyer par AirDrop sur un iPhone). La dernière image du tracé est le graphique statique ; `--canvas 3:4` ou `9:16` l'adapte à Instagram ou aux Reels. Nécessite ffmpeg.
 
 ```bash
 python3 fetch_prices.py NVDA MU AAPL --start 2026-01-01 -o data/watch.json
@@ -228,7 +228,7 @@ python3 quarterly_earnings.py AAPL --period FY2025Q3 -o out/aapl_q3
 - `render_table.py`, `institutional_tables.py`, `prices_to_table.py`: Moteur de rendu des tableaux et ses quatre styles ; construit des spécifications Morgan / Blackstone à partir des prix
 - `fetch_prices.py`, `csv_to_prices.py`: Cours de clôture quotidiens de Nasdaq, Shanghai/Shenzhen et Yahoo ; conversion de vos fichiers CSV
 - `render_chart.py`, `render_common.py`: Moteur de rendu des graphiques ; thèmes et sorties PNG / PDF partagés
-- `render_motion.py`: Graphiques, tableaux et positions d'ETF animés : GIF, MP4 et Live Photo Apple (nécessite ffmpeg)
+- `render_motion.py`: Graphiques, tableaux et positions d'ETF animés : GIF, WebP, MP4 et Live Photo Apple (nécessite ffmpeg ; WebP aussi Pillow)
 - `fetch_holdings.py`, `render_holdings.py`: Positions d'un ETF depuis le fichier de l'émetteur (SPDR, iShares, Vanguard, NEOS, Roundhill, Tema, votre CSV) et rendu du top N
 - `quarterly_earnings.py`, `earnings_core.py`, `earnings_sources.py`, `render_earnings.py`: Commande de résultats, calculs vérifiables, adaptateurs de sources et rendu de style HSBC
 - `localization.py`, `fonts.py`, `fonts/`: Conversion en chinois traditionnel ; polices fournies et intégrées au HTML (licences incluses)
